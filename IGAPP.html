@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Version: 1.0.0 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -267,7 +268,7 @@
             <input type="text" id="tech-name" placeholder="Enter technician name" aria-required="false" autocomplete="name">
 
             <label for="store-number">Store Number:</label>
-            <input type="text" id="store-number" placeholder="Enter store number" aria-required="false" pattern="[0-9]*" inputmode="numeric">
+            <input type="number" id="store-number" placeholder="Enter store number" aria-required="false" inputmode="numeric">
 
             <label for="work-order">Work Order Number:</label>
             <input type="text" id="work-order" placeholder="Enter work order number" aria-required="false">
@@ -294,16 +295,16 @@
             </select>
 
             <label for="dropdown-notes">DAE:</label>
-            <textarea id="dropdown-notes" placeholder="Selecting a dropdown will erase text in this box." aria-describedby="dae-help"></textarea>
+            <textarea id="dropdown-notes" placeholder="Selecting a dropdown will load a template here. If this box is not empty, you will be asked to confirm before overwriting." aria-describedby="dae-help"></textarea>
             <small id="dae-help" class="sr-only">Template text for Digital Asset Expert procedures</small>
             <small id="autofill-help" class="sr-only">Selecting an option will populate the DAE textarea with template text</small>
-            <button onclick="copyToClipboard('dropdown-notes')" aria-describedby="copy-dae-help">Copy DAE</button>
+            <button onclick="copyToClipboard(event, 'dropdown-notes')" aria-describedby="copy-dae-help">Copy DAE</button>
             <small id="copy-dae-help" class="sr-only">Copy DAE template text to clipboard</small>
 
             <label for="notes">Your Call Notes:</label>
             <textarea id="notes" placeholder="Enter your call notes here..." aria-describedby="notes-help"></textarea>
             <small id="notes-help" class="sr-only">Enter additional notes about the call. This will be combined with technician information when copied.</small>
-            <button onclick="copyAdditionalNotes()" aria-describedby="copy-notes-help">Copy Notes</button>
+            <button onclick="copyAdditionalNotes(event)" aria-describedby="copy-notes-help">Copy Notes</button>
             <small id="copy-notes-help" class="sr-only">Copy all form data including technician info and notes to clipboard</small>
             <button onclick="clearFormFields()" aria-describedby="clear-form-help">Clear Form</button>
             <small id="clear-form-help" class="sr-only">Clear all form fields but keep history</small>
@@ -312,144 +313,7 @@
         </div>
     </div>
 
-    <!-- Hidden text storage for notes -->
-    <div style="display: none;">
-        <textarea id="Help Desk Post">Store # 
-EMS - 
-WO# - 
-Issue - 
-What have you done? 
-Wiki Link Used - 
-Any screenshots of issue.:</textarea>
-
-        <textarea id="Condenser and Compressor Staging Changes">Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB etc.):
-EMS system (Novar, Opus, CPC, Danfoss etc.):
-What the technician has requested and the reason for the request:</textarea>
-
-        <textarea id="Changes to Rack Suction Settings">Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB etc.):
-EMS system (Novar, Opus, CPC, Danfoss etc.):
-What the technician has requested and the reason for the request:</textarea>
-
-        <textarea id="Reporting Issues with IoT">Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Detailed error description:
-Screenshots of the error in IoT as well as any supporting screenshots from the EMS system. Paste them into a Word doc and attach it to the work order when you create it.:</textarea>
-
-        <textarea id="Setting MAC Addresses">Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-New device type and position (For example, Novar ES1 on rack LTB or Emerson E2E on HVAC):
-MAC address of the new device (must be 12 characters):
-Old MAC address:</textarea>
-
-        <textarea id="Controller COMM Loss">Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-EMS system (Novar, Opus, CPC, Danfoss etc.):
-Is the ethernet cable plugged into the device, yes or no?:
-Controller type (Novar EP2, Emerson E2E, Danfoss AK255 etc.):
-What system it controls (HVAC, Rack A, Rack B…etc.):
-Has the controller been power cycled, yes or no?:
-Is the controller functioning normally per the technician? If not, please provide details.: 
-MAC address (must be 12 characters):
-The switch and Port controller goes to (if tech can provide):</textarea>
-
-        <textarea id="Changing Board Points">Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB etc.):
-Current module address and point number.:
-New module address and point number.:</textarea>
-
-        <textarea id="Carel BOSS Support">Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB etc.):
-Detailed description of technician request OR
-If an alarm, include a screenshot of the alarm in IoT.:</textarea>
-
-        <textarea id="Novar Download Failures">Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Type of download needed (version, main, comm, etc.):
-What system it controls (HVAC, Rack A, Rack B…etc.):
-Description of controller behavior or error messages received. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:</textarea>
-
-        <textarea id="Danfoss Downloads">Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-What system it controls (HVAC, Rack A, Rack B…etc.):
-Description of what prompted the download request (Controller change out, controller software failure, etc.):
-MAC address (must be 12 characters):</textarea>
-
-        <textarea id="Manager Escalations">Name of the manager or team lead authorizing the escalation:
-Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Detailed description of the issue:
-What actions Contact Center agents have taken so far:
-Any supporting screenshots of EMS systems or other documentation. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:</textarea>
-
-        <textarea id="Program Change Request">Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-EMS system (Novar, Opus, CPC, Danfoss etc.):
-What the technician has requested and the reason for the request:
-A screenshot of the module in the EMS system.:</textarea>
-
-        <textarea id="RTU Fans Mode">Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-EMS system (Novar, Opus, CPC, Danfoss etc.):
-What RTU fan(s) the technician has requested to turn off and the reason for the request.:</textarea>
-
-        <textarea id="Parameter Deviation">Name of the manager or team lead authorizing the escalation:
-Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Detailed description of request:
-Current setpoint and requested setpoint:
-Screenshots of setpoint in EMS system and of the Parameter Cutsheet.:</textarea>
-
-        <textarea id="Swap Work Order">Swap Workorder Notes Show: (Enter the notes from the email).
-Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:</textarea>
-
-        <textarea id="Mastermind Work Order">Mastermind Report Notes Show: (Enter the notes from the work order attachment that is in all caps).
-Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:</textarea>
-    </div>
+<!-- Templates are now managed in JavaScript for maintainability -->
 
     <script>
         // Global state management
@@ -620,11 +484,16 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 // Sort by timestamp (newest first)
                 const sortedHistory = history.sort((a, b) => b.timestamp - a.timestamp);
                 
-                sortedHistory.forEach((entry, index) => {
+                sortedHistory.forEach((entry) => {
                     const date = new Date(entry.timestamp).toLocaleString();
-                    const label = `${date} - ${entry.techName || 'No Name'} (Store: ${entry.storeNumber || 'N/A'})`;
+                    // Truncate techName and storeNumber for better readability
+                    let techName = entry.techName || 'No Name';
+                    let storeNumber = entry.storeNumber || 'N/A';
+                    if (techName.length > 18) techName = techName.substring(0, 15) + '...';
+                    if (storeNumber.length > 10) storeNumber = storeNumber.substring(0, 10) + '...';
+                    const label = `${date} - ${techName} (Store: ${storeNumber})`;
                     const option = document.createElement('option');
-                    option.value = index;
+                    option.value = entry.id;
                     option.textContent = label;
                     historySelect.appendChild(option);
                 });
@@ -636,11 +505,11 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         function restoreNotes() {
             try {
                 const historySelect = document.getElementById('history');
-                const index = historySelect.value;
-                if (!index) return;
+                const selectedId = historySelect.value;
+                if (!selectedId) return;
 
-                const history = getNotesHistory().sort((a, b) => b.timestamp - a.timestamp);
-                const entry = history[index];
+                const history = getNotesHistory();
+                const entry = history.find(e => e.id === selectedId);
                 
                 if (entry) {
                     document.getElementById('tech-name').value = entry.techName || '';
@@ -659,34 +528,173 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             }
         }
 
-        // Enhanced notes updating with validation
+        // Helper for DAE notes overwrite confirmation
+        function shouldOverwriteDAENotes(notesBox) {
+            // Returns true if it's safe to overwrite, or user confirms overwrite
+            if (!notesBox.dataset.userEdited || notesBox.dataset.userEdited === 'false' || !notesBox.value.trim()) {
+                return true;
+            }
+            return confirm('This will overwrite your current DAE notes. Continue?');
+        }
+
+                // DAE Templates managed in JavaScript for maintainability
+                const DAE_TEMPLATES = {
+                    "Help Desk Post": `Store # 
+        EMS - 
+        WO# - 
+        Issue - 
+        What have you done? 
+        Wiki Link Used - 
+        Any screenshots of issue.:`,
+        
+                    "Condenser and Compressor Staging Changes": `Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        Rack (LTA, MTB etc.):
+        EMS system (Novar, Opus, CPC, Danfoss etc.):
+        What the technician has requested and the reason for the request:`,
+        
+                    "Changes to Rack Suction Settings": `Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        Rack (LTA, MTB etc.):
+        EMS system (Novar, Opus, CPC, Danfoss etc.):
+        What the technician has requested and the reason for the request:`,
+        
+                    "Reporting Issues with IoT": `Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        Detailed error description:
+        Screenshots of the error in IoT as well as any supporting screenshots from the EMS system. Paste them into a Word doc and attach it to the work order when you create it.:`,
+        
+                    "Setting MAC Addresses": `Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        New device type and position (For example, Novar ES1 on rack LTB or Emerson E2E on HVAC):
+        MAC address of the new device (must be 12 characters):
+        Old MAC address:`,
+        
+                    "Controller COMM Loss": `Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        EMS system (Novar, Opus, CPC, Danfoss etc.):
+        Is the ethernet cable plugged into the device, yes or no?:
+        Controller type (Novar EP2, Emerson E2E, Danfoss AK255 etc.):
+        What system it controls (HVAC, Rack A, Rack B…etc.):
+        Has the controller been power cycled, yes or no?:
+        Is the controller functioning normally per the technician? If not, please provide details.: 
+        MAC address (must be 12 characters):
+        The switch and Port controller goes to (if tech can provide):`,
+        
+                    "Changing Board Points": `Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        Rack (LTA, MTB etc.):
+        Current module address and point number.:
+        New module address and point number.:`,
+        
+                    "Carel BOSS Support": `Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        Rack (LTA, MTB etc.):
+        Detailed description of technician request OR
+        If an alarm, include a screenshot of the alarm in IoT.:`,
+        
+                    "Novar Download Failures": `Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        Type of download needed (version, main, comm, etc.):
+        What system it controls (HVAC, Rack A, Rack B…etc.):
+        Description of controller behavior or error messages received. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:`,
+        
+                    "Danfoss Downloads": `Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        What system it controls (HVAC, Rack A, Rack B…etc.):
+        Description of what prompted the download request (Controller change out, controller software failure, etc.):
+        MAC address (must be 12 characters):`,
+        
+                    "Manager Escalations": `Name of the manager or team lead authorizing the escalation:
+        Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        Detailed description of the issue:
+        What actions Contact Center agents have taken so far:
+        Any supporting screenshots of EMS systems or other documentation. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:`,
+        
+                    "Program Change Request": `Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        EMS system (Novar, Opus, CPC, Danfoss etc.):
+        What the technician has requested and the reason for the request:
+        A screenshot of the module in the EMS system.:`,
+        
+                    "RTU Fans Mode": `Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        EMS system (Novar, Opus, CPC, Danfoss etc.):
+        What RTU fan(s) the technician has requested to turn off and the reason for the request.:`,
+        
+                    "Parameter Deviation": `Name of the manager or team lead authorizing the escalation:
+        Technician first and last name:
+        Technician cell phone number:
+        Technician email address:
+        Store number:
+        WO:
+        Detailed description of request:
+        Current setpoint and requested setpoint:
+        Screenshots of setpoint in EMS system and of the Parameter Cutsheet.:`,
+        
+                    "Swap Work Order": `Swap Workorder Notes Show: (Enter the notes from the email).
+        Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`,
+        
+                    "Mastermind Work Order": `Mastermind Report Notes Show: (Enter the notes from the work order attachment that is in all caps).
+        Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`
+                };
+        
+                // Enhanced notes updating with validation
         function updateNotes() {
             try {
                 const selectedOption = document.getElementById('autofill').value;
                 if (!selectedOption) return;
-                
+
                 const notesBox = document.getElementById('dropdown-notes');
-                const templateElement = document.getElementById(selectedOption);
-                
-                if (!templateElement) {
+                const selectedText = DAE_TEMPLATES[selectedOption] || '';
+
+                if (!selectedText) {
                     showNotification('Template not found', 'error');
                     return;
                 }
-                
-                const selectedText = templateElement.value || '';
-                
-                // Only update if not user-edited or empty
-                if (!notesBox.dataset.userEdited || notesBox.dataset.userEdited === 'false' || !notesBox.value.trim()) {
+
+                // Use helper for overwrite confirmation
+                if (shouldOverwriteDAENotes(notesBox)) {
                     notesBox.value = selectedText;
                     notesBox.dataset.userEdited = 'false';
                     showNotification('Template loaded', 'success', 1500);
-                } else {
-                    // Confirm overwrite
-                    if (confirm('This will overwrite your current DAE notes. Continue?')) {
-                        notesBox.value = selectedText;
-                        notesBox.dataset.userEdited = 'false';
-                        showNotification('Template loaded', 'success', 1500);
-                    }
                 }
             } catch (error) {
                 console.error('Failed to update notes:', error);
@@ -695,10 +703,10 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         }
 
         // Enhanced clipboard functionality
-        async function copyToClipboard(elementId) {
+        async function copyToClipboard(event, elementId) {
+            const button = event.target;
             try {
                 const element = document.getElementById(elementId);
-                const button = event.target;
                 
                 if (!element) {
                     throw new Error('Element not found');
@@ -727,16 +735,15 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 
             } catch (error) {
                 console.error('Copy failed:', error);
-                addButtonFeedback(event.target, 'error');
+                addButtonFeedback(button, 'error');
                 showNotification('Failed to copy to clipboard', 'error');
             } finally {
-                const button = event.target;
                 button.disabled = false;
                 button.classList.remove('loading');
             }
         }
 
-        async function copyAdditionalNotes() {
+        async function copyAdditionalNotes(event) {
             try {
                 const button = event.target;
                 const formData = getFormData();
@@ -749,12 +756,13 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
 
                 if (copiedText.length === 0) {
                     showNotification('No data to copy', 'error');
+                    button.disabled = false;
+                    button.classList.remove('loading');
                     return;
                 }
                 
                 button.disabled = true;
                 button.classList.add('loading');
-                
                 const success = saveNotesHistory();
                 
                 if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -856,21 +864,23 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 storeNumberInput.addEventListener('input', function(e) {
                     const value = e.target.value;
                     if (value && !/^\d+$/.test(value)) {
-                        e.target.setCustomValidity('Store number must contain only digits');
-                        showNotification('Store number must contain only digits', 'error', 2000);
+                        // Optionally, you can set a custom validity message here
+                        // e.target.setCustomValidity('Please enter only numbers.');
                     } else {
                         e.target.setCustomValidity('');
                     }
-                    scheduleAutoSave();
                 });
             }
-
-            // Add auto-save to all form inputs
-            const formInputs = document.querySelectorAll('input, textarea, select');
+            // Add auto-save only to specific text inputs and textareas (not selects)
+            const formInputs = [
+                document.getElementById('tech-name'),
+                document.getElementById('store-number'),
+                document.getElementById('work-order'),
+                document.getElementById('notes'),
+                document.getElementById('dropdown-notes')
+            ].filter(Boolean);
             formInputs.forEach(input => {
-                if (input.id !== 'history') { // Don't auto-save on history selection
-                    input.addEventListener('input', scheduleAutoSave);
-                }
+                input.addEventListener('input', scheduleAutoSave);
             });
         }
 
