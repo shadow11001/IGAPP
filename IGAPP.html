@@ -59,16 +59,69 @@
         }
 
         .form-section {
-            flex: 1;
-            min-width: 250px;
+            flex: 2;
+            min-width: 400px;
+            order: 2;
         }
 
         .qa-container {
-            flex: 0.5;
-            min-width: 200px;
+            flex: 1;
+            min-width: 300px;
+            order: 1;
+        }        .qa-container h4 {
+            margin: 15px 0 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 4px;
         }
 
-        textarea, input, select {
+        body.dark-mode .qa-container h4 {
+            color: #ccc;
+            border-bottom-color: #555;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .quick-note-btn {
+            padding: 6px 10px;
+            font-size: 12px;
+            min-height: 28px;
+            margin: 0;
+            border-radius: 4px;
+            flex: 0 0 auto;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .quick-note-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .success-quick {
+            background-color: #28a745 !important;
+            color: white !important;
+        }
+
+        .success-quick:hover {
+            background-color: #218838 !important;
+        }
+
+        .error-quick {
+            background-color: #dc3545 !important;
+            color: white !important;
+        }
+
+        .error-quick:hover {
+            background-color: #c82333 !important;
+        }        textarea, input, select {
             width: 100%;
             margin-top: 10px;
             padding: 5px;
@@ -261,6 +314,83 @@
             color: #ffffff;
         }
 
+        .dead-air-timer {
+            position: fixed;
+            top: 10px;
+            right: 70px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .dead-air-timer.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            animation: pulse-warning 1s infinite;
+        }
+
+        .dead-air-timer.critical {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+            animation: flash-critical 0.5s infinite;
+        }
+
+        @keyframes pulse-warning {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes flash-critical {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .timer-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .timer-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .mic-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: background 0.3s;
+        }
+
+        .mic-status.active {
+            background: #28a745;
+            animation: pulse-mic 2s infinite;
+        }
+
+        @keyframes pulse-mic {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         small {
             display: block;
             margin-top: 4px;
@@ -270,22 +400,93 @@
     </style>
 </head>
 <body class="light-mode">
+    <div class="dead-air-timer" id="dead-air-timer">
+        <div class="mic-status" id="mic-status" title="Microphone status"></div>
+        <span id="timer-display">00:00</span>
+        <div class="timer-controls">
+            <button class="timer-btn" onclick="startTimer()" title="Start Timer">▶</button>
+            <button class="timer-btn" onclick="resetTimer()" title="I Spoke / Reset">🗣</button>
+            <button class="timer-btn" onclick="pauseTimer()" title="Pause Timer">⏸</button>
+        </div>
+    </div>
+    
     <button class="theme-toggle" aria-label="Toggle between light and dark mode" onclick="toggleTheme()" id="theme-toggle-btn" tabindex="0">
         <i class="fas fa-sun" id="theme-toggle-icon" aria-hidden="true"></i>
     </button>
 
     <div class="form-container">
-        <!-- QA Checklist on the Left -->
+        <!-- Quick Notes Buttons on the Left -->
         <div class="qa-container">
-            <h3>QA Checklist</h3>
-            <p>✔ Thanks for calling Walmart Digital Assets, where we're always happy to help! My name is [NAME], can I please have your name site and work order number from which you are calling? </p>
-            <p>✔ Repeat site and workorder back to the tech if no work order is provided say "you said site number is xxxx and no workorder correct"</p>
-            <p>✔ Fill Dead air with small talk or talking yourself through the call.</p>
-            <p>✔ Thank you for calling walmart digital assets stay on the line for a brief survey</p>
-            <p>✔ Did you put the store number in VCC?</p>
-            <p>✔ Did you tag HVAC, refrigeration, lighting, or comms in VCC?</p>
-            <p>✔ Did you tag the proper EMS in VCC?</p>
-            <p>✔ Did you notate service channel if a work order was provided?</p>
+            <h3>Quick Notes</h3>
+            
+            <h4>System Login</h4>
+            <div class="button-group">
+                <button onclick="addQuickNote('Logged into Novar.')" class="quick-note-btn" title="Novar Login">Novar</button>
+                <button onclick="addQuickNote('Logged into Opus Arch.')" class="quick-note-btn" title="Opus Arch Login">Opus Arch</button>
+                <button onclick="addQuickNote('Logged into Opus Mag.')" class="quick-note-btn" title="Opus Mag Login">Opus Mag</button>
+                <button onclick="addQuickNote('Logged into CPC.')" class="quick-note-btn" title="CPC Login">CPC</button>
+                <button onclick="addQuickNote('Logged into Danfoss AKA65.')" class="quick-note-btn" title="Danfoss AKA65 Login">AKA65</button>
+                <button onclick="addQuickNote('Logged into Danfoss Storeview.')" class="quick-note-btn" title="Danfoss Storeview Login">Storeview</button>
+            </div>
+
+            <h4>Diagnostics</h4>
+            <div class="button-group">
+                <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn" title="Communications Check">Comms ✓</button>
+                <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn" title="Communications Loss">Comms ✗</button>
+                <button onclick="addQuickNote('Checked temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
+                <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
+                <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn" title="Clock Check">Clocks</button>
+                <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn" title="Ping Test">Ping</button>
+                <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Test</button>
+            </div>
+
+            <h4>Ping Results</h4>
+            <div class="button-group">
+                <button onclick="addQuickNote('Receiving good ping.')" class="quick-note-btn success-quick" title="Successful Ping">Good Ping</button>
+                <button onclick="addQuickNote('Ping timedout.')" class="quick-note-btn error-quick" title="Failed Ping">Ping Timeout</button>
+            </div>
+
+            <h4>Actions</h4>
+            <div class="button-group">
+                <button onclick="addQuickNoteWithInput('Forced defrost on ', 'Enter rack/unit:')" class="quick-note-btn" title="Force Defrost">Defrost</button>
+                <button onclick="addQuickNote('Terminated Defrost.')" class="quick-note-btn" title="Stop Defrost">Stop Defrost</button>
+                <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
+                <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
+                <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
+                <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
+            </div>
+
+            <h4>Downloads</h4>
+            <div class="button-group">
+                <button onclick="addQuickNote('Performed Version Download.')" class="quick-note-btn" title="Version Download">Version</button>
+                <button onclick="addQuickNote('Performed Load Change Download.')" class="quick-note-btn" title="Load Change Download">Load Change</button>
+                <button onclick="addQuickNote('Performed Comms and Load Change Download.')" class="quick-note-btn" title="Comms + Load Change">Comms+LC</button>
+                <button onclick="addQuickNote('Performed Main and Load Change Download.')" class="quick-note-btn" title="Main + Load Change">Main+LC</button>
+                <button onclick="addQuickNote('Performed Main, Comms, and Load Change Download.')" class="quick-note-btn" title="Full Download">Full DL</button>
+            </div>
+
+            <h4>Call Status</h4>
+            <div class="button-group">
+                <button onclick="addQuickNote('All good.')" class="quick-note-btn success-quick" title="Everything Working">All Good</button>
+                <button onclick="addQuickNote('No good.')" class="quick-note-btn error-quick" title="Issue Persists">No Good</button>
+                <button onclick="addQuickNote('Tech will troubleshoot.')" class="quick-note-btn" title="Tech Troubleshooting">Tech T/S</button>
+                <button onclick="addQuickNote('Tech no longer needed assistance.')" class="quick-note-btn success-quick" title="Call Complete">Call Done</button>
+                <button onclick="addEscalateNote()" class="quick-note-btn" title="Escalate with DAE and WO">Escalate</button>
+            </div>
+
+            <h4>Special Cases</h4>
+            <div class="button-group">
+                <button onclick="addQuickNote('Call dropped.')" class="quick-note-btn error-quick" title="Call Disconnected">Call Dropped</button>
+                <button onclick="addQuickNote('Tech called for a suppression. Adv tech of NSRM email.')" class="quick-note-btn" title="Suppression Request">NSRM</button>
+                <button onclick="addQuickNote('Adv tech to power cycle controller.')" class="quick-note-btn" title="Power Cycle Recommendation">Power Cycle</button>
+            </div>
+
+            <h4>Recommendations</h4>
+            <div class="button-group">
+                <button onclick="addQuickNote('Advised to monitor and call back if issues persist.')" class="quick-note-btn" title="Monitor Instruction">Monitor</button>
+                <button onclick="showContactOptions()" class="quick-note-btn" title="Contact Instruction">Contact</button>
+                <button onclick="addReplaceNote()" class="quick-note-btn" title="Replace Instruction">Replace</button>
+            </div>
         </div>
 
         <!-- Form Fields on the Right -->
@@ -353,8 +554,146 @@
         // Global state management
         const AppState = {
             autoSaveTimer: null,
-            lastSavedData: null
+            lastSavedData: null,
+            deadAirTimer: null,
+            deadAirSeconds: 0,
+            timerRunning: false,
+            micStream: null,
+            audioContext: null,
+            analyser: null,
+            micActive: false
         };
+
+        // Dead Air Timer Functions
+        function startTimer() {
+            if (!AppState.timerRunning) {
+                AppState.timerRunning = true;
+                AppState.deadAirTimer = setInterval(updateTimer, 1000);
+                showNotification('Dead air timer started', 'success', 1500);
+            }
+        }
+
+        function pauseTimer() {
+            AppState.timerRunning = false;
+            if (AppState.deadAirTimer) {
+                clearInterval(AppState.deadAirTimer);
+                AppState.deadAirTimer = null;
+            }
+            showNotification('Timer paused', 'success', 1500);
+        }
+
+        function resetTimer() {
+            AppState.deadAirSeconds = 0;
+            updateTimerDisplay();
+            updateTimerVisuals();
+            showNotification('Timer reset - You spoke!', 'success', 1000);
+        }
+
+        function updateTimer() {
+            if (AppState.timerRunning) {
+                AppState.deadAirSeconds++;
+                updateTimerDisplay();
+                updateTimerVisuals();
+            }
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(AppState.deadAirSeconds / 60);
+            const seconds = AppState.deadAirSeconds % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timer-display').textContent = display;
+        }
+
+        function updateTimerVisuals() {
+            const timer = document.getElementById('dead-air-timer');
+            timer.classList.remove('warning', 'critical');
+            
+            if (AppState.deadAirSeconds >= 30) {
+                timer.classList.add('critical');
+            } else if (AppState.deadAirSeconds >= 25) {
+                timer.classList.add('warning');
+            }
+        }
+
+        // Microphone Detection
+        async function initializeMicrophone() {
+            try {
+                AppState.micStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    } 
+                });
+                
+                AppState.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                AppState.analyser = AppState.audioContext.createAnalyser();
+                const microphone = AppState.audioContext.createMediaStreamSource(AppState.micStream);
+                microphone.connect(AppState.analyser);
+                
+                AppState.analyser.fftSize = 256;
+                const bufferLength = AppState.analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                
+                function detectSpeech() {
+                    AppState.analyser.getByteFrequencyData(dataArray);
+                    const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
+                    
+                    // Adjust sensitivity threshold as needed (20-50 works well)
+                    const threshold = 30;
+                    const wasSpeaking = AppState.micActive;
+                    AppState.micActive = average > threshold;
+                    
+                    // Update mic status indicator
+                    const micStatus = document.getElementById('mic-status');
+                    if (AppState.micActive) {
+                        micStatus.classList.add('active');
+                        // Auto-reset timer when speech detected
+                        if (!wasSpeaking && AppState.timerRunning) {
+                            resetTimer();
+                        }
+                    } else {
+                        micStatus.classList.remove('active');
+                    }
+                    
+                    requestAnimationFrame(detectSpeech);
+                }
+                
+                detectSpeech();
+                showNotification('Microphone enabled - Auto speech detection active', 'success', 3000);
+                
+            } catch (error) {
+                console.warn('Microphone access denied or not available:', error);
+                showNotification('Microphone access denied - Using manual controls only', 'error', 3000);
+            }
+        }
+
+        // Enhanced Quick Notes to auto-reset timer
+        function addQuickNote(noteText) {
+            const notesTextarea = document.getElementById('notes');
+            const currentNotes = notesTextarea.value.trim();
+            
+            if (currentNotes) {
+                notesTextarea.value = currentNotes + ' ' + noteText;
+            } else {
+                notesTextarea.value = noteText;
+            }
+            
+            // Auto-reset dead air timer (indicates speaking)
+            if (AppState.timerRunning) {
+                resetTimer();
+            }
+            
+            // Trigger auto-save
+            scheduleAutoSave();
+            
+            // Visual feedback
+            showNotification(`Added: ${noteText}`, 'success', 2000);
+            
+            // Scroll to end of textarea
+            notesTextarea.scrollTop = notesTextarea.scrollHeight;
+            notesTextarea.setSelectionRange(notesTextarea.value.length, notesTextarea.value.length);
+        }
 
         // Utility functions
         function showNotification(message, type = 'success', duration = 3000) {
@@ -571,146 +910,260 @@
             return confirm('This will overwrite your current DAE notes. Continue?');
         }
 
-                // DAE Templates managed in JavaScript for maintainability
-                const DAE_TEMPLATES = {
-                    "Help Desk Post": `Store # 
-        EMS - 
-        WO# - 
-        Issue - 
-        What have you done? 
-        Wiki Link Used - 
-        Any screenshots of issue.:`,
+        // DAE Templates managed in JavaScript for maintainability
+        const DAE_TEMPLATES = {
+            "Help Desk Post": `Store # 
+EMS - 
+WO# - 
+Issue - 
+What have you done? 
+Wiki Link Used - 
+Any screenshots of issue.:`,
+
+            "Condenser and Compressor Staging Changes": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB etc.):
+EMS system (Novar, Opus, CPC, Danfoss etc.):
+What the technician has requested and the reason for the request:`,
+
+            "Changes to Rack Suction Settings": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB etc.):
+EMS system (Novar, Opus, CPC, Danfoss etc.):
+What the technician has requested and the reason for the request:`,
+
+            "Reporting Issues with IoT": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Detailed error description:
+Screenshots of the error in IoT as well as any supporting screenshots from the EMS system. Paste them into a Word doc and attach it to the work order when you create it.:`,
+
+            "Setting MAC Addresses": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+New device type and position (For example, Novar ES1 on rack LTB or Emerson E2E on HVAC):
+MAC address of the new device (must be 12 characters):
+Old MAC address:`,
+
+            "Controller COMM Loss": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+EMS system (Novar, Opus, CPC, Danfoss etc.):
+Is the ethernet cable plugged into the device, yes or no?:
+Controller type (Novar EP2, Emerson E2E, Danfoss AK255 etc.):
+What system it controls (HVAC, Rack A, Rack B…etc.):
+Has the controller been power cycled, yes or no?:
+Is the controller functioning normally per the technician? If not, please provide details.: 
+MAC address (must be 12 characters):
+The switch and Port controller goes to (if tech can provide):`,
+
+            "Changing Board Points": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB etc.):
+Current module address and point number.:
+New module address and point number.:`,
+
+            "Carel BOSS Support": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB etc.):
+Detailed description of technician request OR
+If an alarm, include a screenshot of the alarm in IoT.:`,
+
+            "Novar Download Failures": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Type of download needed (version, main, comm, etc.):
+What system it controls (HVAC, Rack A, Rack B…etc.):
+Description of controller behavior or error messages received. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:`,
+
+            "Danfoss Downloads": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+What system it controls (HVAC, Rack A, Rack B…etc.):
+Description of what prompted the download request (Controller change out, controller software failure, etc.):
+MAC address (must be 12 characters):`,
+
+            "Manager Escalations": `Name of the manager or team lead authorizing the escalation:
+Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Detailed description of the issue:
+What actions Contact Center agents have taken so far:
+Any supporting screenshots of EMS systems or other documentation. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:`,
+
+            "Program Change Request": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+EMS system (Novar, Opus, CPC, Danfoss etc.):
+What the technician has requested and the reason for the request:
+A screenshot of the module in the EMS system.:`,
+
+            "RTU Fans Mode": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+EMS system (Novar, Opus, CPC, Danfoss etc.):
+What RTU fan(s) the technician has requested to turn off and the reason for the request.:`,
+
+            "Parameter Deviation": `Name of the manager or team lead authorizing the escalation:
+Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Detailed description of request:
+Current setpoint and requested setpoint:
+Screenshots of setpoint in EMS system and of the Parameter Cutsheet.:`,
+
+            "Swap Work Order": `Swap Workorder Notes Show: (Enter the notes from the email).
+Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`,
+
+            "Mastermind Work Order": `Mastermind Report Notes Show: (Enter the notes from the work order attachment that is in all caps).
+Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`
+        };
         
-                    "Condenser and Compressor Staging Changes": `Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        Rack (LTA, MTB etc.):
-        EMS system (Novar, Opus, CPC, Danfoss etc.):
-        What the technician has requested and the reason for the request:`,
-        
-                    "Changes to Rack Suction Settings": `Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        Rack (LTA, MTB etc.):
-        EMS system (Novar, Opus, CPC, Danfoss etc.):
-        What the technician has requested and the reason for the request:`,
-        
-                    "Reporting Issues with IoT": `Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        Detailed error description:
-        Screenshots of the error in IoT as well as any supporting screenshots from the EMS system. Paste them into a Word doc and attach it to the work order when you create it.:`,
-        
-                    "Setting MAC Addresses": `Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        New device type and position (For example, Novar ES1 on rack LTB or Emerson E2E on HVAC):
-        MAC address of the new device (must be 12 characters):
-        Old MAC address:`,
-        
-                    "Controller COMM Loss": `Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        EMS system (Novar, Opus, CPC, Danfoss etc.):
-        Is the ethernet cable plugged into the device, yes or no?:
-        Controller type (Novar EP2, Emerson E2E, Danfoss AK255 etc.):
-        What system it controls (HVAC, Rack A, Rack B…etc.):
-        Has the controller been power cycled, yes or no?:
-        Is the controller functioning normally per the technician? If not, please provide details.: 
-        MAC address (must be 12 characters):
-        The switch and Port controller goes to (if tech can provide):`,
-        
-                    "Changing Board Points": `Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        Rack (LTA, MTB etc.):
-        Current module address and point number.:
-        New module address and point number.:`,
-        
-                    "Carel BOSS Support": `Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        Rack (LTA, MTB etc.):
-        Detailed description of technician request OR
-        If an alarm, include a screenshot of the alarm in IoT.:`,
-        
-                    "Novar Download Failures": `Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        Type of download needed (version, main, comm, etc.):
-        What system it controls (HVAC, Rack A, Rack B…etc.):
-        Description of controller behavior or error messages received. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:`,
-        
-                    "Danfoss Downloads": `Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        What system it controls (HVAC, Rack A, Rack B…etc.):
-        Description of what prompted the download request (Controller change out, controller software failure, etc.):
-        MAC address (must be 12 characters):`,
-        
-                    "Manager Escalations": `Name of the manager or team lead authorizing the escalation:
-        Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        Detailed description of the issue:
-        What actions Contact Center agents have taken so far:
-        Any supporting screenshots of EMS systems or other documentation. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:`,
-        
-                    "Program Change Request": `Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        EMS system (Novar, Opus, CPC, Danfoss etc.):
-        What the technician has requested and the reason for the request:
-        A screenshot of the module in the EMS system.:`,
-        
-                    "RTU Fans Mode": `Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        EMS system (Novar, Opus, CPC, Danfoss etc.):
-        What RTU fan(s) the technician has requested to turn off and the reason for the request.:`,
-        
-                    "Parameter Deviation": `Name of the manager or team lead authorizing the escalation:
-        Technician first and last name:
-        Technician cell phone number:
-        Technician email address:
-        Store number:
-        WO:
-        Detailed description of request:
-        Current setpoint and requested setpoint:
-        Screenshots of setpoint in EMS system and of the Parameter Cutsheet.:`,
-        
-                    "Swap Work Order": `Swap Workorder Notes Show: (Enter the notes from the email).
-        Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`,
-        
-                    "Mastermind Work Order": `Mastermind Report Notes Show: (Enter the notes from the work order attachment that is in all caps).
-        Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`
-                };
-        
-                // Enhanced notes updating with validation
+                // Quick Notes functionality
+        function addQuickNote(noteText) {
+            const notesTextarea = document.getElementById('notes');
+            const currentNotes = notesTextarea.value.trim();
+            
+            if (currentNotes) {
+                notesTextarea.value = currentNotes + ' ' + noteText;
+            } else {
+                notesTextarea.value = noteText;
+            }
+            
+            // Trigger auto-save
+            scheduleAutoSave();
+            
+            // Visual feedback
+            showNotification(`Added: ${noteText}`, 'success', 2000);
+            
+            // Scroll to end of textarea
+            notesTextarea.scrollTop = notesTextarea.scrollHeight;
+            notesTextarea.setSelectionRange(notesTextarea.value.length, notesTextarea.value.length);
+        }
+
+        function addQuickNoteWithInput(prefix, prompt) {
+            const userInput = window.prompt(prompt);
+            if (userInput !== null && userInput.trim() !== '') {
+                addQuickNote(prefix + userInput.trim() + '.');
+            }
+        }
+
+        function addForcedNote() {
+            const parameter = window.prompt('What did you force?\n\nExamples:\n• Suct PSI to 30\n• OAT to 68 degrees\n• Discharge temp to 105\n• Fan speed to 75%');
+            if (parameter !== null && parameter.trim() !== '') {
+                addQuickNote('Forced ' + parameter.trim() + '.');
+            }
+        }
+
+        function addTestNote() {
+            const component = window.prompt('What did you test?\n\nExamples:\n• controller functionality\n• sensor readings\n• valve operation\n• communication');
+            if (component !== null && component.trim() !== '') {
+                addQuickNote('Tested ' + component.trim() + '.');
+            }
+        }
+
+        function addMonitorNote() {
+            const instruction = window.prompt('Monitor what?\n\nExamples:\n• temperatures for 30 minutes\n• system and call back if issues persist\n• alarms overnight\n• pressures during peak hours');
+            if (instruction !== null && instruction.trim() !== '') {
+                addQuickNote('Advised to monitor ' + instruction.trim() + '.');
+            }
+        }
+
+        function showContactOptions() {
+            const contacts = [
+                'Docfit',
+                'Service Channel', 
+                'Copeland',
+                'Sporlan',
+                'Other'
+            ];
+            
+            let message = 'Select who to contact:\n\n';
+            contacts.forEach((contact, index) => {
+                message += `${index + 1}. ${contact}\n`;
+            });
+            
+            const choice = window.prompt(message + '\nEnter number (1-5):');
+            
+            if (choice !== null && choice.trim() !== '') {
+                const choiceNum = parseInt(choice.trim());
+                if (choiceNum >= 1 && choiceNum <= 4) {
+                    addQuickNote('Advised tech to contact ' + contacts[choiceNum - 1] + '.');
+                } else if (choiceNum === 5) {
+                    const customContact = window.prompt('Enter contact details:');
+                    if (customContact !== null && customContact.trim() !== '') {
+                        addQuickNote('Advised tech to contact ' + customContact.trim() + '.');
+                    }
+                }
+            }
+        }
+
+        function addContactNote() {
+            const contact = window.prompt('Contact who?\n\nExamples:\n• HVAC vendor\n• facilities management\n• IT support\n• local technician');
+            if (contact !== null && contact.trim() !== '') {
+                addQuickNote('Advised tech to contact ' + contact.trim() + '.');
+            }
+        }
+
+        function addReplaceNote() {
+            const component = window.prompt('Replace what?\n\nExamples:\n• temperature sensor\n• controller board\n• communication cable\n• valve actuator');
+            if (component !== null && component.trim() !== '') {
+                addQuickNote('Advised to replace ' + component.trim() + '.');
+            }
+        }
+
+        function addEscalateNote() {
+            // Get the selected DAE option
+            const daeSelect = document.getElementById('autofill');
+            const selectedDAE = daeSelect.value;
+            
+            let daeText = 'Created DAE';
+            if (selectedDAE && selectedDAE.trim() !== '') {
+                daeText = 'Created ' + selectedDAE + ' DAE';
+            }
+            
+            // Prompt for work order number
+            const workOrder = window.prompt('Enter Work Order number:');
+            
+            if (workOrder !== null && workOrder.trim() !== '') {
+                addQuickNote(daeText + '. Created WO: ' + workOrder.trim() + '.');
+            } else {
+                // If no WO provided, just add the DAE part
+                addQuickNote(daeText + '.');
+            }
+        }
+
+        // Enhanced notes updating with validation
         function updateNotes() {
             try {
                 const selectedOption = document.getElementById('autofill').value;
@@ -914,7 +1367,13 @@
                 document.getElementById('dropdown-notes')
             ].filter(Boolean);
             formInputs.forEach(input => {
-                input.addEventListener('input', scheduleAutoSave);
+                input.addEventListener('input', function() {
+                    scheduleAutoSave();
+                    // Reset timer when typing (indicates speaking/activity)
+                    if (AppState.timerRunning && this.value.length > 0) {
+                        resetTimer();
+                    }
+                });
             });
         }
 
@@ -971,6 +1430,9 @@
 
                 // Initialize auto-save state
                 AppState.lastSavedData = JSON.stringify(getFormData());
+                
+                // Initialize microphone for dead air detection
+                initializeMicrophone();
                 
                 console.log('QA Checklist App initialized successfully');
                 
