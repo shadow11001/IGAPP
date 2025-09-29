@@ -556,6 +556,7 @@
                 <button onclick="addQuickNote('Terminated Defrost.')" class="quick-note-btn" title="Stop Defrost">Stop Defrost</button>
                 <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
                 <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
+                <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
                 <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
                 <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
             </div>
@@ -1462,6 +1463,38 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             if (parameter !== null && parameter.trim() !== '') {
                 addQuickNote('Forced ' + parameter.trim() + '.');
                 // Tag analysis is handled by addQuickNote
+            }
+        }
+
+        function addForcedOffNote() {
+            const notesContent = document.getElementById('notes').value;
+            const daeContent = document.getElementById('dropdown-notes').value;
+            const combinedContent = notesContent + ' ' + daeContent;
+            
+            // Look for previously forced items in the notes
+            const forcedOnRegex = /Forced (?:on )?([^.]+)\./gi;
+            const matches = [];
+            let match;
+            
+            while ((match = forcedOnRegex.exec(combinedContent)) !== null) {
+                const item = match[1].trim();
+                // Skip if it's already been forced off
+                if (!combinedContent.toLowerCase().includes('forced off ' + item.toLowerCase())) {
+                    matches.push(item);
+                }
+            }
+            
+            if (matches.length > 0) {
+                // Use the most recent forced item
+                const lastForcedItem = matches[matches.length - 1];
+                addQuickNote('Forced off ' + lastForcedItem + '.');
+                showNotification(`Auto-detected: ${lastForcedItem}`, 'success', 2000);
+            } else {
+                // No forced items found, prompt for input
+                const item = window.prompt('What did you force off?\n\nExamples:\n• Bypass Valve\n• Compressor 2\n• Fan speed\n• lights');
+                if (item !== null && item.trim() !== '') {
+                    addQuickNote('Forced off ' + item.trim() + '.');
+                }
             }
         }
 
