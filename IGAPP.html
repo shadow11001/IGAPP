@@ -975,6 +975,8 @@
         // Microphone Detection (for voice detection only)
         async function initializeMicrophone() {
             try {
+                console.log('Attempting to initialize microphone...');
+                
                 // Get microphone for voice detection
                 AppState.micStream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
@@ -984,6 +986,8 @@
                     } 
                 });
                 
+                console.log('Microphone access granted');
+                
                 AppState.micAudioContext = new (window.AudioContext || window.webkitAudioContext)();
                 AppState.micAnalyser = AppState.micAudioContext.createAnalyser();
                 const micSource = AppState.micAudioContext.createMediaStreamSource(AppState.micStream);
@@ -992,13 +996,14 @@
                 AppState.micAnalyser.fftSize = 256;
                 AppState.micAnalyser.smoothingTimeConstant = 0.8;
                 
+                console.log('Audio context created, starting voice detection...');
                 startVoiceDetection();
                 
                 // Try to get speaker/system audio for call detection
                 initializeSpeakerDetection();
                 
             } catch (error) {
-                console.warn('Microphone access denied or not available:', error);
+                console.error('Microphone initialization failed:', error);
                 showNotification('Microphone access denied - Using manual controls only', 'error', 3000);
             }
         }
@@ -1203,9 +1208,23 @@
 
         // VCC Integration Methods
         function initializeVCCIntegration() {
+            console.log('Initializing VCC integration...');
+            
             // Method 1: VCC Audio monitoring (if microphone available)
             if (AppState.micAnalyser) {
+                console.log('Microphone analyser available, starting VCC audio monitoring');
                 monitorVCCAudio();
+            } else {
+                console.log('No microphone analyser available yet');
+                // Try again after a short delay
+                setTimeout(() => {
+                    if (AppState.micAnalyser) {
+                        console.log('Microphone analyser now available, starting VCC audio monitoring');
+                        monitorVCCAudio();
+                    } else {
+                        console.log('Microphone analyser still not available');
+                    }
+                }, 2000);
             }
             
             // Method 2: Add VCC call control button
@@ -1297,41 +1316,60 @@
         }
 
         function monitorVCCAudio() {
+            console.log('Starting VCC audio monitoring...');
+            
             const bufferLength = AppState.micAnalyser.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
             let callBeepDetected = false;
             let consecutiveHighAudio = 0;
             let lastAudioLevel = 0;
+            let logCount = 0;
             
             function detectVCCCall() {
-                if (!AppState.micAnalyser) return;
+                if (!AppState.micAnalyser) {
+                    console.log('No mic analyser available');
+                    return;
+                }
                 
                 AppState.micAnalyser.getByteFrequencyData(dataArray);
                 const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
                 
-                // Debug: Log audio levels periodically
-                if (Math.floor(Date.now() / 1000) % 5 === 0 && lastAudioLevel !== average) {
-                    console.log('Audio level:', Math.round(average), 'Threshold:', 60);
+                // Debug: Log audio levels more frequently initially, then every 5 seconds
+                logCount++;
+                if (logCount <= 20 || logCount % 50 === 0) {
+                    console.log(`Audio level: ${Math.round(average)}, Threshold: 60, High threshold: 30, Buffer length: ${bufferLength}`);
+                }
+                
+                // Also log when there are significant changes
+                if (Math.abs(average - lastAudioLevel) > 10) {
+                    console.log(`Audio level changed: ${Math.round(lastAudioLevel)} → ${Math.round(average)}`);
                     lastAudioLevel = average;
                 }
                 
-                // VCC often has a distinct beep pattern before calls
-                if (average > 60) { // Higher threshold for beep detection
+                // VCC high audio detection (original threshold)
+                if (average > 60) {
                     consecutiveHighAudio++;
-                    console.log('High audio detected:', average, 'consecutive:', consecutiveHighAudio);
+                    console.log(`HIGH audio detected: ${Math.round(average)}, consecutive: ${consecutiveHighAudio}`);
                     
                     if (consecutiveHighAudio >= 3 && !AppState.timerRunning && AppState.autoStartEnabled) {
+                        console.log('🎯 VCC CALL DETECTED - Starting timer!');
                         showNotification('📞 VCC audio spike detected - Starting timer!', 'success', 3000);
                         startTimer();
                         callBeepDetected = true;
                     }
                 } else if (average > 30) {
-                    // Medium audio might be call activity
-                    if (consecutiveHighAudio > 0) {
-                        console.log('Medium audio level:', average);
+                    // Medium audio detection (lower threshold)
+                    if (consecutiveHighAudio > 0 || average > 40) {
+                        console.log(`MEDIUM audio detected: ${Math.round(average)}`);
                         showNotification('🎵 Audio activity - Possible VCC call', 'success', 2000);
                     }
                     consecutiveHighAudio = Math.max(0, consecutiveHighAudio - 1);
+                } else if (average > 15) {
+                    // Low audio detection (any activity)
+                    if (logCount <= 20 || logCount % 100 === 0) {
+                        console.log(`Low audio activity: ${Math.round(average)}`);
+                    }
+                    consecutiveHighAudio = 0;
                 } else {
                     consecutiveHighAudio = 0;
                 }
@@ -1340,7 +1378,7 @@
             }
             
             detectVCCCall();
-            console.log('VCC audio monitoring started');
+            console.log('VCC audio monitoring started successfully');
         }
 
         // Enhanced Quick Notes to auto-reset timer
