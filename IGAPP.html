@@ -1044,6 +1044,135 @@
             showNotification('Call ended - Timer stopped and reset', 'success', 2000);
         }
 
+        // VCC Integration Methods
+        function initializeVCCIntegration() {
+            // Method 1: Monitor clipboard for VCC phone numbers
+            document.addEventListener('paste', function(e) {
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                if (pastedText && /^\+?[\d\s\-\(\)]{7,}$/.test(pastedText.trim())) {
+                    showNotification('📞 Phone number detected - Press Space to start timer', 'success', 3000);
+                }
+            });
+            
+            // Method 2: Detect potential VCC window activity
+            let lastActiveTime = Date.now();
+            let isVCCCallActive = false;
+            
+            // Monitor window focus changes (VCC might steal focus during calls)
+            window.addEventListener('focus', function() {
+                const timeSinceActive = Date.now() - lastActiveTime;
+                if (timeSinceActive > 5000 && !AppState.timerRunning) {
+                    showNotification('🔄 Window focus returned - VCC call activity?', 'success', 2000);
+                }
+                lastActiveTime = Date.now();
+            });
+            
+            // Method 3: Audio level monitoring with VCC-specific thresholds
+            if (AppState.micAnalyser) {
+                monitorVCCAudio();
+            }
+            
+            // Method 4: Browser tab audio sharing detection
+            detectTabAudioSharing();
+            
+            console.log('VCC integration methods initialized');
+        }
+
+        function monitorVCCAudio() {
+            const bufferLength = AppState.micAnalyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            let callBeepDetected = false;
+            let consecutiveHighAudio = 0;
+            
+            function detectVCCCall() {
+                if (!AppState.micAnalyser) return;
+                
+                AppState.micAnalyser.getByteFrequencyData(dataArray);
+                const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
+                
+                // VCC often has a distinct beep pattern before calls
+                if (average > 60) { // Higher threshold for beep detection
+                    consecutiveHighAudio++;
+                    if (consecutiveHighAudio >= 5 && !AppState.timerRunning && AppState.autoStartEnabled) {
+                        showNotification('📞 VCC call beep detected - Starting timer!', 'success', 3000);
+                        startTimer();
+                        callBeepDetected = true;
+                    }
+                } else {
+                    consecutiveHighAudio = 0;
+                }
+                
+                requestAnimationFrame(detectVCCCall);
+            }
+            
+            detectVCCCall();
+        }
+
+        function detectTabAudioSharing() {
+            // Check if user can share tab audio (modern browsers)
+            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                // Add button to enable VCC audio monitoring
+                addVCCAudioButton();
+            }
+        }
+
+        function addVCCAudioButton() {
+            // Add VCC audio sharing button to timer controls
+            const timerControls = document.querySelector('.timer-controls');
+            if (timerControls && !document.getElementById('vcc-audio-btn')) {
+                const vccButton = document.createElement('button');
+                vccButton.id = 'vcc-audio-btn';
+                vccButton.className = 'timer-btn';
+                vccButton.onclick = enableVCCAudio;
+                vccButton.title = 'Enable VCC Audio Detection';
+                vccButton.textContent = '🎧';
+                timerControls.appendChild(vccButton);
+            }
+        }
+
+        async function enableVCCAudio() {
+            try {
+                // Request tab audio sharing specifically for VCC
+                const stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: false,
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false,
+                        systemAudio: 'include'
+                    }
+                });
+                
+                const audioTracks = stream.getAudioTracks();
+                if (audioTracks.length > 0) {
+                    AppState.speakerStream = stream;
+                    AppState.speakerAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    AppState.speakerAnalyser = AppState.speakerAudioContext.createAnalyser();
+                    const source = AppState.speakerAudioContext.createMediaStreamSource(stream);
+                    source.connect(AppState.speakerAnalyser);
+                    
+                    AppState.speakerAnalyser.fftSize = 512;
+                    AppState.speakerAnalyser.smoothingTimeConstant = 0.3;
+                    
+                    startCallDetection();
+                    showNotification('🎧 VCC audio sharing enabled - Auto-detection active!', 'success', 4000);
+                    
+                    // Update button to show it's active
+                    const btn = document.getElementById('vcc-audio-btn');
+                    if (btn) {
+                        btn.textContent = '🎧✓';
+                        btn.title = 'VCC Audio Detection Active';
+                        btn.style.background = 'rgba(40, 167, 69, 0.3)';
+                    }
+                } else {
+                    throw new Error('No audio tracks available');
+                }
+            } catch (error) {
+                console.warn('VCC audio sharing failed:', error);
+                showNotification('❌ VCC audio sharing failed - Use manual controls', 'error', 3000);
+            }
+        }
+
         // Enhanced Quick Notes to auto-reset timer
         function addQuickNote(noteText) {
             const notesTextarea = document.getElementById('notes');
@@ -1802,10 +1931,6 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             formInputs.forEach(input => {
                 input.addEventListener('input', function() {
                     scheduleAutoSave();
-                    // Reset timer when typing (indicates speaking/activity)
-                    if (AppState.timerRunning && this.value.length > 0) {
-                        resetTimer();
-                    }
                     // Analyze notes for tag recommendations
                     if (this.id === 'notes' || this.id === 'dropdown-notes') {
                         analyzeNotesForTags();
@@ -1818,6 +1943,33 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         function setupKeyboardNavigation() {
             // Theme toggle with keyboard
             document.addEventListener('keydown', function(e) {
+                // Only trigger if not typing in an input field
+                const isTyping = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT';
+                
+                if (!isTyping) {
+                    if (e.key === ' ' || e.key === 'Spacebar') {
+                        e.preventDefault();
+                        if (!AppState.timerRunning) {
+                            startTimer();
+                        }
+                    }
+                    
+                    if (e.key === 'r' || e.key === 'R') {
+                        e.preventDefault();
+                        resetTimer();
+                    }
+                    
+                    if (e.key === 'p' || e.key === 'P') {
+                        e.preventDefault();
+                        pauseTimer();
+                    }
+                    
+                    if (e.key === 'c' || e.key === 'C') {
+                        e.preventDefault();
+                        resetCallDetection();
+                    }
+                }
+                
                 if (e.key === 'F2') {
                     e.preventDefault();
                     toggleTheme();
@@ -1870,6 +2022,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 
                 // Initialize microphone for dead air detection
                 initializeMicrophone();
+                
+                // Initialize VCC integration
+                initializeVCCIntegration();
                 
                 console.log('QA Checklist App initialized successfully');
                 
