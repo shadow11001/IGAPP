@@ -561,13 +561,16 @@
             deadAirSeconds: 0,
             timerRunning: false,
             micStream: null,
-            audioContext: null,
-            analyser: null,
+            speakerStream: null,
+            micAudioContext: null,
+            speakerAudioContext: null,
+            micAnalyser: null,
+            speakerAnalyser: null,
             micActive: false,
             callDetected: false,
             autoStartEnabled: true,
-            loudSoundThreshold: 80, // Higher threshold for call detection
-            speechThreshold: 30     // Lower threshold for normal speech
+            loudSoundThreshold: 80, // Higher threshold for call detection (speakers)
+            speechThreshold: 25     // Lower threshold for voice detection (microphone)
         };
 
         // Dead Air Timer Functions
@@ -621,84 +624,146 @@
             }
         }
 
-        // Microphone Detection
+        // Microphone Detection (for voice detection only)
         async function initializeMicrophone() {
             try {
+                // Get microphone for voice detection
                 AppState.micStream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
-                        echoCancellation: false, // Disable to better detect call audio
-                        noiseSuppression: false, // Disable to detect the beep
-                        autoGainControl: false   // Disable to get raw audio levels
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
                     } 
                 });
                 
-                AppState.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                AppState.analyser = AppState.audioContext.createAnalyser();
-                const microphone = AppState.audioContext.createMediaStreamSource(AppState.micStream);
-                microphone.connect(AppState.analyser);
+                AppState.micAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                AppState.micAnalyser = AppState.micAudioContext.createAnalyser();
+                const micSource = AppState.micAudioContext.createMediaStreamSource(AppState.micStream);
+                micSource.connect(AppState.micAnalyser);
                 
-                AppState.analyser.fftSize = 512; // Increased for better frequency analysis
-                AppState.analyser.smoothingTimeConstant = 0.3; // Faster response
-                const bufferLength = AppState.analyser.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
+                AppState.micAnalyser.fftSize = 256;
+                AppState.micAnalyser.smoothingTimeConstant = 0.8;
                 
-                let loudSoundCount = 0;
-                let lastLoudSoundTime = 0;
+                startVoiceDetection();
                 
-                function detectAudio() {
-                    AppState.analyser.getByteFrequencyData(dataArray);
-                    const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
-                    const currentTime = Date.now();
-                    
-                    // Detect loud sounds (beep + announcement)
-                    const isLoudSound = average > AppState.loudSoundThreshold;
-                    
-                    // Auto-start timer when call is detected
-                    if (!AppState.callDetected && AppState.autoStartEnabled) {
-                        if (isLoudSound) {
-                            loudSoundCount++;
-                            lastLoudSoundTime = currentTime;
-                            
-                            // If we detect sustained loud audio (beep + announcement)
-                            if (loudSoundCount >= 3 && !AppState.timerRunning) {
-                                AppState.callDetected = true;
-                                startTimer();
-                                showNotification('📞 Call detected - Timer started automatically!', 'success', 3000);
-                            }
-                        } else {
-                            // Reset if silence for too long
-                            if (currentTime - lastLoudSoundTime > 3000) {
-                                loudSoundCount = 0;
-                            }
-                        }
-                    }
-                    
-                    // Normal speech detection (for resetting timer)
-                    const wasSpeaking = AppState.micActive;
-                    AppState.micActive = average > AppState.speechThreshold;
-                    
-                    // Update mic status indicator
-                    const micStatus = document.getElementById('mic-status');
-                    if (AppState.micActive || isLoudSound) {
-                        micStatus.classList.add('active');
-                        // Auto-reset timer when speech detected (but only after call started)
-                        if (!wasSpeaking && AppState.timerRunning && AppState.callDetected) {
-                            resetTimer();
-                        }
-                    } else {
-                        micStatus.classList.remove('active');
-                    }
-                    
-                    requestAnimationFrame(detectAudio);
-                }
-                
-                detectAudio();
-                showNotification('🎤 Microphone enabled - Listening for incoming calls...', 'success', 3000);
+                // Try to get speaker/system audio for call detection
+                initializeSpeakerDetection();
                 
             } catch (error) {
                 console.warn('Microphone access denied or not available:', error);
                 showNotification('Microphone access denied - Using manual controls only', 'error', 3000);
             }
+        }
+
+        async function initializeSpeakerDetection() {
+            try {
+                // Try to capture system audio (speakers) - this requires screen sharing permission
+                AppState.speakerStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: false,
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false,
+                        systemAudio: 'include'  // Try to include system audio
+                    }
+                });
+                
+                // Check if we actually got audio
+                const audioTracks = AppState.speakerStream.getAudioTracks();
+                if (audioTracks.length === 0) {
+                    throw new Error('No audio tracks in display media');
+                }
+                
+                AppState.speakerAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                AppState.speakerAnalyser = AppState.speakerAudioContext.createAnalyser();
+                const speakerSource = AppState.speakerAudioContext.createMediaStreamSource(AppState.speakerStream);
+                speakerSource.connect(AppState.speakerAnalyser);
+                
+                AppState.speakerAnalyser.fftSize = 512;
+                AppState.speakerAnalyser.smoothingTimeConstant = 0.3;
+                
+                startCallDetection();
+                showNotification('� Speaker audio enabled - Auto call detection active!', 'success', 3000);
+                
+            } catch (error) {
+                console.warn('Speaker audio access not available:', error);
+                showNotification('🔊 Speaker detection unavailable - Manual start only', 'error', 3000);
+                // Fall back to manual controls only
+            }
+        }
+
+        function startVoiceDetection() {
+            const bufferLength = AppState.micAnalyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            function detectVoice() {
+                if (!AppState.micAnalyser) return;
+                
+                AppState.micAnalyser.getByteFrequencyData(dataArray);
+                const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
+                
+                const wasSpeaking = AppState.micActive;
+                AppState.micActive = average > AppState.speechThreshold;
+                
+                // Update mic status indicator
+                const micStatus = document.getElementById('mic-status');
+                if (AppState.micActive) {
+                    micStatus.classList.add('active');
+                    // Auto-reset timer when your voice is detected
+                    if (!wasSpeaking && AppState.timerRunning) {
+                        resetTimer();
+                    }
+                } else {
+                    micStatus.classList.remove('active');
+                }
+                
+                requestAnimationFrame(detectVoice);
+            }
+            
+            detectVoice();
+            showNotification('🎤 Voice detection active', 'success', 2000);
+        }
+
+        function startCallDetection() {
+            const bufferLength = AppState.speakerAnalyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            let loudSoundCount = 0;
+            let lastLoudSoundTime = 0;
+            
+            function detectCall() {
+                if (!AppState.speakerAnalyser) return;
+                
+                AppState.speakerAnalyser.getByteFrequencyData(dataArray);
+                const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
+                const currentTime = Date.now();
+                
+                // Detect loud sounds from speakers (beep + announcement)
+                const isLoudSound = average > AppState.loudSoundThreshold;
+                
+                // Auto-start timer when call is detected
+                if (!AppState.callDetected && AppState.autoStartEnabled) {
+                    if (isLoudSound) {
+                        loudSoundCount++;
+                        lastLoudSoundTime = currentTime;
+                        
+                        // If we detect sustained loud audio (beep + announcement)
+                        if (loudSoundCount >= 3 && !AppState.timerRunning) {
+                            AppState.callDetected = true;
+                            startTimer();
+                            showNotification('📞 Call detected - Timer started automatically!', 'success', 3000);
+                        }
+                    } else {
+                        // Reset if silence for too long
+                        if (currentTime - lastLoudSoundTime > 3000) {
+                            loudSoundCount = 0;
+                        }
+                    }
+                }
+                
+                requestAnimationFrame(detectCall);
+            }
+            
+            detectCall();
         }
 
         function toggleAutoStart() {
@@ -709,7 +774,11 @@
 
         function resetCallDetection() {
             AppState.callDetected = false;
-            showNotification('Call detection reset - Ready for next call', 'success', 2000);
+            AppState.timerRunning = false;
+            AppState.deadAirSeconds = 0;
+            updateTimerDisplay();
+            updateTimerVisuals();
+            showNotification('Call ended - Timer stopped and reset', 'success', 2000);
         }
 
         // Enhanced Quick Notes to auto-reset timer
