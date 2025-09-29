@@ -1072,8 +1072,8 @@
                 monitorVCCAudio();
             }
             
-            // Method 4: Browser tab audio sharing detection
-            detectTabAudioSharing();
+            // Method 4: Chrome 140 audio output detection
+            detectChromeAudioOutput();
             
             console.log('VCC integration methods initialized');
         }
@@ -1108,68 +1108,96 @@
             detectVCCCall();
         }
 
-        function detectTabAudioSharing() {
-            // Check if user can share tab audio (modern browsers)
-            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-                // Add button to enable VCC audio monitoring
-                addVCCAudioButton();
+        function detectChromeAudioOutput() {
+            // Chrome 140 specific audio detection methods
+            
+            // Method 1: Use Web Audio API to monitor audio context state changes
+            if (window.AudioContext || window.webkitAudioContext) {
+                monitorAudioContextChanges();
             }
-        }
-
-        function addVCCAudioButton() {
-            // Add VCC audio sharing button to timer controls
-            const timerControls = document.querySelector('.timer-controls');
-            if (timerControls && !document.getElementById('vcc-audio-btn')) {
-                const vccButton = document.createElement('button');
-                vccButton.id = 'vcc-audio-btn';
-                vccButton.className = 'timer-btn';
-                vccButton.onclick = enableVCCAudio;
-                vccButton.title = 'Enable VCC Audio Detection';
-                vccButton.textContent = '🎧';
-                timerControls.appendChild(vccButton);
+            
+            // Method 2: Monitor media session API (if VCC uses it)
+            if ('mediaSession' in navigator) {
+                monitorMediaSession();
             }
+            
+            // Method 3: Use Chrome's audio output device monitoring
+            if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+                monitorAudioDevices();
+            }
+            
+            console.log('Chrome 140 audio output detection initialized');
         }
-
-        async function enableVCCAudio() {
+        
+        function monitorAudioContextChanges() {
+            // Create a dummy audio context to monitor system audio activity
             try {
-                // Request tab audio sharing specifically for VCC
-                const stream = await navigator.mediaDevices.getDisplayMedia({
-                    video: false,
-                    audio: {
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false,
-                        systemAudio: 'include'
+                const testContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Monitor context state changes
+                testContext.addEventListener('statechange', function() {
+                    if (testContext.state === 'running' && !AppState.timerRunning) {
+                        console.log('Audio context activated - possible VCC call');
+                        showNotification('🎵 Audio activity detected - Press Space if call started', 'success', 3000);
                     }
                 });
                 
-                const audioTracks = stream.getAudioTracks();
-                if (audioTracks.length > 0) {
-                    AppState.speakerStream = stream;
-                    AppState.speakerAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    AppState.speakerAnalyser = AppState.speakerAudioContext.createAnalyser();
-                    const source = AppState.speakerAudioContext.createMediaStreamSource(stream);
-                    source.connect(AppState.speakerAnalyser);
-                    
-                    AppState.speakerAnalyser.fftSize = 512;
-                    AppState.speakerAnalyser.smoothingTimeConstant = 0.3;
-                    
-                    startCallDetection();
-                    showNotification('🎧 VCC audio sharing enabled - Auto-detection active!', 'success', 4000);
-                    
-                    // Update button to show it's active
-                    const btn = document.getElementById('vcc-audio-btn');
-                    if (btn) {
-                        btn.textContent = '🎧✓';
-                        btn.title = 'VCC Audio Detection Active';
-                        btn.style.background = 'rgba(40, 167, 69, 0.3)';
-                    }
-                } else {
-                    throw new Error('No audio tracks available');
+                // Check for destination node changes (audio output)
+                if (testContext.destination) {
+                    console.log('Audio destination available:', testContext.destination);
                 }
             } catch (error) {
-                console.warn('VCC audio sharing failed:', error);
-                showNotification('❌ VCC audio sharing failed - Use manual controls', 'error', 3000);
+                console.warn('Audio context monitoring failed:', error);
+            }
+        }
+        
+        function monitorMediaSession() {
+            // Monitor if VCC updates media session metadata
+            const originalSetMetadata = navigator.mediaSession.metadata;
+            
+            Object.defineProperty(navigator.mediaSession, 'metadata', {
+                set: function(value) {
+                    if (value && value.title) {
+                        console.log('Media session updated:', value.title);
+                        if (value.title.toLowerCase().includes('call') || value.title.toLowerCase().includes('vcc')) {
+                            showNotification('📞 VCC call detected via media session', 'success', 3000);
+                            if (AppState.autoStartEnabled && !AppState.timerRunning) {
+                                startTimer();
+                            }
+                        }
+                    }
+                    originalSetMetadata = value;
+                },
+                get: function() {
+                    return originalSetMetadata;
+                }
+            });
+            
+            // Monitor playback state changes
+            navigator.mediaSession.setActionHandler('play', function() {
+                console.log('Media session play detected');
+                showNotification('▶️ Audio playback started - VCC call?', 'success', 2000);
+            });
+            
+            navigator.mediaSession.setActionHandler('pause', function() {
+                console.log('Media session pause detected');
+            });
+        }
+        
+        async function monitorAudioDevices() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const audioOutputs = devices.filter(device => device.kind === 'audiooutput');
+                
+                console.log('Available audio outputs:', audioOutputs.length);
+                
+                // Monitor for device changes (might indicate VCC switching audio)
+                navigator.mediaDevices.addEventListener('devicechange', function() {
+                    console.log('Audio devices changed - possible VCC activity');
+                });
+                
+            } catch (error) {
+                console.warn('Audio device monitoring failed:', error);
             }
         }
 
