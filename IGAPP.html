@@ -499,6 +499,66 @@
         .legend-high { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); }
         .legend-medium { background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%); }
         .legend-low { background: linear-gradient(135deg, #6c757d 0%, #adb5bd 100%); }
+
+        .infraction-tracker {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 100px;
+        }
+
+        .infraction-session, .infraction-total {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .infraction-session {
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 4px;
+        }
+
+        .infraction-total {
+            padding-top: 2px;
+        }
+
+        .infraction-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-width: 20px;
+        }
+
+        .infraction-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .infraction-tracker.has-infractions {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            animation: pulse-infractions 2s infinite;
+        }
+
+        @keyframes pulse-infractions {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
     </style>
 </head>
 <body class="light-mode">
@@ -506,11 +566,21 @@
         <div class="mic-status" id="mic-status" title="Microphone status"></div>
         <span id="timer-display">00:00</span>
         <div class="timer-controls">
-            <button class="timer-btn" onclick="startTimer()" title="Start Timer">▶</button>
             <button class="timer-btn" onclick="resetTimer()" title="I Spoke / Reset">🗣</button>
-            <button class="timer-btn" onclick="pauseTimer()" title="Pause Timer">⏸</button>
             <button class="timer-btn" onclick="toggleAutoStart()" title="Toggle Auto-Start">🤖</button>
-            <button class="timer-btn" onclick="resetCallDetection()" title="Reset Call Detection">📞</button>
+        </div>
+    </div>
+    
+    <div class="infraction-tracker" id="infraction-tracker">
+        <div class="infraction-session">
+            <span>Session: </span>
+            <span id="session-count">0</span>
+            <button class="infraction-btn" onclick="clearLastInfraction()" title="Clear Last Infraction">❌</button>
+        </div>
+        <div class="infraction-total">
+            <span>Total: </span>
+            <span id="total-count">0</span>
+            <button class="infraction-btn" onclick="clearTotalInfractions()" title="Clear Total Count">🗑️</button>
         </div>
     </div>
     
@@ -558,6 +628,7 @@
                 <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
                 <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
                 <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
+                <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">Setpoint</button>
                 <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
             </div>
 
@@ -681,7 +752,10 @@
             autoStartEnabled: true,
             loudSoundThreshold: 80, // Higher threshold for call detection (speakers)
             speechThreshold: 25,    // Lower threshold for voice detection (microphone)
-            selectedTags: new Set()
+            selectedTags: new Set(),
+            sessionInfractions: 0,  // Resets each call
+            totalInfractions: 0,    // Persists across calls
+            deadAirThreshold: 30    // Seconds before infraction
         };
 
         // Tag analysis system
@@ -839,6 +913,12 @@
         // Dead Air Timer Functions
         function startTimer() {
             if (!AppState.timerRunning) {
+                // Clear any existing timer first
+                if (AppState.deadAirTimer) {
+                    clearInterval(AppState.deadAirTimer);
+                    AppState.deadAirTimer = null;
+                }
+                
                 AppState.timerRunning = true;
                 AppState.deadAirTimer = setInterval(updateTimer, 1000);
                 showNotification('Dead air timer started', 'success', 1500);
@@ -866,6 +946,11 @@
                 AppState.deadAirSeconds++;
                 updateTimerDisplay();
                 updateTimerVisuals();
+                
+                // Check for infraction at 30 seconds
+                if (AppState.deadAirSeconds === AppState.deadAirThreshold) {
+                    recordInfraction();
+                }
             }
         }
 
@@ -1039,43 +1124,176 @@
             AppState.callDetected = false;
             AppState.timerRunning = false;
             AppState.deadAirSeconds = 0;
+            
+            // Clear the timer interval
+            if (AppState.deadAirTimer) {
+                clearInterval(AppState.deadAirTimer);
+                AppState.deadAirTimer = null;
+            }
+            
+            // Clear session infractions at end of call
+            AppState.sessionInfractions = 0;
+            updateInfractionDisplay();
+            
             updateTimerDisplay();
             updateTimerVisuals();
             showNotification('Call ended - Timer stopped and reset', 'success', 2000);
         }
 
+        // Infraction tracking functions
+        function recordInfraction() {
+            AppState.sessionInfractions++;
+            AppState.totalInfractions++;
+            
+            // Save total to localStorage
+            localStorage.setItem('totalInfractions', AppState.totalInfractions.toString());
+            
+            updateInfractionDisplay();
+            showNotification('⚠️ Dead air infraction recorded (30+ seconds)', 'error', 3000);
+        }
+
+        function clearLastInfraction() {
+            if (AppState.sessionInfractions > 0) {
+                AppState.sessionInfractions--;
+                AppState.totalInfractions--;
+                
+                // Update localStorage
+                localStorage.setItem('totalInfractions', AppState.totalInfractions.toString());
+                
+                updateInfractionDisplay();
+                showNotification('✅ Last infraction cleared', 'success', 2000);
+            } else {
+                showNotification('❌ No infractions to clear', 'error', 2000);
+            }
+        }
+
+        function clearTotalInfractions() {
+            if (confirm('Clear all total infractions? This cannot be undone.')) {
+                AppState.totalInfractions = 0;
+                localStorage.setItem('totalInfractions', '0');
+                updateInfractionDisplay();
+                showNotification('🗑️ Total infractions cleared', 'success', 2000);
+            }
+        }
+
+        function updateInfractionDisplay() {
+            const sessionCount = document.getElementById('session-count');
+            const totalCount = document.getElementById('total-count');
+            const tracker = document.getElementById('infraction-tracker');
+            
+            if (sessionCount) sessionCount.textContent = AppState.sessionInfractions;
+            if (totalCount) totalCount.textContent = AppState.totalInfractions;
+            
+            // Add visual emphasis when there are infractions
+            if (tracker) {
+                if (AppState.sessionInfractions > 0) {
+                    tracker.classList.add('has-infractions');
+                } else {
+                    tracker.classList.remove('has-infractions');
+                }
+            }
+        }
+
+        function loadTotalInfractions() {
+            const saved = localStorage.getItem('totalInfractions');
+            if (saved) {
+                AppState.totalInfractions = parseInt(saved) || 0;
+            }
+        }
+
         // VCC Integration Methods
         function initializeVCCIntegration() {
-            // Method 1: Monitor clipboard for VCC phone numbers
-            document.addEventListener('paste', function(e) {
-                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-                if (pastedText && /^\+?[\d\s\-\(\)]{7,}$/.test(pastedText.trim())) {
-                    showNotification('📞 Phone number detected - Press Space to start timer', 'success', 3000);
-                }
-            });
-            
-            // Method 2: Detect potential VCC window activity
-            let lastActiveTime = Date.now();
-            let isVCCCallActive = false;
-            
-            // Monitor window focus changes (VCC might steal focus during calls)
-            window.addEventListener('focus', function() {
-                const timeSinceActive = Date.now() - lastActiveTime;
-                if (timeSinceActive > 5000 && !AppState.timerRunning) {
-                    showNotification('🔄 Window focus returned - VCC call activity?', 'success', 2000);
-                }
-                lastActiveTime = Date.now();
-            });
-            
-            // Method 3: Audio level monitoring with VCC-specific thresholds
+            // Method 1: VCC Audio monitoring (if microphone available)
             if (AppState.micAnalyser) {
                 monitorVCCAudio();
             }
             
-            // Method 4: Chrome 140 audio output detection
-            detectChromeAudioOutput();
+            // Method 2: Add VCC call control button
+            addVCCManualButton();
             
             console.log('VCC integration methods initialized');
+        }
+
+        function initializeVCCWindowDetection() {
+            let windowFocusLost = null;
+            let windowBlurCount = 0;
+            
+            // Monitor rapid window focus changes (VCC often steals focus)
+            window.addEventListener('blur', function() {
+                windowFocusLost = Date.now();
+                windowBlurCount++;
+                console.log('Window blur detected, count:', windowBlurCount);
+                
+                // If multiple rapid blurs, might be VCC activity
+                setTimeout(() => {
+                    if (windowBlurCount >= 2) {
+                        showNotification('🔄 Multiple window changes - VCC activity detected?', 'success', 3000);
+                        windowBlurCount = 0;
+                    }
+                }, 3000);
+            });
+            
+            window.addEventListener('focus', function() {
+                if (windowFocusLost) {
+                    const focusTime = Date.now() - windowFocusLost;
+                    console.log('Window focus returned after:', focusTime, 'ms');
+                    
+                    // If focus was lost for a typical call duration (5+ seconds)
+                    if (focusTime > 5000 && focusTime < 30000) {
+                        showNotification('� Focus returned - Was that a VCC call?', 'success', 3000);
+                    }
+                    windowFocusLost = null;
+                }
+            });
+            
+            // Monitor for page visibility changes (VCC switching tabs)
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    console.log('Page hidden - VCC might be active');
+                } else {
+                    console.log('Page visible - Back from VCC?');
+                    showNotification('👀 Page visible - Back from VCC call?', 'success', 2000);
+                }
+            });
+        }
+
+        function addVCCManualButton() {
+            // Add VCC call control button to timer controls
+            const timerControls = document.querySelector('.timer-controls');
+            if (timerControls && !document.getElementById('vcc-manual-btn')) {
+                const vccButton = document.createElement('button');
+                vccButton.id = 'vcc-manual-btn';
+                vccButton.className = 'timer-btn';
+                vccButton.onclick = toggleVCCMode;
+                vccButton.title = 'Start VCC Call';
+                vccButton.textContent = 'VCC';
+                timerControls.appendChild(vccButton);
+            }
+        }
+
+        function toggleVCCMode() {
+            if (!AppState.timerRunning) {
+                // Start VCC call mode
+                startTimer();
+                AppState.callDetected = true;
+                const btn = document.getElementById('vcc-manual-btn');
+                if (btn) {
+                    btn.textContent = 'END';
+                    btn.style.background = 'rgba(220, 53, 69, 0.3)';
+                    btn.title = 'End VCC Call';
+                }
+                showNotification('📞 VCC Call Started', 'success', 2000);
+            } else {
+                // End VCC call mode  
+                resetCallDetection();
+                const btn = document.getElementById('vcc-manual-btn');
+                if (btn) {
+                    btn.textContent = 'VCC';
+                    btn.style.background = '';
+                    btn.title = 'Start VCC Call';
+                }
+                showNotification('📞 VCC Call Ended', 'success', 2000);
+            }
         }
 
         function monitorVCCAudio() {
@@ -1083,6 +1301,7 @@
             const dataArray = new Uint8Array(bufferLength);
             let callBeepDetected = false;
             let consecutiveHighAudio = 0;
+            let lastAudioLevel = 0;
             
             function detectVCCCall() {
                 if (!AppState.micAnalyser) return;
@@ -1090,14 +1309,29 @@
                 AppState.micAnalyser.getByteFrequencyData(dataArray);
                 const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
                 
+                // Debug: Log audio levels periodically
+                if (Math.floor(Date.now() / 1000) % 5 === 0 && lastAudioLevel !== average) {
+                    console.log('Audio level:', Math.round(average), 'Threshold:', 60);
+                    lastAudioLevel = average;
+                }
+                
                 // VCC often has a distinct beep pattern before calls
                 if (average > 60) { // Higher threshold for beep detection
                     consecutiveHighAudio++;
-                    if (consecutiveHighAudio >= 5 && !AppState.timerRunning && AppState.autoStartEnabled) {
-                        showNotification('📞 VCC call beep detected - Starting timer!', 'success', 3000);
+                    console.log('High audio detected:', average, 'consecutive:', consecutiveHighAudio);
+                    
+                    if (consecutiveHighAudio >= 3 && !AppState.timerRunning && AppState.autoStartEnabled) {
+                        showNotification('📞 VCC audio spike detected - Starting timer!', 'success', 3000);
                         startTimer();
                         callBeepDetected = true;
                     }
+                } else if (average > 30) {
+                    // Medium audio might be call activity
+                    if (consecutiveHighAudio > 0) {
+                        console.log('Medium audio level:', average);
+                        showNotification('🎵 Audio activity - Possible VCC call', 'success', 2000);
+                    }
+                    consecutiveHighAudio = Math.max(0, consecutiveHighAudio - 1);
                 } else {
                     consecutiveHighAudio = 0;
                 }
@@ -1106,99 +1340,7 @@
             }
             
             detectVCCCall();
-        }
-
-        function detectChromeAudioOutput() {
-            // Chrome 140 specific audio detection methods
-            
-            // Method 1: Use Web Audio API to monitor audio context state changes
-            if (window.AudioContext || window.webkitAudioContext) {
-                monitorAudioContextChanges();
-            }
-            
-            // Method 2: Monitor media session API (if VCC uses it)
-            if ('mediaSession' in navigator) {
-                monitorMediaSession();
-            }
-            
-            // Method 3: Use Chrome's audio output device monitoring
-            if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
-                monitorAudioDevices();
-            }
-            
-            console.log('Chrome 140 audio output detection initialized');
-        }
-        
-        function monitorAudioContextChanges() {
-            // Create a dummy audio context to monitor system audio activity
-            try {
-                const testContext = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Monitor context state changes
-                testContext.addEventListener('statechange', function() {
-                    if (testContext.state === 'running' && !AppState.timerRunning) {
-                        console.log('Audio context activated - possible VCC call');
-                        showNotification('🎵 Audio activity detected - Press Space if call started', 'success', 3000);
-                    }
-                });
-                
-                // Check for destination node changes (audio output)
-                if (testContext.destination) {
-                    console.log('Audio destination available:', testContext.destination);
-                }
-            } catch (error) {
-                console.warn('Audio context monitoring failed:', error);
-            }
-        }
-        
-        function monitorMediaSession() {
-            // Monitor if VCC updates media session metadata
-            const originalSetMetadata = navigator.mediaSession.metadata;
-            
-            Object.defineProperty(navigator.mediaSession, 'metadata', {
-                set: function(value) {
-                    if (value && value.title) {
-                        console.log('Media session updated:', value.title);
-                        if (value.title.toLowerCase().includes('call') || value.title.toLowerCase().includes('vcc')) {
-                            showNotification('📞 VCC call detected via media session', 'success', 3000);
-                            if (AppState.autoStartEnabled && !AppState.timerRunning) {
-                                startTimer();
-                            }
-                        }
-                    }
-                    originalSetMetadata = value;
-                },
-                get: function() {
-                    return originalSetMetadata;
-                }
-            });
-            
-            // Monitor playback state changes
-            navigator.mediaSession.setActionHandler('play', function() {
-                console.log('Media session play detected');
-                showNotification('▶️ Audio playback started - VCC call?', 'success', 2000);
-            });
-            
-            navigator.mediaSession.setActionHandler('pause', function() {
-                console.log('Media session pause detected');
-            });
-        }
-        
-        async function monitorAudioDevices() {
-            try {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const audioOutputs = devices.filter(device => device.kind === 'audiooutput');
-                
-                console.log('Available audio outputs:', audioOutputs.length);
-                
-                // Monitor for device changes (might indicate VCC switching audio)
-                navigator.mediaDevices.addEventListener('devicechange', function() {
-                    console.log('Audio devices changed - possible VCC activity');
-                });
-                
-            } catch (error) {
-                console.warn('Audio device monitoring failed:', error);
-            }
+            console.log('VCC audio monitoring started');
         }
 
         // Enhanced Quick Notes to auto-reset timer
@@ -1655,6 +1797,20 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             }
         }
 
+        function addSetpointNote() {
+            const coolTemp = window.prompt('Enter cooling setpoint (°F):\n\nExample: 72');
+            if (coolTemp === null || coolTemp.trim() === '') return;
+            
+            const heatTemp = window.prompt('Enter heating setpoint (°F):\n\nExample: 68');
+            if (heatTemp === null || heatTemp.trim() === '') return;
+            
+            const unit = window.prompt('Enter unit/RTU:\n\nExamples:\n• RTU 1\n• RTU 2\n• HVAC Unit A\n• Unit 3');
+            if (unit === null || unit.trim() === '') return;
+            
+            const note = `Changed setpoint to ${coolTemp.trim()}/${heatTemp.trim()} for ${unit.trim()}.`;
+            addQuickNote(note);
+        }
+
         function addTestNote() {
             const component = window.prompt('What did you test?\n\nExamples:\n• controller functionality\n• sensor readings\n• valve operation\n• communication');
             if (component !== null && component.trim() !== '') {
@@ -2053,6 +2209,10 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 
                 // Initialize VCC integration
                 initializeVCCIntegration();
+                
+                // Load saved infractions and update display
+                loadTotalInfractions();
+                updateInfractionDisplay();
                 
                 console.log('QA Checklist App initialized successfully');
                 
