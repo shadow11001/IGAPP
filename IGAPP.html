@@ -397,6 +397,108 @@
             font-size: 12px;
             opacity: 0.7;
         }
+
+        .tag-recommendations {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode .tag-recommendations {
+            background: #f8f9fa;
+            border-color: #dee2e6;
+        }
+
+        body.dark-mode .tag-recommendations {
+            background: #343a40;
+            border-color: #495057;
+        }
+
+        .tag-recommendations h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        body.dark-mode .tag-recommendations h4 {
+            color: #ccc;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-height: 24px;
+            align-items: center;
+        }
+
+        .tag-item {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            font-size: 11px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .tag-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tag-item.high-confidence {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            font-weight: 500;
+        }
+
+        .tag-item.medium-confidence {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: #212529;
+            font-weight: 500;
+        }
+
+        .tag-item.low-confidence {
+            background: linear-gradient(135deg, #6c757d 0%, #adb5bd 100%);
+            color: white;
+        }
+
+        .tag-item.selected {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+            color: white !important;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.3);
+        }
+
+        .tag-confidence-legend {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 8px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tag-confidence-legend span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tag-confidence-legend .legend-color {
+            width: 12px;
+            height: 8px;
+            border-radius: 2px;
+        }
+
+        .legend-high { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); }
+        .legend-medium { background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%); }
+        .legend-low { background: linear-gradient(135deg, #6c757d 0%, #adb5bd 100%); }
     </style>
 </head>
 <body class="light-mode">
@@ -547,6 +649,13 @@
             <small id="clear-form-help" class="sr-only">Clear all form fields but keep history</small>
             <button onclick="clearForm()" aria-describedby="clear-all-help" class="danger-button">Clear Everything</button>
             <small id="clear-all-help" class="sr-only">Clear all form fields and delete all saved history</small>
+            
+            <div id="tag-recommendations" class="tag-recommendations">
+                <h4>Recommended Tags</h4>
+                <div id="recommended-tags" class="tag-list">
+                    <small>Tags will appear here based on your notes content...</small>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -570,8 +679,161 @@
             callDetected: false,
             autoStartEnabled: true,
             loudSoundThreshold: 80, // Higher threshold for call detection (speakers)
-            speechThreshold: 25     // Lower threshold for voice detection (microphone)
+            speechThreshold: 25,    // Lower threshold for voice detection (microphone)
+            selectedTags: new Set()
         };
+
+        // Tag analysis system
+        const TAG_KEYWORDS = {
+            'Call Dropped Mid Call': ['call dropped', 'dropped', 'disconnected', 'lost connection'],
+            'Caller Couldn\'t Hear Me': ['couldn\'t hear me', 'can\'t hear me', 'audio issues', 'mic problems'],
+            'Carel': ['carel', 'boss'],
+            'Couldn\'t Hear Caller': ['couldn\'t hear', 'can\'t hear caller', 'audio problems', 'static'],
+            'Comms': ['comm loss', 'communication loss', 'network', 'ethernet', 'comms', 'communication'],
+            'CPC': ['cpc'],
+            'DAE': ['dae', 'escalat', 'work order', 'wo'],
+            'Danfoss AKA65': ['aka65', 'aka'],
+            'Danfoss SVD': ['svd', 'storeview'],
+            'Defrost': ['defrost', 'forced defrost', 'terminated defrost'],
+            'Download': ['download', 'version download', 'load change download', 'main download', 'comms download', 'full dl', 'performed download'],
+            'Duplicate': ['duplicate', 'already called', 'repeat'],
+            'Electrician Request': ['electrician', 'electrical', 'power issue'],
+            'EMS': ['ems', 'system'],
+            'Equipment Request': ['equipment', 'replace', 'new'],
+            'Fuel Request': ['fuel', 'generator fuel'],
+            'HVAC': ['hvac', 'air conditioning', 'heating', 'rtu'],
+            'Lighting': ['lights', 'lighting', 'forced on lights'],
+            'Manager Escalation': ['manager', 'escalation', 'supervisor'],
+            'Mobile Gen Staging': ['mobile gen', 'generator staging'],
+            'Monitoring (Mobile Gen)': ['monitor', 'mobile gen'],
+            'Monitoring (PMG)': ['monitor', 'pmg'],
+            'New Module': ['new module', 'module'],
+            'No Reply Needed': ['no reply', 'information only'],
+            'Novar ESS': ['novar', 'ess'],
+            'Opus Architect': ['opus arch', 'architect'],
+            'Opus Magnum': ['opus mag', 'magnum'],
+            'Other': ['other', 'misc', 'various'],
+            'PMG Request': ['pmg'],
+            'Point Change': ['point change', 'board point', 'changing board'],
+            'Power Alerts Change Request': ['power alert', 'alert change'],
+            'Power Cycle': ['power cycle', 'restart', 'reboot'],
+            'Power Restoral Emails': ['power restoral', 'power restored'],
+            'PPO': ['ppo'],
+            'Project': ['project'],
+            'Queue Cap': ['queue cap', 'capacity'],
+            'Really Distant/Underwater': ['distant', 'underwater', 'poor connection', 'bad line'],
+            'Refrigeration': ['refrigeration', 'rack', 'cooling', 'temps', 'temperature', 'defrost', 'forced defrost', 'terminated defrost'],
+            'Refrigeration Tech Request': ['refrigeration tech', 'ref tech'],
+            'Remodel': ['remodel', 'renovation'],
+            'Reroute': ['reroute', 'redirect'],
+            'Set Points': ['setpoint', 'set point', 'temperature setting'],
+            'Site Emergency': ['emergency', 'urgent', 'critical'],
+            'Sporlan': ['sporlan'],
+            'Static': ['static', 'noise', 'interference'],
+            'Suppression': ['suppression', 'nsrm'],
+            'Test': ['test', 'testing', 'tested'],
+            'Unplanned Power Outage': ['power outage', 'outage', 'power loss'],
+            'Utility Notification': ['utility', 'notification'],
+            'Sams': ['sams', 'sam\'s club']
+        };
+
+        function analyzeNotesForTags() {
+            const notesContent = document.getElementById('notes').value.toLowerCase();
+            const daeContent = document.getElementById('dropdown-notes').value.toLowerCase();
+            const combinedContent = (notesContent + ' ' + daeContent).trim();
+            
+            if (!combinedContent) {
+                displayRecommendedTags([]);
+                return;
+            }
+            
+            const tagScores = {};
+            
+            // Analyze content for tag keywords
+            for (const [tag, keywords] of Object.entries(TAG_KEYWORDS)) {
+                let score = 0;
+                let matchCount = 0;
+                
+                keywords.forEach(keyword => {
+                    const regex = new RegExp('\\b' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+                    const matches = combinedContent.match(regex);
+                    if (matches) {
+                        matchCount += matches.length;
+                        score += matches.length * (keyword.length > 3 ? 2 : 1); // Longer keywords get more weight
+                    }
+                });
+                
+                if (score > 0) {
+                    tagScores[tag] = { score, matchCount };
+                }
+            }
+            
+            // Sort tags by score and determine confidence levels
+            const sortedTags = Object.entries(tagScores)
+                .sort(([,a], [,b]) => b.score - a.score)
+                .slice(0, 8) // Show top 8 recommendations
+                .map(([tag, data]) => {
+                    let confidence = 'low';
+                    if (data.score >= 4 || data.matchCount >= 3) confidence = 'high';
+                    else if (data.score >= 2 || data.matchCount >= 2) confidence = 'medium';
+                    
+                    return { tag, confidence, score: data.score };
+                });
+            
+            displayRecommendedTags(sortedTags);
+        }
+
+        function displayRecommendedTags(tags) {
+            const tagContainer = document.getElementById('recommended-tags');
+            
+            if (tags.length === 0) {
+                tagContainer.innerHTML = '<small>Tags will appear here based on your notes content...</small>';
+                return;
+            }
+            
+            const tagElements = tags.map(({ tag, confidence }) => {
+                const isSelected = AppState.selectedTags.has(tag);
+                return `<span class="tag-item ${confidence}-confidence ${isSelected ? 'selected' : ''}" 
+                              onclick="toggleTag('${tag.replace(/'/g, '\\\'')}')" 
+                              title="Click to select/deselect this tag">
+                            ${tag}
+                        </span>`;
+            }).join('');
+            
+            const legend = `
+                <div class="tag-confidence-legend">
+                    <span><div class="legend-color legend-high"></div>High confidence</span>
+                    <span><div class="legend-color legend-medium"></div>Medium confidence</span>
+                    <span><div class="legend-color legend-low"></div>Low confidence</span>
+                </div>
+            `;
+            
+            tagContainer.innerHTML = tagElements + legend;
+        }
+
+        function toggleTag(tagName) {
+            if (AppState.selectedTags.has(tagName)) {
+                AppState.selectedTags.delete(tagName);
+            } else {
+                AppState.selectedTags.add(tagName);
+            }
+            
+            // Update visual state
+            const tagElements = document.querySelectorAll('.tag-item');
+            tagElements.forEach(element => {
+                if (element.textContent.trim() === tagName) {
+                    element.classList.toggle('selected');
+                }
+            });
+            
+            // Show notification
+            const action = AppState.selectedTags.has(tagName) ? 'Selected' : 'Deselected';
+            showNotification(`${action} tag: ${tagName}`, 'success', 1500);
+        }
+
+        function getSelectedTags() {
+            return Array.from(AppState.selectedTags);
+        }
 
         // Dead Air Timer Functions
         function startTimer() {
@@ -799,6 +1061,9 @@
             
             // Trigger auto-save
             scheduleAutoSave();
+            
+            // Update tag recommendations after adding note
+            analyzeNotesForTags();
             
             // Visual feedback
             showNotification(`Added: ${noteText}`, 'success', 2000);
@@ -1188,6 +1453,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             const userInput = window.prompt(prompt);
             if (userInput !== null && userInput.trim() !== '') {
                 addQuickNote(prefix + userInput.trim() + '.');
+                // Tag analysis is handled by addQuickNote
             }
         }
 
@@ -1195,6 +1461,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             const parameter = window.prompt('What did you force?\n\nExamples:\n• Suct PSI to 30\n• OAT to 68 degrees\n• Discharge temp to 105\n• Fan speed to 75%');
             if (parameter !== null && parameter.trim() !== '') {
                 addQuickNote('Forced ' + parameter.trim() + '.');
+                // Tag analysis is handled by addQuickNote
             }
         }
 
@@ -1202,6 +1469,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             const component = window.prompt('What did you test?\n\nExamples:\n• controller functionality\n• sensor readings\n• valve operation\n• communication');
             if (component !== null && component.trim() !== '') {
                 addQuickNote('Tested ' + component.trim() + '.');
+                // Tag analysis is handled by addQuickNote
             }
         }
 
@@ -1232,10 +1500,12 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 const choiceNum = parseInt(choice.trim());
                 if (choiceNum >= 1 && choiceNum <= 4) {
                     addQuickNote('Advised tech to contact ' + contacts[choiceNum - 1] + '.');
+                    // Tag analysis is handled by addQuickNote
                 } else if (choiceNum === 5) {
                     const customContact = window.prompt('Enter contact details:');
                     if (customContact !== null && customContact.trim() !== '') {
                         addQuickNote('Advised tech to contact ' + customContact.trim() + '.');
+                        // Tag analysis is handled by addQuickNote
                     }
                 }
             }
@@ -1252,6 +1522,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             const component = window.prompt('Replace what?\n\nExamples:\n• temperature sensor\n• controller board\n• communication cable\n• valve actuator');
             if (component !== null && component.trim() !== '') {
                 addQuickNote('Advised to replace ' + component.trim() + '.');
+                // Tag analysis is handled by addQuickNote
             }
         }
 
@@ -1270,9 +1541,11 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             
             if (workOrder !== null && workOrder.trim() !== '') {
                 addQuickNote(daeText + '. Created WO: ' + workOrder.trim() + '.');
+                // Tag analysis is handled by addQuickNote
             } else {
                 // If no WO provided, just add the DAE part
                 addQuickNote(daeText + '.');
+                // Tag analysis is handled by addQuickNote
             }
         }
 
@@ -1295,6 +1568,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                     notesBox.value = selectedText;
                     notesBox.dataset.userEdited = 'false';
                     showNotification('Template loaded', 'success', 1500);
+                    
+                    // Update tag recommendations after loading template
+                    analyzeNotesForTags();
                 }
             } catch (error) {
                 console.error('Failed to update notes:', error);
@@ -1353,6 +1629,12 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 if (formData.storeNumber) copiedText.push(`Store Number: ${formData.storeNumber}`);
                 if (formData.workOrder) copiedText.push(`Work Order Number: ${formData.workOrder}`);
                 if (formData.notes) copiedText.push(formData.notes);
+                
+                // Add selected tags if any
+                const selectedTags = getSelectedTags();
+                if (selectedTags.length > 0) {
+                    copiedText.push(`Tags: ${selectedTags.join(', ')}`);
+                }
 
                 if (copiedText.length === 0) {
                     showNotification('No data to copy', 'error');
@@ -1378,8 +1660,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 }
                 
                 addButtonFeedback(button, 'success');
+                const tagInfo = selectedTags.length > 0 ? ` (${selectedTags.length} tags included)` : '';
                 showNotification(
-                    success ? 'Copied and saved to history!' : 'Copied successfully!', 
+                    success ? `Copied and saved to history!${tagInfo}` : `Copied successfully!${tagInfo}`, 
                     'success'
                 );
                 
@@ -1414,6 +1697,10 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                         element.value = '';
                     }
                 });
+                
+                // Clear selected tags
+                AppState.selectedTags.clear();
+                displayRecommendedTags([]);
                 
                 showNotification('Form cleared', 'success', 1500);
                 clearAutoSave();
@@ -1485,6 +1772,10 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                     // Reset timer when typing (indicates speaking/activity)
                     if (AppState.timerRunning && this.value.length > 0) {
                         resetTimer();
+                    }
+                    // Analyze notes for tag recommendations
+                    if (this.id === 'notes' || this.id === 'dropdown-notes') {
+                        analyzeNotesForTags();
                     }
                 });
             });
