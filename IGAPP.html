@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version: 1.0.1 -->
+<!-- Version: 1.0.2 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -368,6 +368,15 @@
             background: linear-gradient(135deg, #218838 0%, #1fa8a2 100%);
         }
 
+        /* Top update button specific styling (next to theme toggle) */
+        #update-btn-top {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+        }
+
+        #update-btn-top:hover {
+            background: linear-gradient(135deg, #218838 0%, #1fa8a2 100%) !important;
+        }
+
         /* Notes header with timer */
         .notes-header {
             display: flex;
@@ -476,6 +485,22 @@
             0% { box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
             50% { box-shadow: 0 6px 30px rgba(255,107,107,0.5); }
             100% { box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        }
+
+        /* Update instructions */
+        .update-instructions {
+            position: fixed;
+            top: calc(50% + 50px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            z-index: 1400;
+            backdrop-filter: blur(5px);
+            font-size: 12px;
+            text-align: center;
         }
 
         /* Responsive adjustments */
@@ -982,7 +1007,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.0.1', // Update this when you make changes
+            currentVersion: '1.0.2', // Update this when you make changes
             githubRepo: 'shadow11001/IGAPP',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -1603,34 +1628,67 @@
                 return;
             }
             
-            // Create update button
+            // Create main update button
             const updateBtn = document.createElement('button');
             updateBtn.id = 'dynamic-update-btn';
             updateBtn.className = 'dynamic-update-button';
-            updateBtn.innerHTML = `📥 Update to v${newVersion}`;
+            updateBtn.innerHTML = `📥 Download v${newVersion}`;
             updateBtn.onclick = () => applyUpdate(newContent, newVersion);
-            updateBtn.setAttribute('aria-label', `Update application to version ${newVersion}`);
+            updateBtn.setAttribute('aria-label', `Download application version ${newVersion}`);
+            
+            // Create quick instructions
+            const instructions = document.createElement('div');
+            instructions.className = 'update-instructions';
+            instructions.innerHTML = `
+                <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #666;">
+                    Click to download the new version<br>
+                    Then replace this file and refresh
+                </div>
+            `;
             
             // Add to page
             document.body.appendChild(updateBtn);
+            document.body.appendChild(instructions);
         }
 
         function applyUpdate(newContent, newVersion) {
-            if (!confirm(`Update to version ${newVersion}? This will reload the page with the new version.`)) {
+            const updateChoice = confirm(`Update to version ${newVersion}?\n\nChoose OK to download the new version, or Cancel to abort.`);
+            if (!updateChoice) {
                 return;
             }
             
             try {
-                // Replace current page content
-                document.open();
-                document.write(newContent);
-                document.close();
+                // Create a blob with the new content
+                const blob = new Blob([newContent], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
                 
-                showNotification(`🎉 Updated to v${newVersion}!`, 'success', 3000);
+                // Create a download link
+                const downloadLink = document.createElement('a');
+                downloadLink.href = url;
+                downloadLink.download = 'IGAPP.html';
+                downloadLink.style.display = 'none';
+                
+                // Add to page, click, and remove
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                // Clean up the URL object
+                URL.revokeObjectURL(url);
+                
+                showNotification(`📥 v${newVersion} downloaded! Replace your current file and refresh.`, 'success', 8000);
+                
+                // Remove the update button since update is "applied"
+                const dynamicBtn = document.getElementById('dynamic-update-btn');
+                if (dynamicBtn) dynamicBtn.remove();
+                
+                // Remove instructions too
+                const instructions = document.querySelector('.update-instructions');
+                if (instructions) instructions.remove();
                 
             } catch (error) {
-                console.error('Update failed:', error);
-                showNotification('❌ Update failed - Please refresh manually', 'error', 5000);
+                console.error('Update download failed:', error);
+                showNotification('❌ Update download failed - Please try again', 'error', 5000);
             }
         }
 
