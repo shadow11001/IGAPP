@@ -481,6 +481,30 @@
             transform: translate(-50%, -50%) scale(1.05);
         }
 
+        /* Alternative copy button */
+        .dynamic-update-button-alt {
+            position: fixed;
+            top: calc(50% + 60px);
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #3742fa 0%, #2f3542 100%);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dynamic-update-button-alt:hover {
+            background: linear-gradient(135deg, #2f3542 0%, #57606f 100%);
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
         @keyframes pulse {
             0% { box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
             50% { box-shadow: 0 6px 30px rgba(255,107,107,0.5); }
@@ -501,6 +525,85 @@
             backdrop-filter: blur(5px);
             font-size: 12px;
             text-align: center;
+        }
+
+        /* Update modal */
+        .update-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .update-modal {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: left;
+        }
+
+        .update-modal h3 {
+            margin: 0 0 20px 0;
+            color: #28a745;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .update-steps ol {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+
+        .update-steps li {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .update-steps code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #d63384;
+        }
+
+        .update-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        .update-modal-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 12px 30px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .update-modal-btn:hover {
+            background: #218838;
         }
 
         /* Responsive adjustments */
@@ -1636,28 +1739,68 @@
             updateBtn.onclick = () => applyUpdate(newContent, newVersion);
             updateBtn.setAttribute('aria-label', `Download application version ${newVersion}`);
             
-            // Create quick instructions
+            // Create alternative copy button
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'dynamic-update-button-alt';
+            copyBtn.innerHTML = `📋 Copy v${newVersion} Code`;
+            copyBtn.onclick = () => copyUpdateToClipboard(newContent, newVersion);
+            copyBtn.setAttribute('aria-label', `Copy version ${newVersion} code to clipboard`);
+            
+            // Create instructions
             const instructions = document.createElement('div');
             instructions.className = 'update-instructions';
             instructions.innerHTML = `
                 <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #666;">
-                    Click to download the new version<br>
+                    Download file or copy code to clipboard<br>
                     Then replace this file and refresh
                 </div>
             `;
             
             // Add to page
             document.body.appendChild(updateBtn);
+            document.body.appendChild(copyBtn);
             document.body.appendChild(instructions);
         }
 
+        function copyUpdateToClipboard(newContent, newVersion) {
+            navigator.clipboard.writeText(newContent).then(() => {
+                showNotification(`📋 v${newVersion} code copied to clipboard!`, 'success', 5000);
+                
+                // Show instructions
+                const instructions = `
+Instructions for manual update:
+1. Select all text in this file (Ctrl+A)
+2. Delete all content (Delete key)
+3. Paste the new code (Ctrl+V)
+4. Save the file (Ctrl+S)
+5. Refresh the page (F5)
+                `.trim();
+                
+                alert(instructions);
+                
+                // Remove update UI
+                const dynamicBtn = document.getElementById('dynamic-update-btn');
+                if (dynamicBtn) dynamicBtn.remove();
+                const copyBtn = document.querySelector('.dynamic-update-button-alt');
+                if (copyBtn) copyBtn.remove();
+                const inst = document.querySelector('.update-instructions');
+                if (inst) inst.remove();
+                
+            }).catch(() => {
+                showNotification('❌ Failed to copy to clipboard', 'error', 3000);
+            });
+        }
+
         function applyUpdate(newContent, newVersion) {
-            const updateChoice = confirm(`Update to version ${newVersion}?\n\nChoose OK to download the new version, or Cancel to abort.`);
+            const updateChoice = confirm(`Update to version ${newVersion}?\n\nThis will download the new version. You'll need to replace your current file manually.`);
             if (!updateChoice) {
                 return;
             }
             
             try {
+                // Get the current file name
+                const currentFileName = window.location.pathname.split('/').pop() || 'IGAPP.html';
+                
                 // Create a blob with the new content
                 const blob = new Blob([newContent], { type: 'text/html' });
                 const url = URL.createObjectURL(blob);
@@ -1665,7 +1808,7 @@
                 // Create a download link
                 const downloadLink = document.createElement('a');
                 downloadLink.href = url;
-                downloadLink.download = 'IGAPP.html';
+                downloadLink.download = currentFileName;
                 downloadLink.style.display = 'none';
                 
                 // Add to page, click, and remove
@@ -1676,7 +1819,8 @@
                 // Clean up the URL object
                 URL.revokeObjectURL(url);
                 
-                showNotification(`📥 v${newVersion} downloaded! Replace your current file and refresh.`, 'success', 8000);
+                // Show detailed instructions
+                showUpdateInstructions(newVersion, currentFileName);
                 
                 // Remove the update button since update is "applied"
                 const dynamicBtn = document.getElementById('dynamic-update-btn');
@@ -1690,6 +1834,32 @@
                 console.error('Update download failed:', error);
                 showNotification('❌ Update download failed - Please try again', 'error', 5000);
             }
+        }
+
+        function showUpdateInstructions(newVersion, fileName) {
+            // Create modal overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'update-modal-overlay';
+            overlay.innerHTML = `
+                <div class="update-modal">
+                    <h3>🎉 v${newVersion} Downloaded!</h3>
+                    <div class="update-steps">
+                        <p><strong>Follow these steps to complete the update:</strong></p>
+                        <ol>
+                            <li>📁 Go to your Downloads folder</li>
+                            <li>🔍 Find the file: <code>${fileName}</code></li>
+                            <li>📋 Copy this new file</li>
+                            <li>📂 Navigate to where your current IGAPP file is located</li>
+                            <li>🔄 Replace the old file with the new one</li>
+                            <li>🔄 Refresh this page (F5 or Ctrl+R)</li>
+                        </ol>
+                        <p class="update-note">⚠️ <strong>Important:</strong> You must replace the actual file for the update to persist.</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="update-modal-btn">Got it!</button>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
         }
 
         function setGitHubToken() {
