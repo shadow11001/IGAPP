@@ -317,7 +317,7 @@
         .dead-air-timer {
             position: fixed;
             top: 10px;
-            right: 70px;
+            right: 80px;
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
             padding: 8px 16px;
@@ -502,7 +502,7 @@
 
         .infraction-tracker {
             position: fixed;
-            top: 70px;
+            top: 106px;
             right: 10px;
             background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             color: white;
@@ -558,6 +558,34 @@
         @keyframes pulse-infractions {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.02); }
+        }
+
+        .update-button {
+            position: fixed;
+            top: 150px;
+            right: 10px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            z-index: 1001;
+            animation: pulse-update 2s infinite;
+        }
+
+        .update-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        @keyframes pulse-update {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
         }
     </style>
 </head>
@@ -755,7 +783,14 @@
             selectedTags: new Set(),
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
-            deadAirThreshold: 30    // Seconds before infraction
+            deadAirThreshold: 30,   // Seconds before infraction
+            currentVersion: '1.0.0', // Update this when you make changes
+            githubRepo: 'shadow11001/IGAPP',
+            githubToken: null, // Will be decoded from masked token
+            autoUpdateEnabled: true,
+            // Masked GitHub token (Base64 + simple XOR obfuscation)
+            // Your encoded token is now configured
+            maskedToken: 'TUNeQl9IdVpLXnUbG2toGRh4bHsaa1ITZ2hMa0dhYWIYdVtvR2saeRx5cEwTYGRsa2hrGh5NR01MT2caWXlMYmhde2tsa3NoHkNZXm54YB5pYxhtGGxpbx5cUEZN', // Your encoded token
         };
 
         // Tag analysis system
@@ -1206,31 +1241,177 @@
             }
         }
 
-        // VCC Integration Methods
-        function initializeVCCIntegration() {
-            console.log('Initializing VCC integration...');
-            
-            // Method 1: VCC Audio monitoring (if microphone available)
-            if (AppState.micAnalyser) {
-                console.log('Microphone analyser available, starting VCC audio monitoring');
-                monitorVCCAudio();
-            } else {
-                console.log('No microphone analyser available yet');
-                // Try again after a short delay
-                setTimeout(() => {
-                    if (AppState.micAnalyser) {
-                        console.log('Microphone analyser now available, starting VCC audio monitoring');
-                        monitorVCCAudio();
-                    } else {
-                        console.log('Microphone analyser still not available');
-                    }
-                }, 2000);
+        // Token obfuscation utilities
+        function encodeToken(token) {
+            // Simple XOR + Base64 encoding (not cryptographically secure, just obfuscation)
+            const key = 42; // Simple XOR key
+            const xored = token.split('').map(char => 
+                String.fromCharCode(char.charCodeAt(0) ^ key)
+            ).join('');
+            return btoa(xored);
+        }
+
+        function decodeToken(maskedToken) {
+            try {
+                const key = 42; // Same XOR key
+                const decoded = atob(maskedToken);
+                return decoded.split('').map(char => 
+                    String.fromCharCode(char.charCodeAt(0) ^ key)
+                ).join('');
+            } catch (error) {
+                console.warn('Token decode failed:', error);
+                return null;
+            }
+        }
+
+        function initializeGitHubToken() {
+            // Try to decode the masked token first
+            if (AppState.maskedToken && AppState.maskedToken !== 'Z2hwX0VYQU1QTEVfVE9LRU5fUkVQTEFDRV9NRQ==') {
+                const decodedToken = decodeToken(AppState.maskedToken);
+                if (decodedToken && decodedToken.startsWith('ghp_')) {
+                    AppState.githubToken = decodedToken;
+                    console.log('GitHub token loaded from masked token');
+                    return;
+                }
             }
             
-            // Method 2: Add VCC call control button
+            // Fall back to saved token in localStorage
+            const savedToken = localStorage.getItem('githubToken');
+            if (savedToken) {
+                AppState.githubToken = savedToken;
+                console.log('GitHub token loaded from localStorage');
+            }
+        }
+        async function checkForUpdates() {
+            if (!AppState.autoUpdateEnabled) return;
+            
+            try {
+                console.log('Checking for updates...');
+                
+                // GitHub API URL for the raw file
+                const apiUrl = `https://api.github.com/repos/${AppState.githubRepo}/contents/IGAPP.html`;
+                
+                // Headers for API request
+                const headers = {
+                    'Accept': 'application/vnd.github.v3+json',
+                    'User-Agent': 'IGAPP-AutoUpdater'
+                };
+                
+                // Add authentication for private repo
+                if (AppState.githubToken) {
+                    headers['Authorization'] = `token ${AppState.githubToken}`;
+                }
+                
+                const response = await fetch(apiUrl, { headers });
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        showNotification('🔒 Update check failed: Authentication required for private repo', 'error', 5000);
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const remoteContent = atob(data.content.replace(/\s/g, ''));
+                
+                // Extract version from remote content
+                const versionMatch = remoteContent.match(/currentVersion:\s*['"`]([^'"`]+)['"`]/);
+                const remoteVersion = versionMatch ? versionMatch[1] : null;
+                
+                if (remoteVersion && remoteVersion !== AppState.currentVersion) {
+                    showUpdateAvailable(remoteVersion, remoteContent);
+                } else {
+                    console.log('App is up to date');
+                    showNotification('✅ App is up to date', 'success', 2000);
+                }
+                
+            } catch (error) {
+                console.warn('Update check failed:', error);
+                showNotification('⚠️ Update check failed - Check connection', 'error', 3000);
+            }
+        }
+
+        function showUpdateAvailable(newVersion, newContent) {
+            const updateMessage = `🚀 Update available: v${newVersion} (current: v${AppState.currentVersion})`;
+            showNotification(updateMessage, 'success', 10000);
+            
+            // Add update button to page
+            addUpdateButton(newVersion, newContent);
+        }
+
+        function addUpdateButton(newVersion, newContent) {
+            // Remove existing update button if present
+            const existingBtn = document.getElementById('update-btn');
+            if (existingBtn) existingBtn.remove();
+            
+            // Create update button
+            const updateBtn = document.createElement('button');
+            updateBtn.id = 'update-btn';
+            updateBtn.className = 'update-button';
+            updateBtn.innerHTML = `📥 Update to v${newVersion}`;
+            updateBtn.onclick = () => applyUpdate(newContent, newVersion);
+            
+            // Add to page
+            document.body.appendChild(updateBtn);
+        }
+
+        function applyUpdate(newContent, newVersion) {
+            if (!confirm(`Update to version ${newVersion}? This will reload the page with the new version.`)) {
+                return;
+            }
+            
+            try {
+                // Replace current page content
+                document.open();
+                document.write(newContent);
+                document.close();
+                
+                showNotification(`🎉 Updated to v${newVersion}!`, 'success', 3000);
+                
+            } catch (error) {
+                console.error('Update failed:', error);
+                showNotification('❌ Update failed - Please refresh manually', 'error', 5000);
+            }
+        }
+
+        function setGitHubToken() {
+            const token = prompt('Enter your GitHub Personal Access Token for private repo access:\n\n(Leave blank to cancel)');
+            if (token && token.trim()) {
+                AppState.githubToken = token.trim();
+                localStorage.setItem('githubToken', AppState.githubToken);
+                showNotification('🔑 GitHub token saved - Updates enabled', 'success', 3000);
+                checkForUpdates();
+            }
+        }
+
+        function toggleAutoUpdate() {
+            AppState.autoUpdateEnabled = !AppState.autoUpdateEnabled;
+            localStorage.setItem('autoUpdateEnabled', AppState.autoUpdateEnabled.toString());
+            
+            const status = AppState.autoUpdateEnabled ? 'enabled' : 'disabled';
+            showNotification(`🔄 Auto-updates ${status}`, 'success', 2000);
+        }
+
+        // VCC Integration Methods
+        function initializeVCCIntegration() {
+            console.log('VCC Integration: Browser audio capture requires Google sign-in');
+            console.log('Using manual VCC controls only');
+            
+            // Add VCC call control button
             addVCCManualButton();
             
-            console.log('VCC integration methods initialized');
+            // Add helpful keyboard shortcuts reminder
+            setTimeout(() => {
+                showNotification('💡 VCC Tips: Use VCC button or Spacebar for manual control', 'success', 4000);
+            }, 2000);
+            
+            // Add info about Google sign-in requirement
+            setTimeout(() => {
+                showNotification('ℹ️ Auto-detection needs Google sign-in for audio access', 'error', 5000);
+            }, 7000);
+            
+            console.log('VCC manual integration ready');
         }
 
         function initializeVCCWindowDetection() {
@@ -2190,6 +2371,11 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                         e.preventDefault();
                         resetCallDetection();
                     }
+                    
+                    if (e.key === 'u' || e.key === 'U') {
+                        e.preventDefault();
+                        checkForUpdates();
+                    }
                 }
                 
                 if (e.key === 'F2') {
@@ -2201,6 +2387,12 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 if (e.ctrlKey && e.shiftKey && e.key === 'C') {
                     e.preventDefault();
                     copyAdditionalNotes();
+                }
+                
+                // GitHub token setup with Ctrl+Shift+G
+                if (e.ctrlKey && e.shiftKey && e.key === 'G') {
+                    e.preventDefault();
+                    setGitHubToken();
                 }
             });
         }
@@ -2251,6 +2443,21 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 // Load saved infractions and update display
                 loadTotalInfractions();
                 updateInfractionDisplay();
+                
+                // Load saved settings and initialize GitHub token
+                initializeGitHubToken();
+                
+                const savedAutoUpdate = localStorage.getItem('autoUpdateEnabled');
+                if (savedAutoUpdate !== null) {
+                    AppState.autoUpdateEnabled = savedAutoUpdate === 'true';
+                }
+                
+                // Check for updates on startup (after 5 seconds)
+                if (AppState.autoUpdateEnabled) {
+                    setTimeout(() => {
+                        checkForUpdates();
+                    }, 5000);
+                }
                 
                 console.log('QA Checklist App initialized successfully');
                 
