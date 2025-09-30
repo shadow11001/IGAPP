@@ -1800,19 +1800,48 @@ This method preserves all icons and emojis correctly.
         // Temporary export function for notes analysis
         function exportNotesData() {
             try {
+                // Debug: Check all localStorage keys
+                const allLocalStorageKeys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    allLocalStorageKeys.push(localStorage.key(i));
+                }
+                
+                // Try different possible localStorage keys
+                const possibleKeys = ['savedNotes', 'notes', 'history', 'formData', 'IGAPP_notes', 'notesHistory'];
+                const foundData = {};
+                
+                possibleKeys.forEach(key => {
+                    try {
+                        const data = localStorage.getItem(key);
+                        if (data) {
+                            foundData[key] = JSON.parse(data);
+                        }
+                    } catch (e) {
+                        foundData[key] = localStorage.getItem(key); // Store as string if not JSON
+                    }
+                });
+                
                 // Collect all notes data
+                const savedNotesData = JSON.parse(localStorage.getItem('savedNotes') || '[]');
                 const exportData = {
                     timestamp: new Date().toISOString(),
                     currentVersion: AppState.currentVersion,
                     currentNotes: document.getElementById('notes').value,
-                    savedNotes: JSON.parse(localStorage.getItem('savedNotes') || '[]'),
-                    totalSavedNotes: JSON.parse(localStorage.getItem('savedNotes') || '[]').length,
+                    savedNotes: savedNotesData,
+                    totalSavedNotes: savedNotesData.length,
                     sessionInfractions: AppState.sessionInfractions,
                     totalInfractions: AppState.totalInfractions,
                     selectedTags: Array.from(AppState.selectedTags || []),
                     
+                    // Debug info
+                    debug: {
+                        allLocalStorageKeys: allLocalStorageKeys,
+                        foundDataInKeys: foundData,
+                        historyDropdownOptions: getHistoryDropdownContent()
+                    },
+                    
                     // Usage statistics
-                    notesHistory: JSON.parse(localStorage.getItem('savedNotes') || '[]').map(note => ({
+                    notesHistory: savedNotesData.map(note => ({
                         date: note.date,
                         length: note.notes ? note.notes.length : 0,
                         hasDAE: note.dae ? note.dae.length > 0 : false,
@@ -1822,20 +1851,59 @@ This method preserves all icons and emojis correctly.
                     })),
                     
                     // Most common words/phrases analysis
-                    commonPhrases: analyzeCommonPhrases()
+                    commonPhrases: analyzeCommonPhrases(savedNotesData)
                 };
 
-                // Create formatted export
-                const exportText = `
+                // Create formatted export with all actual notes content
+                let exportText = `
 === IGAPP NOTES DATA EXPORT ===
 Export Date: ${exportData.timestamp}
 App Version: ${exportData.currentVersion}
 
+=== DEBUG INFORMATION ===
+All localStorage keys found: ${exportData.debug.allLocalStorageKeys.join(', ')}
+
+Data found in potential keys:
+${Object.keys(exportData.debug.foundDataInKeys).map(key => 
+    `${key}: ${Array.isArray(exportData.debug.foundDataInKeys[key]) ? 
+        `Array with ${exportData.debug.foundDataInKeys[key].length} items` : 
+        typeof exportData.debug.foundDataInKeys[key]}`
+).join('\n')}
+
+History dropdown content: ${exportData.debug.historyDropdownOptions}
+
 === CURRENT SESSION ===
 Current Notes Length: ${exportData.currentNotes.length} characters
+Current Notes Content:
+${exportData.currentNotes || '(No current notes)'}
+
 Session Infractions: ${exportData.sessionInfractions}
 Total Infractions: ${exportData.totalInfractions}
 Selected Tags: ${exportData.selectedTags.join(', ') || 'None'}
+
+=== ALL SAVED NOTES (${exportData.totalSavedNotes} total) ===
+`;
+
+                // Add each saved note with full content
+                savedNotesData.forEach((note, index) => {
+                    exportText += `
+--- Note ${index + 1} (${note.date}) ---
+Tech Name: ${note.techName || '(not provided)'}
+Store Number: ${note.storeNumber || '(not provided)'}
+Work Order: ${note.workOrder || '(not provided)'}
+
+DAE Content:
+${note.dae || '(no DAE content)'}
+
+Notes Content:
+${note.notes || '(no notes content)'}
+
+Tags: ${note.tags ? note.tags.join(', ') : '(no tags)'}
+---------------------------------
+`;
+                });
+
+                exportText += `
 
 === USAGE STATISTICS ===
 Total Saved Notes: ${exportData.totalSavedNotes}
@@ -1851,36 +1919,54 @@ ${exportData.commonPhrases.join('\n')}
 
 === RAW DATA (JSON) ===
 ${JSON.stringify(exportData, null, 2)}
-                `.trim();
+`;
 
                 // Copy to clipboard
                 navigator.clipboard.writeText(exportText).then(() => {
-                    showNotification('📊 Notes data exported to clipboard!', 'success', 5000);
-                    alert('Notes data exported to clipboard!\n\nThis includes:\n- Usage statistics\n- Common phrases\n- Raw data for analysis\n\nPaste this data to share for Quick Notes improvement.');
+                    showNotification(`📊 Debug export complete! Found ${allLocalStorageKeys.length} localStorage keys`, 'success', 5000);
+                    alert(`Debug export copied to clipboard!\n\nThis includes:\n- Debug info about localStorage\n- ${exportData.totalSavedNotes} saved notes\n- All available data keys\n\nThis will help identify where your notes are stored.`);
                 }).catch(() => {
                     // Fallback: download as file
                     const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
-                    link.download = `IGAPP_Notes_Export_${new Date().toISOString().split('T')[0]}.txt`;
+                    link.download = `IGAPP_Debug_Export_${new Date().toISOString().split('T')[0]}.txt`;
                     link.click();
                     URL.revokeObjectURL(url);
-                    showNotification('📊 Notes data downloaded as file!', 'success', 5000);
+                    showNotification(`📊 Debug data downloaded as file!`, 'success', 5000);
                 });
 
             } catch (error) {
                 console.error('Export failed:', error);
-                showNotification('❌ Export failed', 'error', 3000);
+                showNotification('❌ Export failed: ' + error.message, 'error', 5000);
             }
         }
 
-        function analyzeCommonPhrases() {
+        function getHistoryDropdownContent() {
             try {
-                const savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-                const allNotesText = savedNotes.map(note => note.notes || '').join(' ').toLowerCase();
+                const historyDropdown = document.getElementById('history');
+                if (historyDropdown) {
+                    const options = Array.from(historyDropdown.options).map(option => option.text);
+                    return options.join(', ');
+                }
+                return 'History dropdown not found';
+            } catch (error) {
+                return 'Error reading history dropdown: ' + error.message;
+            }
+        }
+
+        function analyzeCommonPhrases(savedNotesData) {
+            try {
+                if (!savedNotesData || savedNotesData.length === 0) {
+                    return ['No saved notes available for analysis'];
+                }
+
+                const allNotesText = savedNotesData.map(note => (note.notes || '') + ' ' + (note.dae || '')).join(' ').toLowerCase();
                 
-                if (!allNotesText) return ['No notes data available'];
+                if (!allNotesText.trim()) {
+                    return ['No notes content available for analysis'];
+                }
 
                 // Common technical phrases to look for
                 const commonPatterns = [
@@ -1897,7 +1983,7 @@ ${JSON.stringify(exportData, null, 2)}
                     /issue with \w+/gi,
                     /problem with \w+/gi,
                     /error \w+/gi,
-                    /\d{4,} \w*/gi // Store numbers and similar
+                    /\d{4,}/gi // Store numbers
                 ];
 
                 const foundPhrases = [];
@@ -1908,10 +1994,15 @@ ${JSON.stringify(exportData, null, 2)}
                     }
                 });
 
+                if (foundPhrases.length === 0) {
+                    return ['No common technical phrases found'];
+                }
+
                 // Count frequency and return top phrases
                 const frequency = {};
                 foundPhrases.forEach(phrase => {
-                    frequency[phrase] = (frequency[phrase] || 0) + 1;
+                    const cleanPhrase = phrase.trim();
+                    frequency[cleanPhrase] = (frequency[cleanPhrase] || 0) + 1;
                 });
 
                 return Object.entries(frequency)
@@ -1920,7 +2011,7 @@ ${JSON.stringify(exportData, null, 2)}
                     .map(([phrase, count]) => `"${phrase}" (used ${count} times)`);
 
             } catch (error) {
-                return ['Error analyzing phrases'];
+                return ['Error analyzing phrases: ' + error.message];
             }
         }
 
