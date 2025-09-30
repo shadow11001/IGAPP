@@ -457,13 +457,13 @@
             opacity: 1;
         }
 
-        /* Dynamic update button (different from static ones) */
+        /* Dynamic update button (primary - copy method) */
         .dynamic-update-button {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            background: linear-gradient(135deg, #3742fa 0%, #2f3542 100%);
             border: none;
             color: white;
             padding: 15px 25px;
@@ -477,17 +477,17 @@
         }
 
         .dynamic-update-button:hover {
-            background: linear-gradient(135deg, #ee5a24 0%, #c23616 100%);
+            background: linear-gradient(135deg, #2f3542 0%, #57606f 100%);
             transform: translate(-50%, -50%) scale(1.05);
         }
 
-        /* Alternative copy button */
+        /* Alternative download button */
         .dynamic-update-button-alt {
             position: fixed;
             top: calc(50% + 60px);
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #3742fa 0%, #2f3542 100%);
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
             border: none;
             color: white;
             padding: 12px 20px;
@@ -501,7 +501,7 @@
         }
 
         .dynamic-update-button-alt:hover {
-            background: linear-gradient(135deg, #2f3542 0%, #57606f 100%);
+            background: linear-gradient(135deg, #ee5a24 0%, #c23616 100%);
             transform: translate(-50%, -50%) scale(1.05);
         }
 
@@ -1731,34 +1731,34 @@
                 return;
             }
             
-            // Create main update button
-            const updateBtn = document.createElement('button');
-            updateBtn.id = 'dynamic-update-btn';
-            updateBtn.className = 'dynamic-update-button';
-            updateBtn.innerHTML = `📥 Download v${newVersion}`;
-            updateBtn.onclick = () => applyUpdate(newContent, newVersion);
-            updateBtn.setAttribute('aria-label', `Download application version ${newVersion}`);
-            
-            // Create alternative copy button
+            // Create primary copy button (better for preserving encoding)
             const copyBtn = document.createElement('button');
-            copyBtn.className = 'dynamic-update-button-alt';
-            copyBtn.innerHTML = `📋 Copy v${newVersion} Code`;
+            copyBtn.className = 'dynamic-update-button';
+            copyBtn.innerHTML = `� Copy v${newVersion} Code`;
             copyBtn.onclick = () => copyUpdateToClipboard(newContent, newVersion);
             copyBtn.setAttribute('aria-label', `Copy version ${newVersion} code to clipboard`);
+            
+            // Create alternative download button
+            const downloadBtn = document.createElement('button');
+            downloadBtn.id = 'dynamic-update-btn';
+            downloadBtn.className = 'dynamic-update-button-alt';
+            downloadBtn.innerHTML = `� Download v${newVersion}`;
+            downloadBtn.onclick = () => applyUpdate(newContent, newVersion);
+            downloadBtn.setAttribute('aria-label', `Download application version ${newVersion}`);
             
             // Create instructions
             const instructions = document.createElement('div');
             instructions.className = 'update-instructions';
             instructions.innerHTML = `
                 <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #666;">
-                    Download file or copy code to clipboard<br>
+                    Copy code (recommended) or download file<br>
                     Then replace this file and refresh
                 </div>
             `;
             
             // Add to page
-            document.body.appendChild(updateBtn);
             document.body.appendChild(copyBtn);
+            document.body.appendChild(downloadBtn);
             document.body.appendChild(instructions);
         }
 
@@ -1774,15 +1774,17 @@ Instructions for manual update:
 3. Paste the new code (Ctrl+V)
 4. Save the file (Ctrl+S)
 5. Refresh the page (F5)
+
+This method preserves all icons and emojis correctly.
                 `.trim();
                 
                 alert(instructions);
                 
                 // Remove update UI
-                const dynamicBtn = document.getElementById('dynamic-update-btn');
-                if (dynamicBtn) dynamicBtn.remove();
-                const copyBtn = document.querySelector('.dynamic-update-button-alt');
+                const copyBtn = document.querySelector('.dynamic-update-button');
                 if (copyBtn) copyBtn.remove();
+                const downloadBtn = document.getElementById('dynamic-update-btn');
+                if (downloadBtn) downloadBtn.remove();
                 const inst = document.querySelector('.update-instructions');
                 if (inst) inst.remove();
                 
@@ -1801,8 +1803,10 @@ Instructions for manual update:
                 // Get the current file name
                 const currentFileName = window.location.pathname.split('/').pop() || 'IGAPP.html';
                 
-                // Create a blob with the new content
-                const blob = new Blob([newContent], { type: 'text/html' });
+                // Create a blob with proper UTF-8 encoding
+                const blob = new Blob([newContent], { 
+                    type: 'text/html;charset=utf-8' 
+                });
                 const url = URL.createObjectURL(blob);
                 
                 // Create a download link
@@ -1844,6 +1848,9 @@ Instructions for manual update:
                 <div class="update-modal">
                     <h3>🎉 v${newVersion} Downloaded!</h3>
                     <div class="update-steps">
+                        <div class="update-note">
+                            ⚠️ <strong>Important:</strong> If icons appear as strange text after updating, use the "Copy Code" method instead for better character encoding.
+                        </div>
                         <p><strong>Follow these steps to complete the update:</strong></p>
                         <ol>
                             <li>📁 Go to your Downloads folder</li>
@@ -1853,7 +1860,7 @@ Instructions for manual update:
                             <li>🔄 Replace the old file with the new one</li>
                             <li>🔄 Refresh this page (F5 or Ctrl+R)</li>
                         </ol>
-                        <p class="update-note">⚠️ <strong>Important:</strong> You must replace the actual file for the update to persist.</p>
+                        <p><strong>Alternative:</strong> Use the "📋 Copy Code" button for better character preservation.</p>
                     </div>
                     <button onclick="this.parentElement.parentElement.remove()" class="update-modal-btn">Got it!</button>
                 </div>
