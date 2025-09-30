@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version: 1.0.0 -->
+<!-- Version: 1.0.1 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -218,6 +218,28 @@
             transition: transform 0.3s ease;
         }
 
+        /* Override for container-based notifications */
+        .notification-container .notification {
+            position: relative !important;
+            top: auto !important;
+            right: auto !important;
+            pointer-events: auto;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            opacity: 0;
+            margin-bottom: 0;
+            width: 100%;
+            background: var(--bg-color, #fff);
+            border: 1px solid var(--border-color, #ddd);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 14px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            color: #333;
+        }
+
         .notification.show {
             transform: translateX(0);
         }
@@ -228,6 +250,29 @@
 
         .notification.error {
             background-color: #dc3545;
+        }
+
+        .notification.info {
+            background-color: #17a2b8;
+        }
+
+        /* Container notification colors */
+        .notification-container .notification.success {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724 !important;
+        }
+
+        .notification-container .notification.error {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24 !important;
+        }
+
+        .notification-container .notification.info {
+            background-color: #d1ecf1 !important;
+            border-color: #bee5eb !important;
+            color: #0c5460 !important;
         }
 
         .loading {
@@ -314,10 +359,151 @@
             color: #ffffff;
         }
 
-        .dead-air-timer {
+        /* Update button specific styling */
+        #update-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        #update-btn:hover {
+            background: linear-gradient(135deg, #218838 0%, #1fa8a2 100%);
+        }
+
+        /* Notes header with timer */
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .notes-header h1 {
+            margin: 0;
+            flex: 1;
+        }
+
+        .notes-header .dead-air-timer {
+            position: relative;
+            top: 0;
+            left: 0;
+            margin-left: 15px;
+        }
+
+        /* Bottom-right update button */
+        .update-button-bottom {
             position: fixed;
-            top: 10px;
-            right: 80px;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+        }
+
+        .update-button-bottom:hover {
+            background: linear-gradient(135deg, #218838 0%, #1fa8a2 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .update-button-bottom:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Notification container for stacking */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            max-width: 350px;
+        }
+
+        .notification-container .notification {
+            pointer-events: auto;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            opacity: 0;
+            margin-bottom: 0;
+            position: relative;
+            width: 100%;
+        }
+
+        .notification-container .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Dynamic update button (different from static ones) */
+        .dynamic-update-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 1500;
+            animation: pulse 2s infinite;
+            cursor: pointer;
+        }
+
+        .dynamic-update-button:hover {
+            background: linear-gradient(135deg, #ee5a24 0%, #c23616 100%);
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 6px 30px rgba(255,107,107,0.5); }
+            100% { box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .notes-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .notes-header .dead-air-timer {
+                margin-left: 0;
+                margin-top: 10px;
+                align-self: flex-end;
+            }
+
+            .update-button-bottom {
+                bottom: 10px;
+                right: 10px;
+                padding: 10px 16px;
+                font-size: 12px;
+            }
+
+            .update-button-bottom span {
+                display: none;
+            }
+        }
+
+        .dead-air-timer {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
             padding: 8px 16px;
@@ -590,14 +776,6 @@
     </style>
 </head>
 <body class="light-mode">
-    <div class="dead-air-timer" id="dead-air-timer">
-        <div class="mic-status" id="mic-status" title="Microphone status"></div>
-        <span id="timer-display">00:00</span>
-        <div class="timer-controls">
-            <button class="timer-btn" onclick="resetTimer()" title="I Spoke / Reset">🗣</button>
-            <button class="timer-btn" onclick="toggleAutoStart()" title="Toggle Auto-Start">🤖</button>
-        </div>
-    </div>
     
     <div class="infraction-tracker" id="infraction-tracker">
         <div class="infraction-session">
@@ -614,6 +792,16 @@
     
     <button class="theme-toggle" aria-label="Toggle between light and dark mode" onclick="toggleTheme()" id="theme-toggle-btn" tabindex="0">
         <i class="fas fa-sun" id="theme-toggle-icon" aria-hidden="true"></i>
+    </button>
+    
+    <button class="update-button-bottom" aria-label="Check for Updates" onclick="checkForUpdates()" id="update-btn" tabindex="0">
+        <i class="fas fa-sync-alt" id="update-icon" aria-hidden="true"></i>
+        <span>Check for Updates</span>
+    </button>
+    
+    <button class="theme-toggle" aria-label="Check for Updates" onclick="checkForUpdates()" id="update-btn-top" tabindex="0" style="right: 80px;">
+        <i class="fas fa-sync-alt" id="update-icon-top" aria-hidden="true"></i>
+    </button>
     </button>
 
     <div class="form-container">
@@ -695,7 +883,17 @@
 
         <!-- Form Fields on the Right -->
         <div class="form-section">
-            <h1>Notes</h1>
+            <div class="notes-header">
+                <h1>Notes</h1>
+                <div class="dead-air-timer" id="dead-air-timer">
+                    <div class="mic-status" id="mic-status" title="Microphone status"></div>
+                    <span id="timer-display">00:00</span>
+                    <div class="timer-controls">
+                        <button class="timer-btn" onclick="resetTimer()" title="I Spoke / Reset">🗣</button>
+                        <button class="timer-btn" onclick="toggleAutoStart()" title="Toggle Auto-Start">🤖</button>
+                    </div>
+                </div>
+            </div>
 
             <label for="history">View Previous Notes:</label>
             <select id="history" onchange="restoreNotes()" aria-describedby="history-help">
@@ -784,7 +982,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.0.0', // Update this when you make changes
+            currentVersion: '1.0.1', // Update this when you make changes
             githubRepo: 'shadow11001/IGAPP',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -1282,11 +1480,42 @@
                 console.log('GitHub token loaded from localStorage');
             }
         }
+        // Version comparison utility
+        function isNewerVersion(remote, current) {
+            const parseVersion = (v) => v.split('.').map(n => parseInt(n) || 0);
+            const [rMajor, rMinor, rPatch] = parseVersion(remote);
+            const [cMajor, cMinor, cPatch] = parseVersion(current);
+            
+            if (rMajor > cMajor) return true;
+            if (rMajor < cMajor) return false;
+            if (rMinor > cMinor) return true;
+            if (rMinor < cMinor) return false;
+            return rPatch > cPatch;
+        }
+
         async function checkForUpdates() {
             if (!AppState.autoUpdateEnabled) return;
             
+            const updateBtn = document.getElementById('update-btn');
+            const updateIcon = document.getElementById('update-icon');
+            const updateBtnTop = document.getElementById('update-btn-top');
+            const updateIconTop = document.getElementById('update-icon-top');
+            
+            // Add visual feedback to both buttons
+            if (updateBtn && updateIcon) {
+                updateBtn.disabled = true;
+                updateIcon.classList.add('fa-spin');
+                updateBtn.style.opacity = '0.7';
+            }
+            if (updateBtnTop && updateIconTop) {
+                updateBtnTop.disabled = true;
+                updateIconTop.classList.add('fa-spin');
+                updateBtnTop.style.opacity = '0.7';
+            }
+            
             try {
                 console.log('Checking for updates...');
+                showNotification('Checking for updates...', 'info');
                 
                 // GitHub API URL for the raw file
                 const apiUrl = `https://api.github.com/repos/${AppState.githubRepo}/contents/IGAPP.html`;
@@ -1319,16 +1548,33 @@
                 const versionMatch = remoteContent.match(/currentVersion:\s*['"`]([^'"`]+)['"`]/);
                 const remoteVersion = versionMatch ? versionMatch[1] : null;
                 
-                if (remoteVersion && remoteVersion !== AppState.currentVersion) {
+                if (remoteVersion && isNewerVersion(remoteVersion, AppState.currentVersion)) {
                     showUpdateAvailable(remoteVersion, remoteContent);
                 } else {
                     console.log('App is up to date');
                     showNotification('✅ App is up to date', 'success', 2000);
+                    // Hide the static update button since no update is available
+                    const staticUpdateBtn = document.getElementById('update-btn');
+                    if (staticUpdateBtn) {
+                        staticUpdateBtn.style.display = 'none';
+                    }
                 }
                 
             } catch (error) {
                 console.warn('Update check failed:', error);
                 showNotification('⚠️ Update check failed - Check connection', 'error', 3000);
+            } finally {
+                // Reset button state for both buttons
+                if (updateBtn && updateIcon) {
+                    updateBtn.disabled = false;
+                    updateIcon.classList.remove('fa-spin');
+                    updateBtn.style.opacity = '1';
+                }
+                if (updateBtnTop && updateIconTop) {
+                    updateBtnTop.disabled = false;
+                    updateIconTop.classList.remove('fa-spin');
+                    updateBtnTop.style.opacity = '1';
+                }
             }
         }
 
@@ -1336,21 +1582,34 @@
             const updateMessage = `🚀 Update available: v${newVersion} (current: v${AppState.currentVersion})`;
             showNotification(updateMessage, 'success', 10000);
             
-            // Add update button to page
+            // Show the static update button
+            const staticUpdateBtn = document.getElementById('update-btn');
+            if (staticUpdateBtn) {
+                staticUpdateBtn.style.display = 'flex';
+                staticUpdateBtn.innerHTML = `<i class="fas fa-sync-alt" id="update-icon" aria-hidden="true"></i><span>Update to v${newVersion}</span>`;
+            }
+            
+            // Add dynamic update button to page
             addUpdateButton(newVersion, newContent);
         }
 
         function addUpdateButton(newVersion, newContent) {
-            // Remove existing update button if present
-            const existingBtn = document.getElementById('update-btn');
+            // Remove existing dynamic update button if present
+            const existingBtn = document.getElementById('dynamic-update-btn');
             if (existingBtn) existingBtn.remove();
+            
+            // Don't show button if already up to date
+            if (!isNewerVersion(newVersion, AppState.currentVersion)) {
+                return;
+            }
             
             // Create update button
             const updateBtn = document.createElement('button');
-            updateBtn.id = 'update-btn';
-            updateBtn.className = 'update-button';
+            updateBtn.id = 'dynamic-update-btn';
+            updateBtn.className = 'dynamic-update-button';
             updateBtn.innerHTML = `📥 Update to v${newVersion}`;
             updateBtn.onclick = () => applyUpdate(newContent, newVersion);
+            updateBtn.setAttribute('aria-label', `Update application to version ${newVersion}`);
             
             // Add to page
             document.body.appendChild(updateBtn);
@@ -1594,9 +1853,13 @@
 
         // Utility functions
         function showNotification(message, type = 'success', duration = 3000) {
-            // Remove existing notifications
-            const existing = document.querySelector('.notification');
-            if (existing) existing.remove();
+            // Create notification container if it doesn't exist
+            let notificationContainer = document.querySelector('.notification-container');
+            if (!notificationContainer) {
+                notificationContainer = document.createElement('div');
+                notificationContainer.className = 'notification-container';
+                document.body.appendChild(notificationContainer);
+            }
 
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
@@ -1604,7 +1867,8 @@
             notification.setAttribute('role', 'alert');
             notification.setAttribute('aria-live', 'polite');
             
-            document.body.appendChild(notification);
+            // Insert at the beginning (top) to push others down
+            notificationContainer.insertBefore(notification, notificationContainer.firstChild);
             
             // Trigger animation
             setTimeout(() => notification.classList.add('show'), 100);
@@ -1613,7 +1877,13 @@
             setTimeout(() => {
                 if (notification.parentNode) {
                     notification.classList.remove('show');
-                    setTimeout(() => notification.remove(), 300);
+                    setTimeout(() => {
+                        notification.remove();
+                        // Remove container if empty
+                        if (notificationContainer.children.length === 0) {
+                            notificationContainer.remove();
+                        }
+                    }, 300);
                 }
             }, duration);
         }
@@ -2418,6 +2688,12 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
 
                 // Update history dropdown
                 updateHistoryDropdown();
+
+                // Hide static update button initially (only show when update available)
+                const staticUpdateBtn = document.getElementById('update-btn');
+                if (staticUpdateBtn) {
+                    staticUpdateBtn.style.display = 'none';
+                }
 
                 // Setup enhanced functionality
                 setupInputValidation();
