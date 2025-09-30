@@ -1583,13 +1583,18 @@
 
         function decodeToken(maskedToken) {
             try {
+                console.log('Decoding token of length:', maskedToken.length);
                 const key = 42; // Same XOR key
                 const decoded = atob(maskedToken);
-                return decoded.split('').map(char => 
+                console.log('Base64 decoded length:', decoded.length);
+                const result = decoded.split('').map(char => 
                     String.fromCharCode(char.charCodeAt(0) ^ key)
                 ).join('');
+                console.log('XOR decoded result length:', result.length);
+                console.log('XOR decoded starts with:', result.substring(0, 4));
+                return result;
             } catch (error) {
-                console.warn('Token decode failed:', error);
+                console.error('Token decode failed:', error);
                 return null;
             }
         }
@@ -1597,12 +1602,20 @@
         function initializeGitHubToken() {
             // Try to decode the masked token first
             if (AppState.maskedToken && AppState.maskedToken !== 'Z2hwX0VYQU1QTEVfVE9LRU5fUkVQTEFDRV9NRQ==') {
+                console.log('Attempting to decode masked token...');
                 const decodedToken = decodeToken(AppState.maskedToken);
-                if (decodedToken && decodedToken.startsWith('ghp_')) {
+                console.log('Decoded token length:', decodedToken ? decodedToken.length : 0);
+                console.log('Decoded token starts with:', decodedToken ? decodedToken.substring(0, 4) : 'null');
+                
+                if (decodedToken && decodedToken.length > 10) { // More flexible check
                     AppState.githubToken = decodedToken;
-                    console.log('GitHub token loaded from masked token');
+                    console.log('✅ GitHub token loaded from masked token');
                     return;
+                } else {
+                    console.error('❌ Failed to decode masked token or token is invalid');
                 }
+            } else {
+                console.log('No valid masked token found');
             }
             
             // Fall back to saved token in localStorage
@@ -1610,6 +1623,8 @@
             if (savedToken) {
                 AppState.githubToken = savedToken;
                 console.log('GitHub token loaded from localStorage');
+            } else {
+                console.log('No GitHub token found in localStorage either');
             }
         }
         // Version comparison utility
@@ -1647,34 +1662,91 @@
             
             try {
                 console.log('Checking for updates...');
+                console.log('GitHub Token present:', !!AppState.githubToken);
+                console.log('GitHub Repo:', AppState.githubRepo);
                 showNotification('Checking for updates...', 'info');
                 
-                // GitHub API URL for the raw file
-                const apiUrl = `https://api.github.com/repos/${AppState.githubRepo}/contents/IGAPP.html`;
+                // Try multiple possible file names (case sensitivity)
+                const possibleFiles = ['IGAPP.html', 'igapp.html', 'Igapp.html'];
+                let apiUrl, response, data;
                 
-                // Headers for API request
-                const headers = {
-                    'Accept': 'application/vnd.github.v3+json',
-                    'User-Agent': 'IGAPP-AutoUpdater'
-                };
-                
-                // Add authentication for private repo
-                if (AppState.githubToken) {
-                    headers['Authorization'] = `Bearer ${AppState.githubToken}`;
-                }
-                
-                const response = await fetch(apiUrl, { headers });
-                
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        showNotification('🔒 Update check failed: Authentication required for private repo', 'error', 5000);
-                        return;
+                for (const fileName of possibleFiles) {
+                    apiUrl = `https://api.github.com/repos/${AppState.githubRepo}/contents/${fileName}`;
+                    console.log('Trying API URL:', apiUrl);
+                    
+                    // Headers for API request - Updated to latest GitHub API standards
+                    const headers = {
+                        'Accept': 'application/vnd.github+json',
+                        'User-Agent': 'IGAPP-AutoUpdater',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    };
+                    
+                    // Add authentication for private repo
+                    if (AppState.githubToken) {
+                        headers['Authorization'] = `Bearer ${AppState.githubToken}`;
+                        console.log('Added Bearer token to headers');
+                    } else {
+                        console.warn('No GitHub token available for private repo access');
                     }
-                    throw new Error(`HTTP ${response.status}`);
+                    
+                    console.log(`Making fetch request for ${fileName}...`);
+                    response = await fetch(apiUrl, { headers });
+                    console.log(`Response status for ${fileName}:`, response.status);
+                    
+                    if (response.ok) {
+                        console.log(`✅ Found file: ${fileName}`);
+                        break;
+                    } else if (response.status === 404) {
+                        console.log(`❌ File not found: ${fileName}`);
+                        continue;
+                    } else {
+                        // Non-404 error, handle it
+                        const errorText = await response.text();
+                        console.error('API Error Response:', errorText);
+                        
+                        if (response.status === 401) {
+                            showNotification('🔒 Authentication failed - Check your GitHub token', 'error', 5000);
+                            return;
+                        } else if (response.status === 403) {
+                            showNotification('🔒 Access forbidden - Token may lack required permissions', 'error', 5000);
+                            return;
+                        }
+                        throw new Error(`HTTP ${response.status}: ${errorText}`);
+                    }
                 }
                 
-                const data = await response.json();
+                // If we get here and response is not ok, none of the files were found
+                if (!response.ok) {
+                    // Let's try to list the repository contents to see what files exist
+                    console.log('No HTML files found, checking repository contents...');
+                    const repoListUrl = `https://api.github.com/repos/${AppState.githubRepo}/contents`;
+                    const repoHeaders = {
+                        'Accept': 'application/vnd.github+json',
+                        'User-Agent': 'IGAPP-AutoUpdater',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    };
+                    if (AppState.githubToken) {
+                        repoHeaders['Authorization'] = `Bearer ${AppState.githubToken}`;
+                    }
+                    
+                    const repoResponse = await fetch(repoListUrl, { headers: repoHeaders });
+                    if (repoResponse.ok) {
+                        const repoContents = await repoResponse.json();
+                        console.log('Repository contents:', repoContents.map(item => item.name));
+                        showNotification(`📁 No IGAPP.html found. Files in repo: ${repoContents.map(item => item.name).join(', ')}`, 'error', 8000);
+                    } else {
+                        showNotification('📁 Repository or IGAPP.html file not found - Check file name and repository', 'error', 5000);
+                    }
+                    return;
+                }
+                
+                console.log('Parsing response...');
+                data = await response.json();
+                console.log('API Response data keys:', Object.keys(data));
+                console.log('Content encoding:', data.encoding);
+                
                 const remoteContent = atob(data.content.replace(/\s/g, ''));
+                console.log('Decoded content length:', remoteContent.length);
                 
                 // Extract version from remote content
                 const versionMatch = remoteContent.match(/currentVersion:\s*['"`]([^'"`]+)['"`]/);
