@@ -965,13 +965,13 @@
 
             <h4>Actions</h4>
             <div class="button-group">
-                <button onclick="addQuickNoteWithInput('Forced defrost on ', 'Enter rack/unit:')" class="quick-note-btn" title="Force Defrost">Defrost</button>
+                <button onclick="addQuickNoteWithInput('Forced defrost on ', 'Enter circuit:')" class="quick-note-btn" title="Force Defrost">Defrost</button>
                 <button onclick="addQuickNote('Terminated Defrost.')" class="quick-note-btn" title="Stop Defrost">Stop Defrost</button>
                 <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
                 <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
                 <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
                 <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
-                <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">Setpoint</button>
+                <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">RTU Setpoint</button>
                 <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
             </div>
 
@@ -2863,7 +2863,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             const heatTemp = window.prompt('Enter heating setpoint (°F):\n\nExample: 68');
             if (heatTemp === null || heatTemp.trim() === '') return;
             
-            const unit = window.prompt('Enter unit/RTU:\n\nExamples:\n• RTU 1\n• RTU 2\n• HVAC Unit A\n• Unit 3');
+            const unit = window.prompt('Enter RTU/AHU:\n\nExamples:\n• RTU 1\n• AHU 2\n• RG3\n• RE4');
             if (unit === null || unit.trim() === '') return;
             
             const note = `Changed setpoint to ${coolTemp.trim()}/${heatTemp.trim()} for ${unit.trim()}.`;
@@ -2924,7 +2924,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         }
 
         function addReplaceNote() {
-            const component = window.prompt('Replace what?\n\nExamples:\n• temperature sensor\n• controller board\n• communication cable\n• valve actuator');
+            const component = window.prompt('Replace what?\n\nExamples:\n• temperature sensor\n• controller board\n• communication cable\n• RIM board');
             if (component !== null && component.trim() !== '') {
                 addQuickNote('Advised to replace ' + component.trim() + '.');
                 // Tag analysis is handled by addQuickNote
