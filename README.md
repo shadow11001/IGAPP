@@ -4,26 +4,49 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 
 ## 🌟 Features
 
-### 📋 QA Checklist
-- **Interactive checklist** with essential call quality checkpoints
-- **Visual reminders** for proper call flow and documentation requirements
-- **Compliance tracking** for VCC tagging and service channel notation
+### 🎯 Quick Notes System
+- **AutoHotkey-style quick buttons** organized by category for rapid note entry
+- **Smart categorization** - System Login, Diagnostics, Actions, Downloads, Call Status, and Recommendations
+- **Circuit-specific controls** - Updated Defrost button prompts for "Enter circuit:"
+- **RTU/AHU management** - RTU Setpoint button with specialized prompts for RTU/AHU units
+- **Equipment replacement** - Updated examples including RIM board replacements
+
+### ⏱️ Dead Air Timer & Audio Detection
+- **Automatic dead air monitoring** with visual warnings at 25+ seconds
+- **Microphone detection** - Auto-resets timer when voice is detected
+- **Call detection** - Automatically starts timer when calls are detected
+- **Infraction tracking** - Records violations after 30 seconds of dead air
+- **Session and total counters** with manual override capabilities
+
+### 🏷️ Smart Tag Recommendations
+- **AI-powered tag analysis** based on notes content
+- **Confidence levels** - High, medium, and low confidence recommendations
+- **Interactive selection** - Click to select/deselect recommended tags
+- **Real-time updates** as notes are modified
 
 ### 📝 Note Templates (DAE)
 - **16 predefined templates** for common Digital Asset Expert scenarios
 - **Smart template loading** with user confirmation for overwrite protection
 - **Quick copy functionality** for seamless note transfer
 
+### 🔄 Auto-Update System
+- **GitHub integration** with private repository support
+- **Automatic version checking** and update notifications
+- **UTF-8 encoding preservation** - Maintains emojis and special characters
+- **Dual update methods** - Copy to clipboard (recommended) or file download
+- **Bearer token authentication** for secure private repository access
+
 ### 💾 Data Management
 - **Auto-save functionality** - Automatically saves form data every 30 seconds
 - **7-day history retention** - Access previously saved notes
 - **Duplicate prevention** - Intelligent filtering of similar entries
 - **Local storage** - All data stored securely in browser
+- **Notes export functionality** - Export usage data for analysis
 
 ### 🎨 User Experience
 - **Light/Dark theme** toggle with F2 keyboard shortcut
 - **Responsive design** - Works on desktop, tablet, and mobile
-- **Toast notifications** - Clear feedback for all actions
+- **Stacked notifications** - Multiple notifications display properly
 - **Loading indicators** - Visual feedback during operations
 - **Input validation** - Real-time validation for store numbers
 
@@ -42,12 +65,37 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 ## 📖 Usage Guide
 
 ### Basic Workflow
-1. **Review the QA Checklist** on the left side before starting your call
-2. **Fill in technician information** (Name, Store Number, Work Order)
-3. **Select a DAE template** if applicable
-4. **Add your call notes** in the designated textarea
-5. **Copy notes** to clipboard when ready
-6. **Data is automatically saved** to history
+1. **Use Quick Notes buttons** on the left for rapid note entry
+2. **Monitor the dead air timer** in the top-right during calls
+3. **Fill in technician information** (Name, Store Number, Work Order)
+4. **Select a DAE template** if applicable for escalations
+5. **Add your call notes** using quick buttons and manual entry
+6. **Review tag recommendations** and select relevant ones
+7. **Copy notes** to clipboard when ready
+8. **Data is automatically saved** to history
+
+### Quick Notes Categories
+- **System Login** - Novar, Opus Arch, Opus Mag, CPC, AKA65, Storeview
+- **Diagnostics** - Comms, Temps, Alarms, Clocks, Ping, Test
+- **Ping Results** - Good Ping (green), Ping Timeout (red)
+- **Actions** - Defrost (circuit-specific), Force On/Off, RTU Setpoint, Reset Clocks
+- **Downloads** - Version, Load Change, Comms+LC, Main+LC, Full DL
+- **Call Status** - All Good, No Good, Tech T/S, Call Done, Escalate
+- **Special Cases** - Call Dropped, NSRM, Power Cycle
+- **Recommendations** - Monitor, Contact, Replace (including RIM board)
+
+### Dead Air Timer Features
+- **Automatic start** when calls are detected (requires microphone permission)
+- **Voice detection** automatically resets timer when you speak
+- **Visual warnings** at 25 seconds (orange) and 30+ seconds (red)
+- **Infraction tracking** records violations after 30 seconds
+- **Manual controls** - "I Spoke" button and auto-start toggle
+
+### Auto-Update System
+- **Automatic checking** for new versions from GitHub
+- **Copy method (recommended)** - Preserves UTF-8 encoding and emojis
+- **Download method** - Alternative file download option
+- **Private repository support** - Uses secure Bearer token authentication
 
 ### Available DAE Templates
 - Help Desk Post
@@ -71,6 +119,7 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 - **F2** - Toggle light/dark theme
 - **Ctrl+Shift+C** - Quick copy all notes
 - **Tab/Shift+Tab** - Navigate between form fields
+- **Spacebar** - Manual dead air timer control (when focused on timer)
 
 ## 🔧 Technical Specifications
 
@@ -82,12 +131,20 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 
 ### Dependencies
 - **Font Awesome 6.4.0** (CDN) - Icons and theme toggle
-- **No other external dependencies**
+- **Web Audio API** - For microphone detection and call monitoring
+- **GitHub API** - For automatic updates (requires authentication for private repos)
+- **Clipboard API** - For seamless copy functionality
+
+### Required Permissions
+- **Microphone access** - For automatic dead air detection and voice recognition
+- **Clipboard access** - For copying notes and update code
+- **Local storage** - For saving preferences and notes history
 
 ### File Structure
 ```
 IGAPP/
 ├── IGAPP.html          # Complete application (self-contained)
+├── IGAPP_old.html      # Previous version for testing updates
 └── README.md           # This documentation
 ```
 
@@ -97,13 +154,37 @@ IGAPP/
 - **Theme preference** - Persists light/dark mode selection
 - **Notes history** - Stores last 7 days of saved entries
 - **Auto-cleanup** - Automatically removes entries older than 7 days
+- **Infraction tracking** - Maintains total infraction count across sessions
+- **Selected tags** - Remembers tag selections for current session
+- **GitHub token** - Securely stores encrypted authentication token
 
 ### Data Privacy
 - **No external servers** - All data stays in your browser
 - **No tracking** - No analytics or user tracking
 - **Local only** - Data never leaves your device
+- **Encrypted tokens** - GitHub tokens are obfuscated using XOR encryption
 
 ## 🛠️ Advanced Features
+
+### Dead Air Monitoring System
+- **Real-time audio analysis** using Web Audio API
+- **Configurable thresholds** for voice and call detection
+- **Visual indicators** - Microphone status and timer warnings
+- **Session tracking** - Separate counters for current call and total infractions
+- **Manual overrides** - Clear individual infractions or reset totals
+
+### Smart Tag System
+- **Content analysis** - Scans notes for relevant keywords and phrases
+- **Confidence scoring** - Ranks recommendations by relevance
+- **Interactive selection** - Visual feedback for selected tags
+- **Real-time updates** - Recommendations change as notes are edited
+
+### Auto-Update Mechanism
+- **Version comparison** - Semantic versioning support
+- **GitHub API integration** - Fetches updates from private repositories
+- **UTF-8 preservation** - Uses TextDecoder API to maintain character encoding
+- **Multiple update methods** - Copy to clipboard or download file
+- **Fallback handling** - Graceful degradation if authentication fails
 
 ### Auto-Save Functionality
 - Automatically saves form data after 30 seconds of inactivity
@@ -149,6 +230,26 @@ IGAPP/
 
 ### Common Issues
 
+**Microphone not working:**
+- Grant microphone permission when prompted
+- Check browser microphone settings
+- Ensure microphone is not muted or in use by other applications
+
+**Dead air timer not auto-starting:**
+- Microphone permission required for call detection
+- Click "I Spoke" button to manually reset timer
+- Toggle auto-start feature if needed
+
+**Updates not working:**
+- Ensure GitHub token is properly configured for private repository access
+- Check internet connection for GitHub API access
+- Try manual refresh if automatic check fails
+
+**Character encoding issues:**
+- Use copy method instead of download for better UTF-8 preservation
+- Ensure text editor saves files as UTF-8 when manually updating
+- Modern browsers required for proper TextDecoder support
+
 **Theme not persisting:**
 - Ensure browser allows localStorage
 - Check if browser is in private/incognito mode
@@ -164,6 +265,18 @@ IGAPP/
 **Mobile layout issues:**
 - Ensure viewport meta tag is present
 - Test in browser (not WebView) for best results
+
+### Audio Detection Issues
+
+**Call detection not working:**
+- Browser may require user gesture before accessing audio
+- Try clicking page first, then make/receive call
+- Manual controls available as fallback
+
+**Voice detection inconsistent:**
+- Adjust microphone sensitivity in browser settings
+- Ensure clear speech and minimal background noise
+- Use manual "I Spoke" button when needed
 
 ## 🔄 Updates & Maintenance
 
@@ -199,6 +312,41 @@ IGAPP/
 - **JavaScript**: Required for all functionality
 - **localStorage**: Required for data persistence
 - **CSS3**: Required for styling and animations
+- **Web Audio API**: Required for microphone detection and dead air monitoring
+- **Clipboard API**: Required for seamless copy operations
+- **TextDecoder API**: Required for proper UTF-8 handling in updates
+
+## 📋 Changelog
+
+### Version 1.0.5 - Latest Release
+- ✅ **UTF-8 encoding fixes** - Proper character preservation during updates
+- ✅ **Enhanced Quick Notes** - Circuit-specific defrost prompts
+- ✅ **RTU Setpoint improvements** - Updated to RTU/AHU with new examples (RTU 1, AHU 2, RG3, RE4)
+- ✅ **Equipment replacement updates** - RIM board examples in replace function
+- ✅ **Private repository support** - Bearer token authentication for GitHub API
+- ✅ **Improved error handling** - Better debugging and fallback mechanisms
+- ✅ **Variable scope fixes** - Resolved update mechanism issues
+
+### Previous Major Features
+- ✅ Enhanced accessibility with ARIA labels
+- ✅ Auto-save functionality with duplicate prevention
+- ✅ Dead air timer with microphone detection
+- ✅ Smart tag recommendation system
+- ✅ Infraction tracking with session/total counters
+- ✅ Auto-update system with GitHub integration
+- ✅ Stacked notification system
+- ✅ Mobile-responsive design improvements
+- ✅ Keyboard navigation enhancements
+- ✅ Visual feedback system with toast notifications
+- ✅ Input validation for store numbers
+- ✅ Loading indicators for async operations
+
+### Recent Fixes
+- 🔧 **Character encoding corruption** - Fixed emoji/icon preservation during updates
+- 🔧 **GitHub API authentication** - Updated to Bearer token standard
+- 🔧 **Scope resolution** - Fixed remoteContent variable accessibility
+- 🔧 **Update mechanism** - Enhanced UTF-8 decoding using TextDecoder API
+- 🔧 **Button prompt updates** - More accurate terminology for equipment types
 
 ## 📄 License & Credits
 
@@ -207,21 +355,12 @@ This application is developed for internal Walmart Digital Assets use.
 
 ### Credits
 - **Font Awesome** - Icons and theme toggle functionality
+- **Web Audio API** - Microphone detection and audio analysis
+- **GitHub API** - Automated update system
+- **TextDecoder API** - UTF-8 character encoding preservation
 - **Modern CSS** - Responsive design and animations
 - **Vanilla JavaScript** - No framework dependencies
 
-## 📋 Changelog
-
-### Latest Version Features
-- ✅ Enhanced accessibility with ARIA labels
-- ✅ Auto-save functionality with duplicate prevention
-- ✅ Improved error handling and user feedback
-- ✅ Mobile-responsive design improvements
-- ✅ Keyboard navigation enhancements
-- ✅ Visual feedback system with toast notifications
-- ✅ Input validation for store numbers
-- ✅ Loading indicators for async operations
-
 ---
 
-*This application is designed to be completely portable and self-contained. Simply download the HTML file and open in any modern web browser to get started.*
+*This application is designed to be completely portable and self-contained. Simply download the HTML file and open in any modern web browser to get started. For the best experience, allow microphone access for automatic dead air detection and ensure a stable internet connection for auto-updates.*
