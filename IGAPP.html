@@ -1745,8 +1745,32 @@
                 console.log('API Response data keys:', Object.keys(data));
                 console.log('Content encoding:', data.encoding);
                 
-                const remoteContent = atob(data.content.replace(/\s/g, ''));
-                console.log('Decoded content length:', remoteContent.length);
+                // Properly decode UTF-8 content from GitHub API
+                let remoteContent;
+                if (data.encoding === 'base64') {
+                    // GitHub returns base64-encoded content
+                    const base64Content = data.content.replace(/\s/g, '');
+                    console.log('Base64 content length:', base64Content.length);
+                    
+                    try {
+                        // Use proper UTF-8 decoding instead of atob
+                        const binaryString = atob(base64Content);
+                        const bytes = new Uint8Array(binaryString.length);
+                        for (let i = 0; i < binaryString.length; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
+                        }
+                        remoteContent = new TextDecoder('utf-8').decode(bytes);
+                        console.log('UTF-8 decoded content length:', remoteContent.length);
+                        console.log('Content starts with:', remoteContent.substring(0, 50));
+                    } catch (decodeError) {
+                        console.error('UTF-8 decode failed, falling back to atob:', decodeError);
+                        remoteContent = atob(base64Content);
+                    }
+                } else {
+                    // Content is not base64 encoded
+                    remoteContent = data.content;
+                }
+                console.log('Final decoded content length:', remoteContent.length);
                 
                 // Extract version from remote content
                 const versionMatch = remoteContent.match(/currentVersion:\s*['"`]([^'"`]+)['"`]/);
