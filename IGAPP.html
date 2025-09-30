@@ -1660,7 +1660,7 @@
                 
                 // Add authentication for private repo
                 if (AppState.githubToken) {
-                    headers['Authorization'] = `token ${AppState.githubToken}`;
+                    headers['Authorization'] = `Bearer ${AppState.githubToken}`;
                 }
                 
                 const response = await fetch(apiUrl, { headers });
