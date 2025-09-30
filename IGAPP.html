@@ -1767,17 +1767,33 @@
         }
 
         function copyUpdateToClipboard(newContent, newVersion) {
-            navigator.clipboard.writeText(newContent).then(() => {
+            // Add UTF-8 BOM to preserve encoding
+            const utf8BOM = '\uFEFF';
+            const contentWithBOM = utf8BOM + newContent;
+            
+            navigator.clipboard.writeText(contentWithBOM).then(() => {
                 showNotification(`📋 v${newVersion} code copied to clipboard!`, 'success', 5000);
                 
-                // Show instructions
+                // Show enhanced instructions
                 const instructions = `
-Instructions for manual update:
-1. Select all text in this file (Ctrl+A)
-2. Delete all content (Delete key)
-3. Paste the new code (Ctrl+V)
-4. Save the file (Ctrl+S)
-5. Refresh the page (F5)
+Instructions for manual update (PRESERVES EMOJIS):
+
+METHOD 1 - Direct Replacement:
+1. Right-click this HTML file in your file manager
+2. Open with a text editor (Notepad++, VS Code, etc.)
+3. Select All (Ctrl+A) and Delete
+4. Paste the new code (Ctrl+V)
+5. Save (Ctrl+S) - MAKE SURE TO SAVE AS UTF-8 ENCODING
+6. Refresh this page (F5)
+
+METHOD 2 - Alternative:
+1. Create a new file named "IGAPP_new.html"
+2. Paste the copied code into it
+3. Save as UTF-8 encoding
+4. Replace your current file with the new one
+5. Refresh
+
+IMPORTANT: Make sure your text editor saves as UTF-8 to preserve emojis!
 
 This method preserves all icons and emojis correctly.
                 `.trim();
@@ -2025,8 +2041,10 @@ ${JSON.stringify(exportData, null, 2)}
                 // Get the current file name
                 const currentFileName = window.location.pathname.split('/').pop() || 'IGAPP.html';
                 
-                // Create a blob with proper UTF-8 encoding
-                const blob = new Blob([newContent], { 
+                // Add UTF-8 BOM and create blob with explicit UTF-8 encoding
+                const utf8BOM = '\uFEFF';
+                const contentWithBOM = utf8BOM + newContent;
+                const blob = new Blob([contentWithBOM], { 
                     type: 'text/html;charset=utf-8' 
                 });
                 const url = URL.createObjectURL(blob);
