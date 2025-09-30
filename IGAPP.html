@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version: 1.0.3 -->
+<!-- Version: 1.0.4 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1076,6 +1076,10 @@
             <button onclick="clearForm()" aria-describedby="clear-all-help" class="danger-button">Clear Everything</button>
             <small id="clear-all-help" class="sr-only">Clear all form fields and delete all saved history</small>
             
+            <!-- Temporary Export Feature -->
+            <button onclick="exportNotesData()" aria-describedby="export-help" class="primary-button" style="margin-top: 10px; background: #6f42c1;">📊 Export Notes Data</button>
+            <small id="export-help" class="sr-only">Export your notes usage data for analysis and improvement</small>
+            
             <div id="tag-recommendations" class="tag-recommendations">
                 <h4>Recommended Tags</h4>
                 <div id="recommended-tags" class="tag-list">
@@ -1110,7 +1114,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.0.3', // Update this when you make changes
+            currentVersion: '1.0.4', // Update this when you make changes
             githubRepo: 'shadow11001/IGAPP',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -1791,6 +1795,133 @@ This method preserves all icons and emojis correctly.
             }).catch(() => {
                 showNotification('❌ Failed to copy to clipboard', 'error', 3000);
             });
+        }
+
+        // Temporary export function for notes analysis
+        function exportNotesData() {
+            try {
+                // Collect all notes data
+                const exportData = {
+                    timestamp: new Date().toISOString(),
+                    currentVersion: AppState.currentVersion,
+                    currentNotes: document.getElementById('notes').value,
+                    savedNotes: JSON.parse(localStorage.getItem('savedNotes') || '[]'),
+                    totalSavedNotes: JSON.parse(localStorage.getItem('savedNotes') || '[]').length,
+                    sessionInfractions: AppState.sessionInfractions,
+                    totalInfractions: AppState.totalInfractions,
+                    selectedTags: Array.from(AppState.selectedTags || []),
+                    
+                    // Usage statistics
+                    notesHistory: JSON.parse(localStorage.getItem('savedNotes') || '[]').map(note => ({
+                        date: note.date,
+                        length: note.notes ? note.notes.length : 0,
+                        hasDAE: note.dae ? note.dae.length > 0 : false,
+                        techName: note.techName ? 'present' : 'empty',
+                        storeNumber: note.storeNumber ? 'present' : 'empty',
+                        workOrder: note.workOrder ? 'present' : 'empty'
+                    })),
+                    
+                    // Most common words/phrases analysis
+                    commonPhrases: analyzeCommonPhrases()
+                };
+
+                // Create formatted export
+                const exportText = `
+=== IGAPP NOTES DATA EXPORT ===
+Export Date: ${exportData.timestamp}
+App Version: ${exportData.currentVersion}
+
+=== CURRENT SESSION ===
+Current Notes Length: ${exportData.currentNotes.length} characters
+Session Infractions: ${exportData.sessionInfractions}
+Total Infractions: ${exportData.totalInfractions}
+Selected Tags: ${exportData.selectedTags.join(', ') || 'None'}
+
+=== USAGE STATISTICS ===
+Total Saved Notes: ${exportData.totalSavedNotes}
+Notes with DAE: ${exportData.notesHistory.filter(n => n.hasDAE).length}
+Notes with Tech Name: ${exportData.notesHistory.filter(n => n.techName === 'present').length}
+Notes with Store Number: ${exportData.notesHistory.filter(n => n.storeNumber === 'present').length}
+Notes with Work Order: ${exportData.notesHistory.filter(n => n.workOrder === 'present').length}
+
+Average Notes Length: ${exportData.notesHistory.length > 0 ? Math.round(exportData.notesHistory.reduce((sum, n) => sum + n.length, 0) / exportData.notesHistory.length) : 0} characters
+
+=== COMMON PHRASES ===
+${exportData.commonPhrases.join('\n')}
+
+=== RAW DATA (JSON) ===
+${JSON.stringify(exportData, null, 2)}
+                `.trim();
+
+                // Copy to clipboard
+                navigator.clipboard.writeText(exportText).then(() => {
+                    showNotification('📊 Notes data exported to clipboard!', 'success', 5000);
+                    alert('Notes data exported to clipboard!\n\nThis includes:\n- Usage statistics\n- Common phrases\n- Raw data for analysis\n\nPaste this data to share for Quick Notes improvement.');
+                }).catch(() => {
+                    // Fallback: download as file
+                    const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `IGAPP_Notes_Export_${new Date().toISOString().split('T')[0]}.txt`;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    showNotification('📊 Notes data downloaded as file!', 'success', 5000);
+                });
+
+            } catch (error) {
+                console.error('Export failed:', error);
+                showNotification('❌ Export failed', 'error', 3000);
+            }
+        }
+
+        function analyzeCommonPhrases() {
+            try {
+                const savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+                const allNotesText = savedNotes.map(note => note.notes || '').join(' ').toLowerCase();
+                
+                if (!allNotesText) return ['No notes data available'];
+
+                // Common technical phrases to look for
+                const commonPatterns = [
+                    /logged into \w+/gi,
+                    /called \w+/gi,
+                    /contacted \w+/gi,
+                    /replaced \w+/gi,
+                    /tested \w+/gi,
+                    /checked \w+/gi,
+                    /updated \w+/gi,
+                    /installed \w+/gi,
+                    /configured \w+/gi,
+                    /troubleshoot\w*/gi,
+                    /issue with \w+/gi,
+                    /problem with \w+/gi,
+                    /error \w+/gi,
+                    /\d{4,} \w*/gi // Store numbers and similar
+                ];
+
+                const foundPhrases = [];
+                commonPatterns.forEach(pattern => {
+                    const matches = allNotesText.match(pattern);
+                    if (matches) {
+                        foundPhrases.push(...matches);
+                    }
+                });
+
+                // Count frequency and return top phrases
+                const frequency = {};
+                foundPhrases.forEach(phrase => {
+                    frequency[phrase] = (frequency[phrase] || 0) + 1;
+                });
+
+                return Object.entries(frequency)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 20)
+                    .map(([phrase, count]) => `"${phrase}" (used ${count} times)`);
+
+            } catch (error) {
+                return ['Error analyzing phrases'];
+            }
         }
 
         function applyUpdate(newContent, newVersion) {
