@@ -1267,6 +1267,12 @@
             </div>
         </div>
         <div class="settings-item">
+            <span class="settings-label">🧪 Test Usage Report</span>
+            <button class="settings-test-btn" id="test-report-btn" onclick="testUsageReport()" title="Send test usage report to GitHub">
+                Send Now
+            </button>
+        </div>
+        <div class="settings-item">
             <span class="settings-label">🔄 Auto Updates</span>
             <div class="settings-toggle" id="updates-toggle" onclick="toggleAutoUpdateFromSettings()">
                 <div class="settings-toggle-slider"></div>
@@ -2618,11 +2624,21 @@ ${JSON.stringify(exportData, null, 2)}
                 console.log('📊 Generating weekly usage report...');
                 
                 const reportData = generateUsageReportData();
+                
+                // Validate we have meaningful data
+                if (!reportData || !reportData.userHash) {
+                    console.warn('⚠️ Report data invalid, skipping submission');
+                    return;
+                }
+                
                 await submitUsageReportToGitHub(reportData);
                 
                 // Update last report timestamp
                 AppState.usageTracking.lastReport = Date.now();
                 localStorage.setItem('lastUsageReport', AppState.usageTracking.lastReport.toString());
+                
+                // Clear session data after successful report
+                AppState.usageTracking.notePatterns = [];
                 
                 showNotification('📊 Anonymous usage data submitted - Thank you for helping improve the app!', 'success', 5000);
                 console.log('✅ Usage report submitted successfully');
@@ -2641,27 +2657,45 @@ ${JSON.stringify(exportData, null, 2)}
                 .sort(([,a], [,b]) => b - a)
                 .slice(0, 25); // Top 25 most used buttons
             
+            // Ensure we have some data - add default if empty
+            if (buttonStats.length === 0) {
+                buttonStats.push(['No button usage recorded', 0]);
+            }
+            
             // Analyze note patterns (no actual content)
+            const notePatternCount = AppState.usageTracking.notePatterns.length;
             const noteStats = {
-                averageLength: AppState.usageTracking.notePatterns.reduce((sum, p) => sum + p.length, 0) / Math.max(AppState.usageTracking.notePatterns.length, 1),
-                averageWordCount: AppState.usageTracking.notePatterns.reduce((sum, p) => sum + p.wordCount, 0) / Math.max(AppState.usageTracking.notePatterns.length, 1),
-                percentWithNumbers: AppState.usageTracking.notePatterns.filter(p => p.hasNumbers).length / Math.max(AppState.usageTracking.notePatterns.length, 1) * 100,
-                totalNotesSaved: savedNotes.length
+                averageLength: notePatternCount > 0 ? 
+                    Math.round(AppState.usageTracking.notePatterns.reduce((sum, p) => sum + p.length, 0) / notePatternCount) : 0,
+                averageWordCount: notePatternCount > 0 ? 
+                    Math.round(AppState.usageTracking.notePatterns.reduce((sum, p) => sum + p.wordCount, 0) / notePatternCount) : 0,
+                percentWithNumbers: notePatternCount > 0 ? 
+                    Math.round(AppState.usageTracking.notePatterns.filter(p => p.hasNumbers).length / notePatternCount * 100) : 0,
+                totalNotesSaved: savedNotes.length,
+                sessionNotesAnalyzed: notePatternCount
             };
             
             // Analyze saved notes for common patterns (anonymized)
             const commonPhrases = analyzeCommonPhrasesForButtonSuggestions(savedNotes);
             
-            return {
-                userHash: AppState.usageTracking.userHash,
+            const reportData = {
+                userHash: AppState.usageTracking.userHash || 'unknown',
                 reportDate: new Date().toISOString().split('T')[0],
                 sessionDuration: Math.round((Date.now() - AppState.usageTracking.sessionStart) / 1000 / 60), // minutes
                 version: AppState.currentVersion,
                 buttonUsage: buttonStats,
                 noteStatistics: noteStats,
                 buttonSuggestions: commonPhrases,
-                reportingPeriod: '7days'
+                reportingPeriod: '7days',
+                dataQuality: {
+                    hasButtonData: Object.keys(AppState.usageTracking.buttonClicks).length > 0,
+                    hasNotePatterns: notePatternCount > 0,
+                    hasSavedNotes: savedNotes.length > 0
+                }
             };
+            
+            console.log('📊 Generated report data:', reportData);
+            return reportData;
         }
         
         function analyzeCommonPhrasesForButtonSuggestions(savedNotesData) {
@@ -2721,28 +2755,37 @@ ${JSON.stringify(exportData, null, 2)}
                 throw new Error('GitHub credentials not available');
             }
             
-            const issueTitle = `Usage Analytics - ${reportData.reportDate} - ${reportData.userHash.substring(0, 8)}`;
+            const issueTitle = `${reportData.isTestReport ? '[TEST] ' : ''}Usage Analytics - ${reportData.reportDate} - ${reportData.userHash.substring(0, 8)}`;
             const issueBody = `
-## 📊 Weekly Usage Analytics Report
+## 📊 ${reportData.isTestReport ? 'TEST ' : ''}Weekly Usage Analytics Report
 
-**Report Date:** ${reportData.reportDate}
+${reportData.isTestReport ? '**⚠️ This is a test report for debugging purposes**\n\n' : ''}**Report Date:** ${reportData.reportDate}
 **User ID:** ${reportData.userHash.substring(0, 8)}...
 **Session Duration:** ${reportData.sessionDuration} minutes
 **App Version:** ${reportData.version}
 
-### 🔥 Most Used Buttons (Top 25)
-${reportData.buttonUsage.map(([button, clicks]) => `- **${button}**: ${clicks} clicks`).join('\n')}
+### � Data Quality Summary
+- **Button Data Available:** ${reportData.dataQuality.hasButtonData ? '✅ Yes' : '❌ No'}
+- **Note Patterns Analyzed:** ${reportData.dataQuality.hasNotePatterns ? '✅ Yes' : '❌ No'}
+- **Saved Notes Available:** ${reportData.dataQuality.hasSavedNotes ? '✅ Yes' : '❌ No'}
+
+### �🔥 Most Used Buttons (Top 25)
+${reportData.buttonUsage.length > 0 ? 
+    reportData.buttonUsage.map(([button, clicks]) => `- **${button}**: ${clicks} clicks`).join('\n') :
+    '- No button usage data available this session'
+}
 
 ### 📝 Note Statistics
 - **Total Notes Saved:** ${reportData.noteStatistics.totalNotesSaved}
-- **Average Note Length:** ${Math.round(reportData.noteStatistics.averageLength)} characters
-- **Average Word Count:** ${Math.round(reportData.noteStatistics.averageWordCount)} words
-- **Notes with Numbers:** ${Math.round(reportData.noteStatistics.percentWithNumbers)}%
+- **Session Notes Analyzed:** ${reportData.noteStatistics.sessionNotesAnalyzed}
+- **Average Note Length:** ${reportData.noteStatistics.averageLength} characters
+- **Average Word Count:** ${reportData.noteStatistics.averageWordCount} words
+- **Notes with Numbers:** ${reportData.noteStatistics.percentWithNumbers}%
 
 ### 💡 Suggested New Buttons (Based on Common User Patterns)
 ${reportData.buttonSuggestions.length > 0 ? 
     reportData.buttonSuggestions.map(item => `- "${item.suggestion}" (used ${item.frequency} times)`).join('\n') :
-    'No new button suggestions this period'
+    'No new button suggestions this period (requires more usage data)'
 }
 
 ### 🔍 Raw Analytics Data
@@ -2792,6 +2835,43 @@ ${JSON.stringify(reportData, null, 2)}
             updateSettingsToggles();
             
             console.log(`📊 Usage reporting ${status}`);
+        }
+        
+        async function testUsageReport() {
+            const testBtn = document.getElementById('test-report-btn');
+            
+            // Disable button during test
+            testBtn.disabled = true;
+            testBtn.textContent = 'Sending...';
+            
+            try {
+                if (!AppState.usageTracking.reportingEnabled) {
+                    showNotification('⚠️ Enable usage analytics first', 'error', 3000);
+                    return;
+                }
+                
+                console.log('🧪 Sending test usage report...');
+                showNotification('🧪 Generating test usage report...', 'info', 2000);
+                
+                const reportData = generateUsageReportData();
+                
+                // Add test indicator to the report
+                reportData.isTestReport = true;
+                reportData.testTimestamp = new Date().toISOString();
+                
+                await submitUsageReportToGitHub(reportData);
+                
+                showNotification('✅ Test usage report sent successfully!', 'success', 5000);
+                console.log('✅ Test report submitted successfully');
+                
+            } catch (error) {
+                console.error('❌ Test report failed:', error);
+                showNotification(`❌ Test report failed: ${error.message}`, 'error', 5000);
+            } finally {
+                // Re-enable button
+                testBtn.disabled = false;
+                testBtn.textContent = 'Send Now';
+            }
         }
 
         // Settings Menu Functions
