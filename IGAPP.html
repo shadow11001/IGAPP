@@ -1267,8 +1267,8 @@
             </div>
         </div>
         <div class="settings-item">
-            <span class="settings-label">🧪 Test Usage Report</span>
-            <button class="settings-test-btn" id="test-report-btn" onclick="testUsageReport()" title="Send test usage report to GitHub">
+            <span class="settings-label">📤 Send Usage Report</span>
+            <button class="settings-test-btn" id="send-report-btn" onclick="sendUsageReport()" title="Send usage report to GitHub">
                 Send Now
             </button>
         </div>
@@ -1277,6 +1277,12 @@
             <div class="settings-toggle" id="updates-toggle" onclick="toggleAutoUpdateFromSettings()">
                 <div class="settings-toggle-slider"></div>
             </div>
+        </div>
+        <div class="settings-item">
+            <span class="settings-label">📊 Export Notes Data</span>
+            <button class="settings-test-btn" onclick="exportNotesData()" title="Export all notes data for analysis">
+                Export
+            </button>
         </div>
         <div class="settings-item">
             <span class="settings-label">⚠️ Visual Dead Air Warnings</span>
@@ -1310,19 +1316,18 @@
 
             <h4>Diagnostics</h4>
             <div class="button-group">
-                <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn" title="Communications Check">Comms ✓</button>
-                <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn" title="Communications Loss">Comms ✗</button>
+                <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
+                <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
                 <button onclick="addQuickNote('Checked temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
                 <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
                 <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn" title="Clock Check">Clocks</button>
                 <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn" title="Ping Test">Ping</button>
-                <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Test</button>
-            </div>
-
-            <h4>Ping Results</h4>
-            <div class="button-group">
                 <button onclick="addQuickNote('Receiving good ping.')" class="quick-note-btn success-quick" title="Successful Ping">Good Ping</button>
                 <button onclick="addQuickNote('Ping timedout.')" class="quick-note-btn error-quick" title="Failed Ping">Ping Timeout</button>
+                <button onclick="addCheckBreakersNote()" class="quick-note-btn" title="Check Breakers">Check Breakers</button>
+                <button onclick="addDefrostAlreadyRunningNote()" class="quick-note-btn" title="Defrost Already Active">Already Defrosting</button>
+                <button onclick="addQuickNote('Defrost already terminated.')" class="quick-note-btn" title="Defrost Already Ended">Already Terminated</button>
+                <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Test</button>
             </div>
 
             <h4>Actions</h4>
@@ -1333,7 +1338,6 @@
                 <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
                 <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
                 <button onclick="addShutdownCircuitNote()" class="quick-note-btn" title="Shutdown Circuit">Shutdown Circuit</button>
-                <button onclick="addCheckBreakersNote()" class="quick-note-btn" title="Check Breakers">Check Breakers</button>
                 <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
                 <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">RTU Setpoint</button>
                 <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
@@ -1366,6 +1370,7 @@
                 <button onclick="addQuickNote('This is a Sams store.')" class="quick-note-btn" title="Sam's Club Store">Sams</button>
                 <button onclick="addQuickNote('Submitted PCR.')" class="quick-note-btn success-quick" title="Point Change Request Submitted">Submitted PCR</button>
                 <button onclick="addQuickNote('Submitted PDR.')" class="quick-note-btn success-quick" title="Parameter Deviation Request Submitted">Submitted PDR</button>
+                <button onclick="addAdvisoryNote()" class="quick-note-btn" title="Advise Tech of Issue">Advisory</button>
             </div>
 
             <h4>Recommendations</h4>
@@ -1373,6 +1378,13 @@
                 <button onclick="addQuickNote('Advised to monitor and call back if issues persist.')" class="quick-note-btn" title="Monitor Instruction">Monitor</button>
                 <button onclick="showContactOptions()" class="quick-note-btn" title="Contact Instruction">Contact</button>
                 <button onclick="addReplaceNote()" class="quick-note-btn" title="Replace Instruction">Replace</button>
+            </div>
+
+            <h4>Communication</h4>
+            <div class="button-group">
+                <button onclick="addTechQuestionNote()" class="quick-note-btn" title="Tech Asked Question">Tech Question</button>
+                <button onclick="addStatusUpdateNote()" class="quick-note-btn" title="Status Update Request">Status Update</button>
+                <button onclick="addTechRefusedNote()" class="quick-note-btn error-quick" title="Tech Refused Action">Tech Refused</button>
             </div>
         </div>
 
@@ -1457,10 +1469,6 @@
             <button onclick="clearForm()" aria-describedby="clear-all-help" class="danger-button">Clear Everything</button>
             <small id="clear-all-help" class="sr-only">Clear all form fields and delete all saved history</small>
             
-            <!-- Temporary Export Feature -->
-            <button onclick="exportNotesData()" aria-describedby="export-help" class="primary-button" style="margin-top: 10px; background: #6f42c1;">📊 Export Notes Data</button>
-            <small id="export-help" class="sr-only">Export your notes usage data for analysis and improvement</small>
-            
             <div id="tag-recommendations" class="tag-recommendations">
                 <h4>Recommended Tags</h4>
                 <div id="recommended-tags" class="tag-list">
@@ -1495,7 +1503,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.0.6', // Update this when you make changes
+            currentVersion: '1.0.7', // Update this when you make changes
             githubRepo: 'shadow11001/IGAPP',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -3264,6 +3272,79 @@ ${subIssueNumbers.map((num, index) =>
             console.log(`📊 Usage reporting ${status}`);
         }
         
+        async function sendUsageReport() {
+            const sendBtn = document.getElementById('send-report-btn');
+            
+            // Check for 24-hour cooldown
+            const lastSent = localStorage.getItem('lastUsageReportSent');
+            const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+            
+            if (lastSent && parseInt(lastSent) > twentyFourHoursAgo) {
+                const hoursLeft = Math.ceil((parseInt(lastSent) + (24 * 60 * 60 * 1000) - Date.now()) / (60 * 60 * 1000));
+                showNotification(`⏰ Usage report already sent today. Try again in ${hoursLeft} hours.`, 'error', 5000);
+                return;
+            }
+            
+            // Disable button during send
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+            
+            try {
+                if (!AppState.usageTracking.reportingEnabled) {
+                    showNotification('⚠️ Enable usage analytics first', 'error', 3000);
+                    return;
+                }
+                
+                console.log('📤 Sending usage report...');
+                
+                // Debug: Show current tracking state
+                console.log('📊 Current tracking state:');
+                console.log('- Session start:', new Date(AppState.usageTracking.sessionStart));
+                console.log('- Button clicks:', Object.keys(AppState.usageTracking.buttonClicks).length, 'tracked');
+                console.log('- Note patterns:', AppState.usageTracking.notePatterns.length, 'patterns');
+                console.log('- User hash:', AppState.usageTracking.userHash);
+                
+                // Add some button clicks if none exist
+                if (Object.keys(AppState.usageTracking.buttonClicks).length === 0) {
+                    console.log('🔧 No button clicks found, adding usage data...');
+                    trackButtonClick('Send Usage Report');
+                    trackButtonClick('Settings Menu');
+                }
+                
+                showNotification('📤 Generating usage report...', 'info', 2000);
+                
+                const reportData = generateUsageReportData();
+                
+                // Remove test indicators for production report
+                reportData.isTestReport = false;
+                reportData.reportTimestamp = new Date().toISOString();
+                reportData.debugInfo = {
+                    trackingInitialized: !!AppState.usageTracking.userHash,
+                    sessionStartTime: AppState.usageTracking.sessionStart,
+                    currentTime: Date.now(),
+                    localStorageWorks: typeof localStorage !== 'undefined'
+                };
+                
+                console.log('📤 Sending report data:', reportData);
+                
+                await submitUsageReportToGitHub(reportData);
+                
+                // Set cooldown timestamp
+                localStorage.setItem('lastUsageReportSent', Date.now().toString());
+                
+                showNotification('✅ Usage report sent successfully!', 'success', 5000);
+                console.log('✅ Usage report submitted successfully');
+                
+            } catch (error) {
+                console.error('❌ Usage report failed:', error);
+                showNotification(`❌ Usage report failed: ${error.message}`, 'error', 5000);
+            } finally {
+                // Re-enable button
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send Now';
+            }
+        }
+
         async function testUsageReport() {
             const testBtn = document.getElementById('test-report-btn');
             
@@ -4452,6 +4533,46 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 const note = `For breaker panel ${detail.panel}, breakers ${detail.breakers}, are showing as ${detail.status}.`;
                 addQuickNote(note);
             });
+        }
+
+        function addAdvisoryNote() {
+            const issue = window.prompt('Enter issue to advise tech about:\n\nExamples:\n• NSRM email\n• comm loss\n• controller issue\n• parameter deviation');
+            if (issue === null || issue.trim() === '') return;
+            
+            const note = `Adv tech of ${issue.trim()}.`;
+            addQuickNote(note);
+        }
+
+        function addTechQuestionNote() {
+            const question = window.prompt('What did the tech want to know?\n\nExamples:\n• how to access the controller\n• what the alarm means\n• if the system is working properly');
+            if (question === null || question.trim() === '') return;
+            
+            const note = `Tech wanted to know ${question.trim()}.`;
+            addQuickNote(note);
+        }
+
+        function addStatusUpdateNote() {
+            const item = window.prompt('What status update did the tech request?\n\nExamples:\n• the work order\n• the repair progress\n• the controller status');
+            if (item === null || item.trim() === '') return;
+            
+            const note = `Tech wanted a status update on ${item.trim()}.`;
+            addQuickNote(note);
+        }
+
+        function addTechRefusedNote() {
+            const action = window.prompt('What did the tech refuse to do?\n\nExamples:\n• power cycle the controller\n• check the breakers\n• wait for the download');
+            if (action === null || action.trim() === '') return;
+            
+            const note = `Tech refused ${action.trim()}.`;
+            addQuickNote(note);
+        }
+
+        function addDefrostAlreadyRunningNote() {
+            const circuit = window.prompt('Enter circuit that is already defrosting:\n\nExamples:\n• C2\n• B3\n• Circuit 5');
+            if (circuit === null || circuit.trim() === '') return;
+            
+            const note = `${circuit.trim()} is already defrosting.`;
+            addQuickNote(note);
         }
 
         function addSetpointNote() {
