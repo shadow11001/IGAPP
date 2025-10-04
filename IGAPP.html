@@ -2652,27 +2652,52 @@ ${JSON.stringify(exportData, null, 2)}
         function generateUsageReportData() {
             const savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
             
-            // Analyze button usage
-            const buttonStats = Object.entries(AppState.usageTracking.buttonClicks)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 25); // Top 25 most used buttons
+            // Debug: Get all localStorage data like export function does
+            const allLocalStorageKeys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                allLocalStorageKeys.push(localStorage.key(i));
+            }
+            
+            // Check for button click analytics
+            const buttonClickData = localStorage.getItem('buttonClickAnalytics');
+            let buttonStats = [];
+            
+            if (buttonClickData) {
+                try {
+                    const clicks = JSON.parse(buttonClickData);
+                    buttonStats = Object.entries(clicks)
+                        .sort(([,a], [,b]) => b - a)
+                        .slice(0, 25);
+                } catch (e) {
+                    console.warn('Error parsing button click data:', e);
+                }
+            }
+            
+            // If no button click data, analyze saved notes for button usage patterns
+            if (buttonStats.length === 0 && savedNotes.length > 0) {
+                console.log('📊 No button click data found, analyzing saved notes for patterns...');
+                const notePatterns = analyzeNotesForButtonPatterns(savedNotes);
+                buttonStats = notePatterns.slice(0, 25);
+            }
             
             // Ensure we have some data - add default if empty
             if (buttonStats.length === 0) {
-                buttonStats.push(['No button usage recorded', 0]);
+                buttonStats.push(['No usage data available', 0]);
             }
             
-            // Analyze note patterns (no actual content)
+            // Enhanced note statistics using actual saved notes
             const notePatternCount = AppState.usageTracking.notePatterns.length;
             const noteStats = {
-                averageLength: notePatternCount > 0 ? 
-                    Math.round(AppState.usageTracking.notePatterns.reduce((sum, p) => sum + p.length, 0) / notePatternCount) : 0,
-                averageWordCount: notePatternCount > 0 ? 
-                    Math.round(AppState.usageTracking.notePatterns.reduce((sum, p) => sum + p.wordCount, 0) / notePatternCount) : 0,
-                percentWithNumbers: notePatternCount > 0 ? 
-                    Math.round(AppState.usageTracking.notePatterns.filter(p => p.hasNumbers).length / notePatternCount * 100) : 0,
+                averageLength: savedNotes.length > 0 ? 
+                    Math.round(savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.length : 0), 0) / savedNotes.length) : 0,
+                averageWordCount: savedNotes.length > 0 ? 
+                    Math.round(savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.split(' ').length : 0), 0) / savedNotes.length) : 0,
+                percentWithNumbers: savedNotes.length > 0 ? 
+                    Math.round(savedNotes.filter(note => note.notes && /\d/.test(note.notes)).length / savedNotes.length * 100) : 0,
                 totalNotesSaved: savedNotes.length,
-                sessionNotesAnalyzed: notePatternCount
+                sessionNotesAnalyzed: notePatternCount,
+                notesWithDAE: savedNotes.filter(note => note.dae && note.dae.length > 0).length,
+                notesWithTechName: savedNotes.filter(note => note.techName && note.techName.length > 0).length
             };
             
             // Analyze saved notes for common patterns (anonymized)
@@ -2688,14 +2713,47 @@ ${JSON.stringify(exportData, null, 2)}
                 buttonSuggestions: commonPhrases,
                 reportingPeriod: '7days',
                 dataQuality: {
-                    hasButtonData: Object.keys(AppState.usageTracking.buttonClicks).length > 0,
+                    hasButtonData: buttonStats.length > 1 || buttonStats[0][0] !== 'No usage data available',
                     hasNotePatterns: notePatternCount > 0,
-                    hasSavedNotes: savedNotes.length > 0
+                    hasSavedNotes: savedNotes.length > 0,
+                    localStorageKeys: allLocalStorageKeys,
+                    dataSource: buttonClickData ? 'button_tracking' : (savedNotes.length > 0 ? 'note_analysis' : 'no_data')
                 }
             };
             
             console.log('📊 Generated report data:', reportData);
             return reportData;
+        }
+        
+        function analyzeNotesForButtonPatterns(savedNotes) {
+            const patterns = {};
+            
+            // Common patterns that might indicate button usage
+            const buttonPatterns = {
+                'Escalation': /escalat|escalation|tier|t2|t3/i,
+                'Version Download': /version|download|update|dl/i,
+                'Reboot/Restart': /reboot|restart|reset|power/i,
+                'Connection Issues': /connect|connection|network|wifi|internet/i,
+                'Hardware': /hardware|device|equipment|unit/i,
+                'Software': /software|app|application|program/i,
+                'Store Visit': /visit|onsite|store|location/i,
+                'Remote Access': /remote|anydesk|teamviewer|vnc/i,
+                'Testing': /test|testing|check|verify/i,
+                'Documentation': /document|note|record|log/i
+            };
+            
+            savedNotes.forEach(note => {
+                const noteText = note.notes || '';
+                Object.entries(buttonPatterns).forEach(([buttonName, pattern]) => {
+                    if (pattern.test(noteText)) {
+                        patterns[buttonName] = (patterns[buttonName] || 0) + 1;
+                    }
+                });
+            });
+            
+            return Object.entries(patterns)
+                .sort(([,a], [,b]) => b - a)
+                .map(([name, count]) => [name, count]);
         }
         
         function analyzeCommonPhrasesForButtonSuggestions(savedNotesData) {
@@ -2851,6 +2909,22 @@ ${JSON.stringify(reportData, null, 2)}
                 }
                 
                 console.log('🧪 Sending test usage report...');
+                
+                // Debug: Show current tracking state
+                console.log('📊 Current tracking state:');
+                console.log('- Session start:', new Date(AppState.usageTracking.sessionStart));
+                console.log('- Button clicks:', Object.keys(AppState.usageTracking.buttonClicks).length, 'tracked');
+                console.log('- Note patterns:', AppState.usageTracking.notePatterns.length, 'patterns');
+                console.log('- User hash:', AppState.usageTracking.userHash);
+                
+                // Add some test button clicks if none exist
+                if (Object.keys(AppState.usageTracking.buttonClicks).length === 0) {
+                    console.log('🔧 No button clicks found, adding test data...');
+                    trackButtonClick('Test Button');
+                    trackButtonClick('Settings Menu');
+                    trackButtonClick('Test Usage Report');
+                }
+                
                 showNotification('🧪 Generating test usage report...', 'info', 2000);
                 
                 const reportData = generateUsageReportData();
@@ -2858,6 +2932,14 @@ ${JSON.stringify(reportData, null, 2)}
                 // Add test indicator to the report
                 reportData.isTestReport = true;
                 reportData.testTimestamp = new Date().toISOString();
+                reportData.debugInfo = {
+                    trackingInitialized: !!AppState.usageTracking.userHash,
+                    sessionStartTime: AppState.usageTracking.sessionStart,
+                    currentTime: Date.now(),
+                    localStorageWorks: typeof localStorage !== 'undefined'
+                };
+                
+                console.log('📤 Sending report data:', reportData);
                 
                 await submitUsageReportToGitHub(reportData);
                 
