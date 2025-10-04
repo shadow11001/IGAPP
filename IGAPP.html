@@ -1186,6 +1186,38 @@
             background-color: #218838 !important;
         }
 
+        .dev-analysis-button {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%) !important;
+            color: #ffffff !important;
+            border: 2px solid #ff6b35 !important;
+            position: relative;
+        }
+
+        .dev-analysis-button:hover {
+            background: linear-gradient(135deg, #e55a2b 0%, #e8821a 100%) !important;
+            border-color: #e55a2b !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+        }
+
+        .dev-analysis-button::before {
+            content: "🚧";
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        body.dark-mode .dev-analysis-button {
+            background: linear-gradient(135deg, #ff8a50 0%, #ffb347 100%) !important;
+            border-color: #ff8a50 !important;
+        }
+
+        body.dark-mode .dev-analysis-button:hover {
+            background: linear-gradient(135deg, #ff7043 0%, #ffa726 100%) !important;
+        }
+
         .theme-toggle {
             position: fixed;
             top: 10px;
@@ -2407,6 +2439,7 @@
                             <div class="email-controls">
                                 <button onclick="processEmail()" class="primary-button">🔍 Process Email</button>
                                 <button onclick="clearEmailProcessor()" class="danger-button">Clear</button>
+                                <button id="dev-email-analysis-btn" onclick="submitEmailForAnalysis()" class="dev-analysis-button" style="display: none;" title="Submit email for analysis (Dev only)">🧪 Analyze Email (Dev)</button>
                             </div>
                         </div>
                         
@@ -5028,6 +5061,18 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                 AppState.githubRepo = 'shadow11001/IGAPP'; // Same repo, dev branch
             }
             
+            // Control dev-only features visibility
+            const devButton = document.getElementById('dev-email-analysis-btn');
+            if (devButton) {
+                if (branch === 'dev') {
+                    devButton.style.display = 'inline-block';
+                    console.log('🧪 Dev features enabled - Email analysis button visible');
+                } else {
+                    devButton.style.display = 'none';
+                    console.log('🚫 Dev features hidden - Not on dev branch');
+                }
+            }
+            
             updateBranchInfo();
             
             console.log(`🌿 Switched to ${branch} branch`);
@@ -5843,6 +5888,161 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             document.getElementById('generated-response').style.backgroundColor = '';
             
             showNotification('🗑️ Email processor cleared', 'success', 2000);
+        }
+
+        // Dev-only email analysis function
+        async function submitEmailForAnalysis() {
+            const emailContent = document.getElementById('email-input').value.trim();
+            const analysisBtn = document.getElementById('dev-email-analysis-btn');
+            
+            if (!emailContent) {
+                showNotification('📧 Please enter email content to analyze', 'error', 3000);
+                return;
+            }
+            
+            // Disable button during submission
+            analysisBtn.disabled = true;
+            analysisBtn.textContent = '🧪 Analyzing...';
+            
+            try {
+                showNotification('📊 Processing email for analysis...', 'info', 2000);
+                
+                // Process the email to get analysis data
+                const emailData = EMAIL_PROCESSOR.parseEmail(emailContent);
+                
+                // Create comprehensive analysis report
+                const analysisReport = {
+                    timestamp: new Date().toISOString(),
+                    originalEmail: emailContent,
+                    extractedData: emailData,
+                    systemInfo: {
+                        userAgent: navigator.userAgent,
+                        currentBranch: AppState.currentBranch || 'dev',
+                        timestamp: new Date().toLocaleString(),
+                        sessionId: AppState.usageTracking.userHash?.substring(0, 8) || 'unknown'
+                    },
+                    analysisMetrics: {
+                        emailLength: emailContent.length,
+                        wordCount: emailContent.split(/\s+/).length,
+                        lineCount: emailContent.split('\n').length,
+                        workOrdersFound: emailData.workOrders?.length || 0,
+                        storeNumbersFound: emailData.storeNumbers?.length || 0,
+                        caseNumbersFound: emailData.caseNumbers?.length || 0,
+                        techNamesFound: emailData.techNames?.length || 0,
+                        emailType: emailData.emailType || 'unknown'
+                    }
+                };
+                
+                // Submit to GitHub for analysis
+                showNotification('📤 Sending email analysis to GitHub...', 'info', 3000);
+                await submitEmailAnalysisToGitHub(analysisReport);
+                
+                showNotification('✅ Email analysis submitted successfully! (Dev branch only)', 'success', 5000);
+                
+            } catch (error) {
+                console.error('Error submitting email analysis:', error);
+                showNotification(`❌ Failed to submit analysis: ${error.message}`, 'error', 8000);
+            } finally {
+                // Re-enable button
+                analysisBtn.disabled = false;
+                analysisBtn.textContent = '🧪 Analyze Email (Dev)';
+            }
+        }
+
+        async function submitEmailAnalysisToGitHub(analysisData) {
+            if (!AppState.githubToken || !AppState.githubRepo) {
+                throw new Error('GitHub credentials not available');
+            }
+
+            const issueTitle = `📧 Email Analysis - ${new Date().toLocaleDateString()} - ${analysisData.systemInfo.sessionId}`;
+            
+            const issueBody = `
+## 📧 Email Processing Analysis Report
+
+**Submitted:** ${analysisData.timestamp}
+**Session ID:** ${analysisData.systemInfo.sessionId}
+**Current Branch:** ${analysisData.systemInfo.currentBranch}
+**Analysis Type:** Development Email Processing
+
+### 📊 Email Metrics
+- **Email Length:** ${analysisData.analysisMetrics.emailLength} characters
+- **Word Count:** ${analysisData.analysisMetrics.wordCount} words
+- **Line Count:** ${analysisData.analysisMetrics.lineCount} lines
+- **Detected Email Type:** ${analysisData.analysisMetrics.emailType}
+
+### 🔍 Extraction Results
+- **Work Orders Found:** ${analysisData.analysisMetrics.workOrdersFound}
+- **Store Numbers Found:** ${analysisData.analysisMetrics.storeNumbersFound}
+- **Case Numbers Found:** ${analysisData.analysisMetrics.caseNumbersFound}
+- **Tech Names Found:** ${analysisData.analysisMetrics.techNamesFound}
+
+### 📋 Extracted Data
+<details>
+<summary>Click to expand extracted information</summary>
+
+\`\`\`json
+${JSON.stringify(analysisData.extractedData, null, 2)}
+\`\`\`
+</details>
+
+### 📧 Original Email Content
+<details>
+<summary>Click to expand original email</summary>
+
+\`\`\`
+${analysisData.originalEmail}
+\`\`\`
+</details>
+
+### 🔧 System Information
+- **User Agent:** ${analysisData.systemInfo.userAgent}
+- **Submission Time:** ${analysisData.systemInfo.timestamp}
+- **Current Branch:** ${analysisData.systemInfo.currentBranch}
+
+---
+*This email analysis was submitted from the development branch for improving email processing accuracy and debugging extraction algorithms.*
+            `;
+
+            // Create GitHub issue
+            const issueResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${AppState.githubToken}`,
+                    'Accept': 'application/vnd.github+json',
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'IGAPP-Email-Analysis'
+                },
+                body: JSON.stringify({
+                    title: issueTitle,
+                    body: issueBody,
+                    labels: ['email-analysis', 'development', 'auto-generated', 'enhancement']
+                })
+            });
+
+            if (!issueResponse.ok) {
+                const errorText = await issueResponse.text();
+                console.error('GitHub API Error:', errorText);
+                throw new Error(`GitHub submission failed: ${issueResponse.status} ${issueResponse.statusText}`);
+            }
+
+            const issueData = await issueResponse.json();
+            console.log('✅ Email analysis submitted to GitHub:', issueData.html_url);
+            
+            return issueData;
+        }
+
+        // Initialize dev button visibility on page load
+        function initializeDevFeatures() {
+            const currentBranch = AppState.currentBranch || localStorage.getItem('selectedBranch') || 'main';
+            const devButton = document.getElementById('dev-email-analysis-btn');
+            
+            if (currentBranch === 'dev') {
+                devButton.style.display = 'inline-block';
+                console.log('🧪 Dev features enabled - Email analysis button visible');
+            } else {
+                devButton.style.display = 'none';
+                console.log('🚫 Dev features hidden - Not on dev branch');
+            }
         }
 
         // War Room System
@@ -7477,6 +7677,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             
             // Initialize War Room system
             initializeWarRoom();
+            
+            // Initialize dev-only features
+            initializeDevFeatures();
             
             // Add War Room template preview event listeners
             setTimeout(() => {
