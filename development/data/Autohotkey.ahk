@@ -15,11 +15,11 @@
 ::.ge::Good Evening
 ::.c::Please see the screenshot(s) below:
 ::.s::Thank you for contacting Walmart Digital Assets{!}
-::.pn::800-932-3367
-::.spn::866-886-4251
-::.iemail::andrew.toothman@walmart.insightglobal-msd.com
-::.wemail::andrew.toothman@walmart.com
-::.mc::ems00.s00000.us.wal-mart.com
+::.pn::PHONE_PLACEHOLDER
+::.spn::PHONE_PLACEHOLDER
+::.iemail::USER_EMAIL_PLACEHOLDER
+::.wemail::USER_EMAIL_PLACEHOLDER
+::.mc::URL_PLACEHOLDER
 
 
 ;WO Notes
@@ -75,18 +75,18 @@ Run "L:\fm_apps\fm_ping\fm_ping.exe", "L:\fm_apps\fm_ping"
 
 ;Logins
 
-::.login::vn580fc{Tab}Walmart is great3{#}{Enter}
-::.pw::Walmart is great3{#}
-::.cpc::homeoffice\vn580fc{Tab}Walmart is great3{#}{Enter}
-::.sv::Supervisor{Tab}{#}5and10{#}{Enter}
-::.opa::OpusSupervisorLB.CLOUD.Wal-Mart.com
-::.opm::OpusMagnumLB.CLOUD.wal-mart.com
-::.boss::Supervisor{Tab}WMT{$}0004{Enter}
-::.homeoffice::vn580fc@homeoffice.walmart.com
-::.maga::ip:OpusMagnumLB.CLOUD.wal-mart.com|foxs:|station:|slot:/Services/OpusEnterpriseService/Opus$20Systems
+::.login::USER_ID_PLACEHOLDER{Tab}PASSWORD_PLACEHOLDER{Enter}
+::.pw::PASSWORD_PLACEHOLDER
+::.cpc::homeoffice\USER_ID_PLACEHOLDER{Tab}PASSWORD_PLACEHOLDER{Enter}
+::.sv::USER_ID_PLACEHOLDER{Tab}PASSWORD_PLACEHOLDER{Enter}
+::.opa::URL_PLACEHOLDER
+::.opm::URL_PLACEHOLDER
+::.boss::USER_ID_PLACEHOLDER{Tab}PASSWORD_PLACEHOLDER{Enter}
+::.homeoffice::USER_EMAIL_PLACEHOLDER
+::.maga::URL_PLACEHOLDER
 
 ;Tech Tracker
-::.tt::Andrew Toothman vn580fc{Tab}LEUS32411130316{Tab}
+::.tt::USER_ID_PLACEHOLDER{Tab}HARDWARE_ID_PLACEHOLDER{Tab}
 
 ;Templates
 
@@ -276,18 +276,3 @@ The request you have made requires a Digital Assets Escalation. Your request has
     SendInput "{Enter}Name: {Enter}Site: {Enter}WO: {Enter}Issue: {Enter}What have you done: "
 }
 
-;Scripts
-
-global maxIdleTime := (A_Args.Length > 0) ? A_Args[1] : 60000
-SetTimer DetectInactivity, 1000
-
-
-DetectInactivity()
-{
-	static idleEventCount := 0
-	if A_TimeIdle > maxIdleTime
-	{
-		idleEventCount += 1
-		MouseMove (idleEventCount&1) ? 5 : -5, 0, , "R"
-	}
-}

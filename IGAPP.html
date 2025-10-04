@@ -81,6 +81,278 @@
             border-bottom-color: #555;
         }
 
+        /* Tab System */
+        .tab-container {
+            margin-bottom: 15px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 0;
+            margin-bottom: 10px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: #f8f9fa;
+            color: #666;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 0;
+        }
+        
+        .tab-btn:first-child {
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        
+        .tab-btn:last-child {
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+            border-left: none;
+        }
+        
+        .tab-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: #e9ecef;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* QA Checklist Styles */
+        .qa-checklist {
+            margin-top: 10px;
+        }
+        
+        .qa-checklist h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+        
+        .name-setting {
+            margin-bottom: 20px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .name-setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .name-setting-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+        }
+        
+        .name-setting-toggle {
+            font-size: 12px;
+            color: #6c757d;
+            transition: transform 0.3s ease;
+        }
+        
+        .name-setting.expanded .name-setting-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .name-setting-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .name-setting.expanded .name-setting-content {
+            max-height: 100px;
+            margin-top: 12px;
+        }
+        
+        .name-setting label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+        
+        .name-input {
+            width: calc(100% - 20px);
+            max-width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 13px;
+            background: white;
+            color: #495057;
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        
+        .name-setting small {
+            display: block;
+            margin-top: 4px;
+            font-size: 11px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        #agent-name-display {
+            font-weight: 600;
+            color: #007bff;
+            background: rgba(0, 123, 255, 0.1);
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: 6px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+        }
+        
+        .checklist-item:hover {
+            background: #e9ecef;
+        }
+        
+        .checklist-checkbox {
+            margin-top: 2px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .checklist-text {
+            flex: 1;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #333;
+        }
+        
+        .checklist-item.completed {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .checklist-item.completed .checklist-text {
+            color: #155724;
+        }
+        
+        /* Dark mode for tabs and checklist */
+        body.dark-mode .tab-btn {
+            background: #2c3e50;
+            border-color: #34495e;
+            color: #bdc3c7;
+        }
+        
+        body.dark-mode .tab-btn.active {
+            background: #3498db;
+            border-color: #3498db;
+        }
+        
+        body.dark-mode .tab-btn:hover:not(.active) {
+            background: #34495e;
+        }
+        
+        body.dark-mode .qa-checklist h3 {
+            color: #ecf0f1;
+        }
+        
+        body.dark-mode .name-setting {
+            background: #2c3e50;
+            border-color: #34495e;
+        }
+        
+        body.dark-mode .name-setting-title {
+            color: #bdc3c7;
+        }
+        
+        body.dark-mode .name-setting-toggle {
+            color: #95a5a6;
+        }
+        
+        body.dark-mode .name-setting label {
+            color: #bdc3c7;
+        }
+        
+        body.dark-mode .name-input {
+            background: #34495e;
+            border-color: #4a5f7a;
+            color: #ecf0f1;
+        }
+        
+        body.dark-mode .name-input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.25);
+        }
+        
+        body.dark-mode .name-setting small {
+            color: #95a5a6;
+        }
+        
+        body.dark-mode #agent-name-display {
+            color: #3498db;
+            background: rgba(52, 152, 219, 0.2);
+        }
+        
+        body.dark-mode .checklist-item {
+            background: #2c3e50;
+            border-color: #34495e;
+        }
+        
+        body.dark-mode .checklist-item:hover {
+            background: #34495e;
+        }
+        
+        body.dark-mode .checklist-text {
+            color: #bdc3c7;
+        }
+        
+        body.dark-mode .checklist-item.completed {
+            background: #27ae60;
+            border-color: #2ecc71;
+        }
+        
+        body.dark-mode .checklist-item.completed .checklist-text {
+            color: #ecf0f1;
+        }
+
         .button-group {
             display: flex;
             flex-wrap: wrap;
@@ -1302,33 +1574,39 @@
     <div class="form-container">
         <!-- Quick Notes Buttons on the Left -->
         <div class="qa-container">
-            <h3>Quick Notes</h3>
-            
-            <h4>System Login</h4>
-            <div class="button-group">
-                <button onclick="addQuickNote('Logged into Novar.')" class="quick-note-btn" title="Novar Login">Novar</button>
-                <button onclick="addQuickNote('Logged into Opus Arch.')" class="quick-note-btn" title="Opus Arch Login">Opus Arch</button>
-                <button onclick="addQuickNote('Logged into Opus Mag.')" class="quick-note-btn" title="Opus Mag Login">Opus Mag</button>
-                <button onclick="addQuickNote('Logged into CPC.')" class="quick-note-btn" title="CPC Login">CPC</button>
-                <button onclick="addQuickNote('Logged into Danfoss AKA65.')" class="quick-note-btn" title="Danfoss AKA65 Login">AKA65</button>
-                <button onclick="addQuickNote('Logged into Danfoss Storeview.')" class="quick-note-btn" title="Danfoss Storeview Login">Storeview</button>
-            </div>
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('quick-notes')">Quick Notes</button>
+                    <button class="tab-btn" onclick="switchTab('qa-checklist')">QA Checklist</button>
+                </div>
+                
+                <!-- Quick Notes Tab Content -->
+                <div id="quick-notes" class="tab-content active">
+                    <h4>System Login</h4>
+                    <div class="button-group">
+                        <button onclick="addQuickNote('Logged into Novar.')" class="quick-note-btn" title="Novar Login">Novar</button>
+                        <button onclick="addQuickNote('Logged into Opus Arch.')" class="quick-note-btn" title="Opus Arch Login">Opus Arch</button>
+                        <button onclick="addQuickNote('Logged into Opus Mag.')" class="quick-note-btn" title="Opus Mag Login">Opus Mag</button>
+                        <button onclick="addQuickNote('Logged into CPC.')" class="quick-note-btn" title="CPC Login">CPC</button>
+                        <button onclick="addQuickNote('Logged into Danfoss AKA65.')" class="quick-note-btn" title="Danfoss AKA65 Login">AKA65</button>
+                        <button onclick="addQuickNote('Logged into Danfoss Storeview.')" class="quick-note-btn" title="Danfoss Storeview Login">Storeview</button>
+                    </div>
 
-            <h4>Diagnostics</h4>
-            <div class="button-group">
-                <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
-                <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
-                <button onclick="addQuickNote('Checked temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
-                <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
-                <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn" title="Clock Check">Clocks</button>
-                <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn" title="Ping Test">Ping</button>
-                <button onclick="addQuickNote('Receiving good ping.')" class="quick-note-btn success-quick" title="Successful Ping">Good Ping</button>
-                <button onclick="addQuickNote('Ping timedout.')" class="quick-note-btn error-quick" title="Failed Ping">Ping Timeout</button>
-                <button onclick="addCheckBreakersNote()" class="quick-note-btn" title="Check Breakers">Check Breakers</button>
-                <button onclick="addDefrostAlreadyRunningNote()" class="quick-note-btn" title="Defrost Already Active">Already Defrosting</button>
-                <button onclick="addQuickNote('Defrost already terminated.')" class="quick-note-btn" title="Defrost Already Ended">Already Terminated</button>
-                <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Test</button>
-            </div>
+                    <h4>Diagnostics</h4>
+                    <div class="button-group">
+                        <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
+                        <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
+                        <button onclick="addQuickNote('Checked temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
+                        <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
+                        <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn" title="Clock Check">Clocks</button>
+                        <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn" title="Ping Test">Ping</button>
+                        <button onclick="addQuickNote('Receiving good ping.')" class="quick-note-btn success-quick" title="Successful Ping">Good Ping</button>
+                        <button onclick="addQuickNote('Ping timedout.')" class="quick-note-btn error-quick" title="Failed Ping">Ping Timeout</button>
+                        <button onclick="addCheckBreakersNote()" class="quick-note-btn" title="Check Breakers">Check Breakers</button>
+                        <button onclick="addDefrostAlreadyRunningNote()" class="quick-note-btn" title="Defrost Already Active">Already Defrosting</button>
+                        <button onclick="addQuickNote('Defrost already terminated.')" class="quick-note-btn" title="Defrost Already Ended">Already Terminated</button>
+                        <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Test</button>
+                    </div>
 
             <h4>Actions</h4>
             <div class="button-group">
@@ -1385,6 +1663,68 @@
                 <button onclick="addTechQuestionNote()" class="quick-note-btn" title="Tech Asked Question">Tech Question</button>
                 <button onclick="addStatusUpdateNote()" class="quick-note-btn" title="Status Update Request">Status Update</button>
                 <button onclick="addTechRefusedNote()" class="quick-note-btn error-quick" title="Tech Refused Action">Tech Refused</button>
+            </div>
+                </div>
+                
+                <!-- QA Checklist Tab Content -->
+                <div id="qa-checklist" class="tab-content">
+                    <div class="qa-checklist">
+                        <h3>QA Checklist</h3>
+                        
+                        <!-- Name Customization -->
+                        <div class="name-setting" id="name-setting">
+                            <div class="name-setting-header" onclick="toggleNameSetting()">
+                                <span class="name-setting-title">Customize Name</span>
+                                <span class="name-setting-toggle">▼</span>
+                            </div>
+                            <div class="name-setting-content">
+                                <label for="agent-name">Your Name:</label>
+                                <input type="text" id="agent-name" class="name-input" placeholder="Enter your name" onchange="updateAgentName()" onblur="autoCollapseNameSetting()">
+                                <small>This will replace [NAME] in the greeting below</small>
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Thanks for calling Walmart Digital Assets, where we're always happy to help! My name is <span id="agent-name-display">[NAME]</span>, can I please have your name site and work order number from which you are calling?</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Repeat site and workorder back to the tech if no work order is provided say "you said site number is xxxx and no workorder correct"</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Fill Dead air with small talk or talking yourself through the call.</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Thank you for calling walmart digital assets stay on the line for a brief survey</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Did you put the store number in VCC?</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Did you tag HVAC, refrigeration, lighting, or comms in VCC?</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Did you tag the proper EMS in VCC?</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Did you notate service channel if a work order was provided?</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1503,7 +1843,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.0.7', // Update this when you make changes
+            currentVersion: '1.0.6', // Update this when you make changes
             githubRepo: 'shadow11001/IGAPP',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -2236,16 +2576,26 @@
             if (staticUpdateBtn) {
                 staticUpdateBtn.style.display = 'flex';
                 staticUpdateBtn.innerHTML = `<i class="fas fa-sync-alt" id="update-icon" aria-hidden="true"></i><span>Update to v${newVersion}</span>`;
+                // Store the update data for when the button is clicked
+                staticUpdateBtn.onclick = () => showUpdateOptions(newVersion, newContent);
             }
             
-            // Add dynamic update button to page
-            addUpdateButton(newVersion, newContent);
+            // Store update data globally for top button as well
+            const staticUpdateBtnTop = document.getElementById('update-btn-top');
+            if (staticUpdateBtnTop) {
+                staticUpdateBtnTop.onclick = () => showUpdateOptions(newVersion, newContent);
+            }
         }
 
-        function addUpdateButton(newVersion, newContent) {
-            // Remove existing dynamic update button if present
-            const existingBtn = document.getElementById('dynamic-update-btn');
-            if (existingBtn) existingBtn.remove();
+        function showUpdateOptions(newVersion, newContent) {
+            // Remove existing dynamic update buttons if present
+            const existingCopyBtn = document.querySelector('.dynamic-update-button');
+            const existingDownloadBtn = document.getElementById('dynamic-update-btn');
+            const existingInstructions = document.querySelector('.update-instructions');
+            
+            if (existingCopyBtn) existingCopyBtn.remove();
+            if (existingDownloadBtn) existingDownloadBtn.remove();
+            if (existingInstructions) existingInstructions.remove();
             
             // Don't show button if already up to date
             if (!isNewerVersion(newVersion, AppState.currentVersion)) {
@@ -2255,7 +2605,7 @@
             // Create primary copy button (better for preserving encoding)
             const copyBtn = document.createElement('button');
             copyBtn.className = 'dynamic-update-button';
-            copyBtn.innerHTML = `� Copy v${newVersion} Code`;
+            copyBtn.innerHTML = `📋 Copy v${newVersion} Code`;
             copyBtn.onclick = () => copyUpdateToClipboard(newContent, newVersion);
             copyBtn.setAttribute('aria-label', `Copy version ${newVersion} code to clipboard`);
             
@@ -2263,24 +2613,13 @@
             const downloadBtn = document.createElement('button');
             downloadBtn.id = 'dynamic-update-btn';
             downloadBtn.className = 'dynamic-update-button-alt';
-            downloadBtn.innerHTML = `� Download v${newVersion}`;
+            downloadBtn.innerHTML = `💾 Download v${newVersion}`;
             downloadBtn.onclick = () => applyUpdate(newContent, newVersion);
             downloadBtn.setAttribute('aria-label', `Download application version ${newVersion}`);
-            
-            // Create instructions
-            const instructions = document.createElement('div');
-            instructions.className = 'update-instructions';
-            instructions.innerHTML = `
-                <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #666;">
-                    Copy code (recommended) or download file<br>
-                    Then replace this file and refresh
-                </div>
-            `;
             
             // Add to page
             document.body.appendChild(copyBtn);
             document.body.appendChild(downloadBtn);
-            document.body.appendChild(instructions);
         }
 
         function copyUpdateToClipboard(newContent, newVersion) {
@@ -3773,8 +4112,8 @@ ${subIssueNumbers.map((num, index) =>
                 // Clean up the URL object
                 URL.revokeObjectURL(url);
                 
-                // Show detailed instructions
-                showUpdateInstructions(newVersion, currentFileName);
+                // Show simple success notification
+                showNotification(`💾 v${newVersion} downloaded successfully!`, 'success', 5000);
                 
                 // Remove the update button since update is "applied"
                 const dynamicBtn = document.getElementById('dynamic-update-btn');
@@ -3790,34 +4129,7 @@ ${subIssueNumbers.map((num, index) =>
             }
         }
 
-        function showUpdateInstructions(newVersion, fileName) {
-            // Create modal overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'update-modal-overlay';
-            overlay.innerHTML = `
-                <div class="update-modal">
-                    <h3>🎉 v${newVersion} Downloaded!</h3>
-                    <div class="update-steps">
-                        <div class="update-note">
-                            ⚠️ <strong>Important:</strong> If icons appear as strange text after updating, use the "Copy Code" method instead for better character encoding.
-                        </div>
-                        <p><strong>Follow these steps to complete the update:</strong></p>
-                        <ol>
-                            <li>📁 Go to your Downloads folder</li>
-                            <li>🔍 Find the file: <code>${fileName}</code></li>
-                            <li>📋 Copy this new file</li>
-                            <li>📂 Navigate to where your current IGAPP file is located</li>
-                            <li>🔄 Replace the old file with the new one</li>
-                            <li>🔄 Refresh this page (F5 or Ctrl+R)</li>
-                        </ol>
-                        <p><strong>Alternative:</strong> Use the "📋 Copy Code" button for better character preservation.</p>
-                    </div>
-                    <button onclick="this.parentElement.parentElement.remove()" class="update-modal-btn">Got it!</button>
-                </div>
-            `;
-            
-            document.body.appendChild(overlay);
-        }
+
 
         function setGitHubToken() {
             const token = prompt('Enter your GitHub Personal Access Token for private repo access:\n\n(Leave blank to cancel)');
@@ -4004,6 +4316,147 @@ ${subIssueNumbers.map((num, index) =>
             
             detectVCCCall();
             console.log('VCC audio monitoring started successfully');
+        }
+
+        // Tab System Functions
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const selectedTab = document.getElementById(tabName);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+        
+        // QA Checklist Functions
+        function toggleChecklistItem(item) {
+            const checkbox = item.querySelector('.checklist-checkbox');
+            
+            // Toggle checkbox state
+            checkbox.checked = !checkbox.checked;
+            
+            // Toggle visual state
+            if (checkbox.checked) {
+                item.classList.add('completed');
+            } else {
+                item.classList.remove('completed');
+            }
+            
+            // Save checklist state to localStorage
+            saveChecklistState();
+        }
+        
+        function saveChecklistState() {
+            const checklistItems = document.querySelectorAll('.checklist-item');
+            const states = [];
+            
+            checklistItems.forEach((item, index) => {
+                const checkbox = item.querySelector('.checklist-checkbox');
+                states.push(checkbox.checked);
+            });
+            
+            localStorage.setItem('qaChecklistState', JSON.stringify(states));
+        }
+        
+        function loadChecklistState() {
+            const savedStates = localStorage.getItem('qaChecklistState');
+            if (savedStates) {
+                const states = JSON.parse(savedStates);
+                const checklistItems = document.querySelectorAll('.checklist-item');
+                
+                checklistItems.forEach((item, index) => {
+                    if (index < states.length) {
+                        const checkbox = item.querySelector('.checklist-checkbox');
+                        checkbox.checked = states[index];
+                        
+                        if (states[index]) {
+                            item.classList.add('completed');
+                        } else {
+                            item.classList.remove('completed');
+                        }
+                    }
+                });
+            }
+        }
+        
+        function resetChecklist() {
+            const checklistItems = document.querySelectorAll('.checklist-item');
+            checklistItems.forEach(item => {
+                const checkbox = item.querySelector('.checklist-checkbox');
+                checkbox.checked = false;
+                item.classList.remove('completed');
+            });
+            
+            localStorage.removeItem('qaChecklistState');
+        }
+        
+        // Agent name customization functions
+        function toggleNameSetting() {
+            const nameSetting = document.getElementById('name-setting');
+            if (nameSetting) {
+                nameSetting.classList.toggle('expanded');
+                
+                // Focus the input when expanding
+                if (nameSetting.classList.contains('expanded')) {
+                    setTimeout(() => {
+                        const nameInput = document.getElementById('agent-name');
+                        if (nameInput) {
+                            nameInput.focus();
+                        }
+                    }, 300);
+                }
+            }
+        }
+        
+        function autoCollapseNameSetting() {
+            // Auto-collapse after a short delay when focus is lost
+            setTimeout(() => {
+                const nameSetting = document.getElementById('name-setting');
+                if (nameSetting && nameSetting.classList.contains('expanded')) {
+                    nameSetting.classList.remove('expanded');
+                }
+            }, 200);
+        }
+        
+        function updateAgentName() {
+            const nameInput = document.getElementById('agent-name');
+            const nameDisplay = document.getElementById('agent-name-display');
+            
+            if (nameInput && nameDisplay) {
+                const name = nameInput.value.trim();
+                if (name) {
+                    nameDisplay.textContent = name;
+                    localStorage.setItem('agentName', name);
+                } else {
+                    nameDisplay.textContent = '[NAME]';
+                    localStorage.removeItem('agentName');
+                }
+            }
+        }
+        
+        function loadAgentName() {
+            const savedName = localStorage.getItem('agentName');
+            const nameInput = document.getElementById('agent-name');
+            const nameDisplay = document.getElementById('agent-name-display');
+            
+            if (savedName && nameInput && nameDisplay) {
+                nameInput.value = savedName;
+                nameDisplay.textContent = savedName;
+            }
         }
 
         // Enhanced Quick Notes to auto-reset timer
@@ -5063,6 +5516,10 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                         checkForUpdates();
                     }, 5000);
                 }
+                
+                // Load QA checklist state
+                loadChecklistState();
+                loadAgentName();
                 
                 console.log('QA Checklist App initialized successfully');
                 
