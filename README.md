@@ -76,9 +76,9 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 
 ### Quick Notes Categories
 - **System Login** - Novar, Opus Arch, Opus Mag, CPC, AKA65, Storeview
-- **Diagnostics** - Comms, Temps, Alarms, Clocks, Ping, Test
+- **Diagnostics** - Comms, Temps, Alarms, Clocks, Settings, Ping, Test, Test Fans
 - **Ping Results** - Good Ping (green), Ping Timeout (red)
-- **Actions** - Defrost (circuit-specific), Force On/Off, RTU Setpoint, Reset Clocks
+- **Actions** - Defrost (circuit-specific), Defrost Off, Force On/Off, RTU Setpoint, Reset Clocks, Shutdown (circuit-specific)
 - **Downloads** - Version, Load Change, Comms+LC, Main+LC, Full DL
 - **Call Status** - All Good, No Good, Tech T/S, Call Done, Escalate
 - **Special Cases** - Call Dropped, NSRM, Power Cycle

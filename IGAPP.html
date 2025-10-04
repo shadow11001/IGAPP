@@ -1315,8 +1315,10 @@
                 <button onclick="addQuickNote('Checked temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
                 <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
                 <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn" title="Clock Check">Clocks</button>
+                <button onclick="addQuickNote('Checked settings.')" class="quick-note-btn" title="Settings Check">Settings</button>
                 <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn" title="Ping Test">Ping</button>
                 <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Test</button>
+                <button onclick="addQuickNote('Tested fans.')" class="quick-note-btn" title="Test Fans">Test Fans</button>
             </div>
 
             <h4>Ping Results</h4>
@@ -1328,6 +1330,7 @@
             <h4>Actions</h4>
             <div class="button-group">
                 <button onclick="addQuickNoteWithInput('Forced defrost on ', 'Enter circuit:')" class="quick-note-btn" title="Force Defrost">Defrost</button>
+                <button onclick="addQuickNoteWithInput('Forced off defrost on ', 'Enter circuit:')" class="quick-note-btn" title="Force Off Defrost">Defrost Off</button>
                 <button onclick="addQuickNote('Terminated Defrost.')" class="quick-note-btn" title="Stop Defrost">Stop Defrost</button>
                 <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
                 <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
@@ -1335,6 +1338,7 @@
                 <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
                 <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">RTU Setpoint</button>
                 <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
+                <button onclick="addQuickNoteWithInput('Shutdown circuit ', 'Enter circuit:')" class="quick-note-btn" title="Shutdown Circuit">Shutdown</button>
             </div>
 
             <h4>Downloads</h4>
@@ -1493,7 +1497,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.0.6', // Update this when you make changes
+            currentVersion: '1.0.7', // Update this when you make changes
             githubRepo: 'shadow11001/IGAPP',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
