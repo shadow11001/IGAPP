@@ -1332,6 +1332,8 @@
                 <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
                 <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
                 <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
+                <button onclick="addShutdownCircuitNote()" class="quick-note-btn" title="Shutdown Circuit">Shutdown Circuit</button>
+                <button onclick="addCheckBreakersNote()" class="quick-note-btn" title="Check Breakers">Check Breakers</button>
                 <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
                 <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">RTU Setpoint</button>
                 <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
@@ -4390,6 +4392,66 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                     addQuickNote('Forced off ' + item.trim() + '.');
                 }
             }
+        }
+
+        function addShutdownCircuitNote() {
+            const circuit = window.prompt('Enter circuit to shutdown:\n\nExamples:\n• A3\n• B2\n• Circuit 5\n• Comp 1');
+            if (circuit === null || circuit.trim() === '') return;
+            
+            const note = `Shutdown circuit ${circuit.trim()}.`;
+            addQuickNote(note);
+        }
+
+        function addCheckBreakersNote() {
+            // First add the initial check breakers note
+            addQuickNote('Checked breakers.');
+            
+            // Ask if they want to add detailed breaker information
+            const addDetails = window.confirm('Add detailed breaker panel information?');
+            if (!addDetails) return;
+            
+            let breakerDetails = [];
+            let addMore = true;
+            
+            while (addMore && breakerDetails.length < 5) { // Limit to 5 panels max
+                const panel = window.prompt(`Enter breaker panel name:\n\nCommon examples:\n• H1P1\n• H1P2\n• H1P\n• H2P\n• L1P\n• L2P\n• Panel A\n\n${breakerDetails.length > 0 ? 'Or leave blank to finish' : ''}`);
+                
+                if (panel === null || panel.trim() === '') {
+                    break; // User cancelled or left blank
+                }
+                
+                const breakers = window.prompt(`Enter breaker numbers for panel ${panel.trim()}:\n\nExamples:\n• 15, 16, 17, 18\n• 12, 13, 14\n• 1, 2, 3, 4, 5`);
+                
+                if (breakers === null || breakers.trim() === '') {
+                    continue; // Skip this panel if no breakers entered
+                }
+                
+                const status = window.prompt(`Enter status for these breakers:\n\nCommon statuses:\n• Not Present\n• Faulted On\n• Faulted Off\n• Normal\n• Tripped`);
+                
+                if (status === null || status.trim() === '') {
+                    continue; // Skip this panel if no status entered
+                }
+                
+                breakerDetails.push({
+                    panel: panel.trim(),
+                    breakers: breakers.trim(),
+                    status: status.trim()
+                });
+                
+                // Ask if they want to add another panel
+                if (breakerDetails.length < 5) {
+                    addMore = window.confirm('Add another breaker panel?');
+                } else {
+                    addMore = false;
+                    alert('Maximum of 5 panels reached.');
+                }
+            }
+            
+            // Add the detailed breaker information
+            breakerDetails.forEach(detail => {
+                const note = `For breaker panel ${detail.panel}, breakers ${detail.breakers}, are showing as ${detail.status}.`;
+                addQuickNote(note);
+            });
         }
 
         function addSetpointNote() {
