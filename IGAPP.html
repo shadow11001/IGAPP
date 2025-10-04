@@ -2778,8 +2778,8 @@ ${JSON.stringify(exportData, null, 2)}
                     notesDataSource: notesDataSource,
                     dataSource: buttonClickData ? 'button_tracking' : (savedNotes.length > 0 ? 'note_analysis' : 'no_data')
                 },
-                // Include anonymized notes data for analysis
-                rawNotesData: savedNotes.map((note, index) => ({
+                // Include condensed notes data for analysis (to avoid GitHub 422 errors)
+                rawNotesData: savedNotes.slice(0, 20).map((note, index) => ({
                     id: `note_${index + 1}`,
                     date: note.date || 'unknown',
                     noteLength: note.notes ? note.notes.length : 0,
@@ -2789,9 +2789,9 @@ ${JSON.stringify(exportData, null, 2)}
                     hasStoreNumber: !!(note.storeNumber && note.storeNumber.length > 0),
                     hasWorkOrder: !!(note.workOrder && note.workOrder.length > 0),
                     tags: note.tags || [],
-                    // Include actual note content for analysis
-                    notesContent: note.notes || '',
-                    daeContent: note.dae || '',
+                    // Include truncated note content to avoid size limits
+                    notesPreview: note.notes ? note.notes.substring(0, 150) + (note.notes.length > 150 ? '...' : '') : '',
+                    daePreview: note.dae ? note.dae.substring(0, 100) + (note.dae.length > 100 ? '...' : '') : '',
                     techName: note.techName || '',
                     storeNumber: note.storeNumber || '',
                     workOrder: note.workOrder || ''
@@ -2906,6 +2906,10 @@ ${JSON.stringify(exportData, null, 2)}
                 throw new Error('GitHub credentials not available');
             }
             
+            // Create a copy without the full notes data for GitHub submission
+            const githubReportData = { ...reportData };
+            delete githubReportData.fullNotesData; // Remove full data to reduce size
+            
             const issueTitle = `${reportData.isTestReport ? '[TEST] ' : ''}Usage Analytics - ${reportData.reportDate} - ${reportData.userHash.substring(0, 8)}`;
             const issueBody = `
 ## 📊 ${reportData.isTestReport ? 'TEST ' : ''}Weekly Usage Analytics Report
@@ -2950,23 +2954,28 @@ ${reportData.rawDataSummary ? `
 
 ### �🔍 Raw Analytics Data
 <details>
-<summary>Click to expand raw data</summary>
+<summary>Click to expand raw data (condensed for GitHub limits)</summary>
 
 \`\`\`json
-${JSON.stringify(reportData, null, 2)}
+${JSON.stringify(githubReportData, null, 2)}
 \`\`\`
 </details>
 
-### 📝 Sample Notes Content (First 10 Notes)
+### 📝 Sample Notes Content (First 20 Notes - Condensed)
 ${reportData.rawNotesData && reportData.rawNotesData.length > 0 ? 
-    reportData.rawNotesData.slice(0, 10).map((note, index) => `
+    reportData.rawNotesData.map((note, index) => `
 **Note ${index + 1}** (${note.date})
 - Store: ${note.storeNumber || 'N/A'} | WO: ${note.workOrder || 'N/A'} | Tech: ${note.techName || 'N/A'}
-- Content: ${note.notesContent.substring(0, 200)}${note.notesContent.length > 200 ? '...' : ''}
-- DAE: ${note.daeContent.substring(0, 100)}${note.daeContent.length > 100 ? '...' : note.daeContent || 'None'}
+- Content Preview: ${note.notesPreview || 'No content'}
+- DAE Preview: ${note.daePreview || 'None'}
+- Stats: ${note.noteLength} chars, ${note.wordCount} words
 `).join('\n') :
 'No notes content available'
 }
+
+### ⚠️ Note: Full Data Available
+Due to GitHub's size limitations, only the first 20 notes with truncated content are shown above. 
+The complete dataset with all ${reportData.rawDataSummary?.totalNotes || 0} notes is available in the Raw Analytics Data section below.
 
 ---
 *This is an automated analytics report to help improve the Quick Notes system based on real usage patterns.*
@@ -2989,10 +2998,65 @@ ${reportData.rawNotesData && reportData.rawNotesData.length > 0 ?
             
             if (!response.ok) {
                 const errorText = await response.text();
+                
+                // If it's a size error, try to save full data locally
+                if (response.status === 422 && errorText.includes('too large')) {
+                    console.warn('📊 GitHub issue too large, saving full data locally...');
+                    saveFullAnalyticsDataLocally(reportData);
+                    throw new Error(`GitHub issue body too large. Full data saved to browser console and localStorage.`);
+                }
+                
                 throw new Error(`GitHub API error: ${response.status} - ${errorText}`);
             }
             
+            // Log full data to console for analysis
+            console.log('📊 Full analytics data (not sent to GitHub due to size limits):', reportData.fullNotesData);
+            
             console.log('📊 Usage report submitted to GitHub Issues as enhancement request');
+        }
+        
+        function saveFullAnalyticsDataLocally(reportData) {
+            try {
+                // Save to localStorage with timestamp
+                const fullDataKey = `analytics_full_${reportData.reportDate}_${Date.now()}`;
+                localStorage.setItem(fullDataKey, JSON.stringify(reportData.fullNotesData));
+                
+                // Log to console
+                console.log('📊 FULL ANALYTICS DATA FOR ANALYSIS:');
+                console.log('='.repeat(50));
+                console.log('Total Notes:', reportData.fullNotesData?.length || 0);
+                console.log('Full Data:', reportData.fullNotesData);
+                console.log('='.repeat(50));
+                console.log(`💾 Full data also saved to localStorage key: ${fullDataKey}`);
+                
+                // Show notification
+                showNotification(`💾 Full analytics data saved locally (${reportData.fullNotesData?.length || 0} notes)`, 'info', 5000);
+                
+            } catch (error) {
+                console.error('Failed to save full data locally:', error);
+            }
+        }
+        
+        function saveFullAnalyticsDataLocally(reportData) {
+            try {
+                // Save to localStorage with timestamp
+                const fullDataKey = `analytics_full_${reportData.reportDate}_${Date.now()}`;
+                localStorage.setItem(fullDataKey, JSON.stringify(reportData.fullNotesData));
+                
+                // Log to console
+                console.log('📊 FULL ANALYTICS DATA FOR ANALYSIS:');
+                console.log('='.repeat(50));
+                console.log('Total Notes:', reportData.fullNotesData?.length || 0);
+                console.log('Full Data:', reportData.fullNotesData);
+                console.log('='.repeat(50));
+                console.log(`💾 Full data also saved to localStorage key: ${fullDataKey}`);
+                
+                // Show notification
+                showNotification(`💾 Full analytics data saved locally (${reportData.fullNotesData?.length || 0} notes)`, 'info', 5000);
+                
+            } catch (error) {
+                console.error('Failed to save full data locally:', error);
+            }
         }
         
         function toggleUsageReporting() {
