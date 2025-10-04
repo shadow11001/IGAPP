@@ -5907,8 +5907,19 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             try {
                 showNotification('📊 Processing email for analysis...', 'info', 2000);
                 
-                // Process the email to get analysis data
-                const emailData = EMAIL_PROCESSOR.parseEmail(emailContent);
+                // Extract information using EMAIL_PROCESSOR methods
+                const emailData = {
+                    workOrder: EMAIL_PROCESSOR.extractWorkOrder(emailContent),
+                    workOrders: EMAIL_PROCESSOR.extractWorkOrder(emailContent) ? [EMAIL_PROCESSOR.extractWorkOrder(emailContent)] : [],
+                    storeNumber: EMAIL_PROCESSOR.extractStoreNumber(emailContent),
+                    storeNumbers: EMAIL_PROCESSOR.extractStoreNumber(emailContent) ? [EMAIL_PROCESSOR.extractStoreNumber(emailContent)] : [],
+                    caseNumber: EMAIL_PROCESSOR.extractCaseNumber(emailContent),
+                    caseNumbers: EMAIL_PROCESSOR.extractCaseNumber(emailContent) ? [EMAIL_PROCESSOR.extractCaseNumber(emailContent)] : [],
+                    techName: EMAIL_PROCESSOR.extractTechName(emailContent),
+                    techNames: EMAIL_PROCESSOR.extractTechName(emailContent) ? [EMAIL_PROCESSOR.extractTechName(emailContent)] : [],
+                    emailType: EMAIL_PROCESSOR.classifyEmail(emailContent),
+                    rawContent: emailContent
+                };
                 
                 // Create comprehensive analysis report
                 const analysisReport = {
