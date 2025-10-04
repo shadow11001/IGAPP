@@ -1,0 +1,85 @@
+# Select main issue and assign to copilot. Provide below prompt to analyze.
+
+Comprehensive Notes Analysis Prompt
+TASK: Systematically analyze ALL sub-issues from the usage report to identify patterns and recommend new Quick Note buttons based on ACTUAL user data.
+
+Step-by-Step Analysis Instructions:
+1. Data Collection Phase
+Read EVERY sub-issue from the usage report (Issues #17-22)
+Extract the full content from each note (not just previews)
+Document the following for each note:
+
+Store number
+Work order number
+Date
+Full notes content
+DAE content (if any)
+Tech name
+
+2. Pattern Identification Phase
+For each note, identify:
+
+Action verbs (called, contacted, checked, reset, etc.)
+Equipment references (controller, rack, RTU, etc.)
+Troubleshooting steps (power cycle, reboot, download, etc.)
+Communication patterns (tech called back, contacted support, etc.)
+Resolution methods (issue resolved, escalated, monitoring, etc.)
+
+3. Frequency Analysis
+Count exact phrases that appear multiple times across notes
+Group similar actions (e.g., "called tech", "called technician", "contacted tech")
+Identify equipment-specific patterns (e.g., "reset controller", "power cycled RTU")
+Track communication flows (e.g., "tech called back", "left voicemail")
+
+4. Citation Requirements
+For EVERY recommendation, provide:
+
+Exact quote from the original note
+Issue number and note number where found
+Work order number for reference
+Frequency count across all notes
+Date range of occurrences
+
+5. Button Recommendation Format
+For each suggested button:
+
+```
+**Button Name:** [Exact text for button]
+**Frequency:** Found in X notes
+**Citations:**- Issue #17, Note 5, WO: WO123456, Date: 2025-01-15  Quote: "contacted tech to advise of issue"- Issue #18, Note 12, WO: WO789012, Date: 2025-01-16  Quote: "called tech back with update"
+**Suggested Button Text:** "Contacted tech"
+**Category:** Communication/Actions/Status/etc.
+```
+
+6. Validation Criteria
+Only recommend buttons if:
+
+Minimum 3 occurrences across different notes
+Consistent phrasing or easily groupable variations
+Clear time-saving potential (replacing manual typing)
+Not already covered by existing Quick Note buttons
+
+7. Analysis Depth Requirements
+Read the complete note content, not just summaries
+Look for both explicit and implicit patterns
+Consider context (what led to the action, what followed)
+Identify workflow sequences (e.g., checked → reset → verified)
+
+8. Output Structure
+Organize findings into:
+
+High Priority (5+ occurrences, clear patterns)
+Medium Priority (3-4 occurrences, good patterns)
+Workflow Sequences (multi-step processes that could be automated)
+Equipment-Specific (buttons for specific hardware/software)
+Communication Templates (standard phrases for customer interaction)
+Quality Assurance Checklist
+Before providing recommendations, verify:
+
+ Read ALL sub-issues completely
+ Extracted actual note content (not previews)
+ Provided specific citations with issue/note numbers
+ Counted exact frequencies
+ Grouped similar phrases appropriately
+ Considered existing Quick Note buttons to avoid duplicates
+ Prioritized by frequency and time-saving potential

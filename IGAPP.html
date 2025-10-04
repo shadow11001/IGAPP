@@ -81,6 +81,278 @@
             border-bottom-color: #555;
         }
 
+        /* Tab System */
+        .tab-container {
+            margin-bottom: 15px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 0;
+            margin-bottom: 10px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: #f8f9fa;
+            color: #666;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 0;
+        }
+        
+        .tab-btn:first-child {
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        
+        .tab-btn:last-child {
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+            border-left: none;
+        }
+        
+        .tab-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: #e9ecef;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* QA Checklist Styles */
+        .qa-checklist {
+            margin-top: 10px;
+        }
+        
+        .qa-checklist h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+        
+        .name-setting {
+            margin-bottom: 20px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .name-setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .name-setting-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+        }
+        
+        .name-setting-toggle {
+            font-size: 12px;
+            color: #6c757d;
+            transition: transform 0.3s ease;
+        }
+        
+        .name-setting.expanded .name-setting-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .name-setting-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .name-setting.expanded .name-setting-content {
+            max-height: 100px;
+            margin-top: 12px;
+        }
+        
+        .name-setting label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+        
+        .name-input {
+            width: calc(100% - 20px);
+            max-width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 13px;
+            background: white;
+            color: #495057;
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        
+        .name-setting small {
+            display: block;
+            margin-top: 4px;
+            font-size: 11px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        #agent-name-display {
+            font-weight: 600;
+            color: #007bff;
+            background: rgba(0, 123, 255, 0.1);
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: 6px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+        }
+        
+        .checklist-item:hover {
+            background: #e9ecef;
+        }
+        
+        .checklist-checkbox {
+            margin-top: 2px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .checklist-text {
+            flex: 1;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #333;
+        }
+        
+        .checklist-item.completed {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .checklist-item.completed .checklist-text {
+            color: #155724;
+        }
+        
+        /* Dark mode for tabs and checklist */
+        body.dark-mode .tab-btn {
+            background: #2c3e50;
+            border-color: #34495e;
+            color: #bdc3c7;
+        }
+        
+        body.dark-mode .tab-btn.active {
+            background: #3498db;
+            border-color: #3498db;
+        }
+        
+        body.dark-mode .tab-btn:hover:not(.active) {
+            background: #34495e;
+        }
+        
+        body.dark-mode .qa-checklist h3 {
+            color: #ecf0f1;
+        }
+        
+        body.dark-mode .name-setting {
+            background: #2c3e50;
+            border-color: #34495e;
+        }
+        
+        body.dark-mode .name-setting-title {
+            color: #bdc3c7;
+        }
+        
+        body.dark-mode .name-setting-toggle {
+            color: #95a5a6;
+        }
+        
+        body.dark-mode .name-setting label {
+            color: #bdc3c7;
+        }
+        
+        body.dark-mode .name-input {
+            background: #34495e;
+            border-color: #4a5f7a;
+            color: #ecf0f1;
+        }
+        
+        body.dark-mode .name-input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.25);
+        }
+        
+        body.dark-mode .name-setting small {
+            color: #95a5a6;
+        }
+        
+        body.dark-mode #agent-name-display {
+            color: #3498db;
+            background: rgba(52, 152, 219, 0.2);
+        }
+        
+        body.dark-mode .checklist-item {
+            background: #2c3e50;
+            border-color: #34495e;
+        }
+        
+        body.dark-mode .checklist-item:hover {
+            background: #34495e;
+        }
+        
+        body.dark-mode .checklist-text {
+            color: #bdc3c7;
+        }
+        
+        body.dark-mode .checklist-item.completed {
+            background: #27ae60;
+            border-color: #2ecc71;
+        }
+        
+        body.dark-mode .checklist-item.completed .checklist-text {
+            color: #ecf0f1;
+        }
+
         .button-group {
             display: flex;
             flex-wrap: wrap;
@@ -666,6 +938,49 @@
             50% { opacity: 0.7; }
         }
 
+        /* Dead Air Visual Warnings */
+        .dead-air-warning-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        .dead-air-warning-overlay.warning {
+            opacity: 1;
+            background: 
+                linear-gradient(to right, rgba(255, 193, 7, 0.8) 0%, rgba(255, 193, 7, 0.4) 15px, transparent 50px),
+                linear-gradient(to left, rgba(255, 193, 7, 0.8) 0%, rgba(255, 193, 7, 0.4) 15px, transparent 50px),
+                linear-gradient(to bottom, rgba(255, 193, 7, 0.8) 0%, rgba(255, 193, 7, 0.4) 15px, transparent 50px),
+                linear-gradient(to top, rgba(255, 193, 7, 0.8) 0%, rgba(255, 193, 7, 0.4) 15px, transparent 50px);
+        }
+
+        .dead-air-warning-overlay.critical {
+            opacity: 1;
+            background: 
+                linear-gradient(to right, rgba(220, 53, 69, 0.9) 0%, rgba(220, 53, 69, 0.5) 15px, transparent 50px),
+                linear-gradient(to left, rgba(220, 53, 69, 0.9) 0%, rgba(220, 53, 69, 0.5) 15px, transparent 50px),
+                linear-gradient(to bottom, rgba(220, 53, 69, 0.9) 0%, rgba(220, 53, 69, 0.5) 15px, transparent 50px),
+                linear-gradient(to top, rgba(220, 53, 69, 0.9) 0%, rgba(220, 53, 69, 0.5) 15px, transparent 50px);
+            animation: overlayPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes overlayPulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        /* Remove old border warning styles */
+
         .timer-controls {
             display: flex;
             gap: 4px;
@@ -702,6 +1017,86 @@
         @keyframes pulse-mic {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
+        }
+
+        /* Microphone Level Indicator */
+        .mic-level-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        .mic-level-bar {
+            width: 120px;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mic-level-fill {
+            height: 100%;
+            background: linear-gradient(to right, #28a745 0%, #ffc107 70%, #dc3545 100%);
+            border-radius: 3px;
+            transition: width 0.1s ease;
+            width: 0%;
+        }
+
+        .mic-level-text {
+            font-size: 10px;
+            font-weight: 500;
+            min-width: 35px;
+            text-align: right;
+        }
+
+        .sensitivity-container {
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sensitivity-slider {
+            width: 100px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .sensitivity-slider::-webkit-slider-thumb {
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .sensitivity-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .sensitivity-label {
+            font-size: 9px;
+            opacity: 0.8;
+            min-width: 25px;
         }
 
         small {
@@ -900,10 +1295,200 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.03); }
         }
+
+        /* Settings Menu */
+        .settings-menu {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-menu:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .settings-dropdown {
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            padding: 15px;
+            min-width: 250px;
+            z-index: 1001;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .settings-dropdown {
+            background: #2c2c2c;
+            border-color: #555;
+            color: white;
+        }
+
+        .settings-dropdown.show {
+            display: block;
+            animation: slideUpFade 0.3s ease;
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark-mode .settings-item {
+            border-bottom-color: #555;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .settings-toggle {
+            position: relative;
+            width: 50px;
+            height: 25px;
+            background: #ccc;
+            border-radius: 25px;
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+
+        .settings-toggle.active {
+            background: #28a745;
+        }
+
+        .settings-toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 21px;
+            height: 21px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .settings-toggle.active .settings-toggle-slider {
+            transform: translateX(25px);
+        }
+
+        .branch-selector {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        body.dark-mode .branch-selector {
+            background: #444;
+            border-color: #666;
+            color: white;
+        }
+
+        .branch-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        body.dark-mode .branch-info {
+            color: #aaa;
+        }
+
+        .password-prompt {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 2000;
+            min-width: 300px;
+            text-align: center;
+        }
+
+        body.dark-mode .password-prompt {
+            background: #2c2c2c;
+            border-color: #555;
+            color: white;
+        }
+
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1999;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        body.dark-mode .password-input {
+            background: #444;
+            border-color: #666;
+            color: white;
+        }
     </style>
 </head>
 <body class="light-mode">
     
+    <!-- Dead Air Warning Overlay -->
+    <div class="dead-air-warning-overlay" id="dead-air-warning-overlay"></div>
+
     <div class="infraction-tracker" id="infraction-tracker">
         <div class="infraction-session">
             <span>Session: </span>
@@ -929,39 +1514,99 @@
     <button class="theme-toggle" aria-label="Check for Updates" onclick="checkForUpdates()" id="update-btn-top" tabindex="0" style="right: 80px;">
         <i class="fas fa-sync-alt" id="update-icon-top" aria-hidden="true"></i>
     </button>
+    
+    <!-- Settings Menu -->
+    <button class="settings-menu" aria-label="Open Settings" onclick="toggleSettingsMenu()" id="settings-btn" tabindex="0">
+        <i class="fas fa-cog" aria-hidden="true"></i>
+    </button>
+    
+    <div class="settings-dropdown" id="settings-dropdown">
+        <div class="settings-item">
+            <span class="settings-label">🌿 Update Branch</span>
+        </div>
+        <div style="padding: 0 0 10px 0;">
+            <select class="branch-selector" id="branch-selector" onchange="handleBranchChange()">
+                <option value="main">Stable (Recommended)</option>
+                <option value="beta">Beta (Password Required)</option>
+                <option value="dev">Development (Password Required)</option>
+            </select>
+            <div class="branch-info" id="branch-info">Currently using: Stable branch</div>
+        </div>
+        <div class="settings-item">
+            <span class="settings-label">📊 Usage Analytics</span>
+            <div class="settings-toggle" id="analytics-toggle" onclick="toggleUsageReporting()">
+                <div class="settings-toggle-slider"></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <span class="settings-label">📤 Send Usage Report</span>
+            <button class="settings-test-btn" id="send-report-btn" onclick="sendUsageReport()" title="Send usage report to GitHub">
+                Send Now
+            </button>
+        </div>
+        <div class="settings-item">
+            <span class="settings-label">🔄 Auto Updates</span>
+            <div class="settings-toggle" id="updates-toggle" onclick="toggleAutoUpdateFromSettings()">
+                <div class="settings-toggle-slider"></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <span class="settings-label">📊 Export Notes Data</span>
+            <button class="settings-test-btn" onclick="exportNotesData()" title="Export all notes data for analysis">
+                Export
+            </button>
+        </div>
+        <div class="settings-item">
+            <span class="settings-label">⚠️ Visual Dead Air Warnings</span>
+            <div class="settings-toggle" id="visual-warnings-toggle" onclick="toggleVisualDeadAirWarnings()">
+                <div class="settings-toggle-slider"></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <span class="settings-label">🎤 Microphone Level Display</span>
+            <div class="settings-toggle" id="mic-level-toggle" onclick="toggleMicLevelDisplay()">
+                <div class="settings-toggle-slider"></div>
+            </div>
+        </div>
+    </div>
     </button>
 
     <div class="form-container">
         <!-- Quick Notes Buttons on the Left -->
         <div class="qa-container">
-            <h3>Quick Notes</h3>
-            
-            <h4>System Login</h4>
-            <div class="button-group">
-                <button onclick="addQuickNote('Logged into Novar.')" class="quick-note-btn" title="Novar Login">Novar</button>
-                <button onclick="addQuickNote('Logged into Opus Arch.')" class="quick-note-btn" title="Opus Arch Login">Opus Arch</button>
-                <button onclick="addQuickNote('Logged into Opus Mag.')" class="quick-note-btn" title="Opus Mag Login">Opus Mag</button>
-                <button onclick="addQuickNote('Logged into CPC.')" class="quick-note-btn" title="CPC Login">CPC</button>
-                <button onclick="addQuickNote('Logged into Danfoss AKA65.')" class="quick-note-btn" title="Danfoss AKA65 Login">AKA65</button>
-                <button onclick="addQuickNote('Logged into Danfoss Storeview.')" class="quick-note-btn" title="Danfoss Storeview Login">Storeview</button>
-            </div>
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('quick-notes')">Quick Notes</button>
+                    <button class="tab-btn" onclick="switchTab('qa-checklist')">QA Checklist</button>
+                </div>
+                
+                <!-- Quick Notes Tab Content -->
+                <div id="quick-notes" class="tab-content active">
+                    <h4>System Login</h4>
+                    <div class="button-group">
+                        <button onclick="addQuickNote('Logged into Novar.')" class="quick-note-btn" title="Novar Login">Novar</button>
+                        <button onclick="addQuickNote('Logged into Opus Arch.')" class="quick-note-btn" title="Opus Arch Login">Opus Arch</button>
+                        <button onclick="addQuickNote('Logged into Opus Mag.')" class="quick-note-btn" title="Opus Mag Login">Opus Mag</button>
+                        <button onclick="addQuickNote('Logged into CPC.')" class="quick-note-btn" title="CPC Login">CPC</button>
+                        <button onclick="addQuickNote('Logged into Danfoss AKA65.')" class="quick-note-btn" title="Danfoss AKA65 Login">AKA65</button>
+                        <button onclick="addQuickNote('Logged into Danfoss Storeview.')" class="quick-note-btn" title="Danfoss Storeview Login">Storeview</button>
+                    </div>
 
-            <h4>Diagnostics</h4>
-            <div class="button-group">
-                <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn" title="Communications Check">Comms ✓</button>
-                <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn" title="Communications Loss">Comms ✗</button>
-                <button onclick="addQuickNote('Checked temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
-                <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
-                <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn" title="Clock Check">Clocks</button>
-                <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn" title="Ping Test">Ping</button>
-                <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Test</button>
-            </div>
-
-            <h4>Ping Results</h4>
-            <div class="button-group">
-                <button onclick="addQuickNote('Receiving good ping.')" class="quick-note-btn success-quick" title="Successful Ping">Good Ping</button>
-                <button onclick="addQuickNote('Ping timedout.')" class="quick-note-btn error-quick" title="Failed Ping">Ping Timeout</button>
-            </div>
+                    <h4>Diagnostics</h4>
+                    <div class="button-group">
+                        <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
+                        <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
+                        <button onclick="addQuickNote('Checked temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
+                        <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
+                        <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn" title="Clock Check">Clocks</button>
+                        <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn" title="Ping Test">Ping</button>
+                        <button onclick="addQuickNote('Receiving good ping.')" class="quick-note-btn success-quick" title="Successful Ping">Good Ping</button>
+                        <button onclick="addQuickNote('Ping timedout.')" class="quick-note-btn error-quick" title="Failed Ping">Ping Timeout</button>
+                        <button onclick="addCheckBreakersNote()" class="quick-note-btn" title="Check Breakers">Check Breakers</button>
+                        <button onclick="addDefrostAlreadyRunningNote()" class="quick-note-btn" title="Defrost Already Active">Already Defrosting</button>
+                        <button onclick="addQuickNote('Defrost already terminated.')" class="quick-note-btn" title="Defrost Already Ended">Already Terminated</button>
+                        <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Test</button>
+                    </div>
 
             <h4>Actions</h4>
             <div class="button-group">
@@ -970,6 +1615,7 @@
                 <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
                 <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
                 <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
+                <button onclick="addShutdownCircuitNote()" class="quick-note-btn" title="Shutdown Circuit">Shutdown Circuit</button>
                 <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
                 <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">RTU Setpoint</button>
                 <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
@@ -998,6 +1644,11 @@
                 <button onclick="addQuickNote('Call dropped.')" class="quick-note-btn error-quick" title="Call Disconnected">Call Dropped</button>
                 <button onclick="addQuickNote('Tech called for a suppression. Adv tech of NSRM email.')" class="quick-note-btn" title="Suppression Request">NSRM</button>
                 <button onclick="addQuickNote('Adv tech to power cycle controller.')" class="quick-note-btn" title="Power Cycle Recommendation">Power Cycle</button>
+                <button onclick="addQuickNote('Store is in remodel.')" class="quick-note-btn" title="Store Remodel Status">Remodel</button>
+                <button onclick="addQuickNote('This is a Sams store.')" class="quick-note-btn" title="Sam's Club Store">Sams</button>
+                <button onclick="addQuickNote('Submitted PCR.')" class="quick-note-btn success-quick" title="Point Change Request Submitted">Submitted PCR</button>
+                <button onclick="addQuickNote('Submitted PDR.')" class="quick-note-btn success-quick" title="Parameter Deviation Request Submitted">Submitted PDR</button>
+                <button onclick="addAdvisoryNote()" class="quick-note-btn" title="Advise Tech of Issue">Advisory</button>
             </div>
 
             <h4>Recommendations</h4>
@@ -1005,6 +1656,75 @@
                 <button onclick="addQuickNote('Advised to monitor and call back if issues persist.')" class="quick-note-btn" title="Monitor Instruction">Monitor</button>
                 <button onclick="showContactOptions()" class="quick-note-btn" title="Contact Instruction">Contact</button>
                 <button onclick="addReplaceNote()" class="quick-note-btn" title="Replace Instruction">Replace</button>
+            </div>
+
+            <h4>Communication</h4>
+            <div class="button-group">
+                <button onclick="addTechQuestionNote()" class="quick-note-btn" title="Tech Asked Question">Tech Question</button>
+                <button onclick="addStatusUpdateNote()" class="quick-note-btn" title="Status Update Request">Status Update</button>
+                <button onclick="addTechRefusedNote()" class="quick-note-btn error-quick" title="Tech Refused Action">Tech Refused</button>
+            </div>
+                </div>
+                
+                <!-- QA Checklist Tab Content -->
+                <div id="qa-checklist" class="tab-content">
+                    <div class="qa-checklist">
+                        <h3>QA Checklist</h3>
+                        
+                        <!-- Name Customization -->
+                        <div class="name-setting" id="name-setting">
+                            <div class="name-setting-header" onclick="toggleNameSetting()">
+                                <span class="name-setting-title">Customize Name</span>
+                                <span class="name-setting-toggle">▼</span>
+                            </div>
+                            <div class="name-setting-content">
+                                <label for="agent-name">Your Name:</label>
+                                <input type="text" id="agent-name" class="name-input" placeholder="Enter your name" onchange="updateAgentName()" onblur="autoCollapseNameSetting()">
+                                <small>This will replace [NAME] in the greeting below</small>
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Thanks for calling Walmart Digital Assets, where we're always happy to help! My name is <span id="agent-name-display">[NAME]</span>, can I please have your name site and work order number from which you are calling?</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Repeat site and workorder back to the tech if no work order is provided say "you said site number is xxxx and no workorder correct"</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Fill Dead air with small talk or talking yourself through the call.</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Thank you for calling walmart digital assets stay on the line for a brief survey</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Did you put the store number in VCC?</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Did you tag HVAC, refrigeration, lighting, or comms in VCC?</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Did you tag the proper EMS in VCC?</div>
+                        </div>
+                        
+                        <div class="checklist-item" onclick="toggleChecklistItem(this)">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <div class="checklist-text">Did you notate service channel if a work order was provided?</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1018,6 +1738,20 @@
                     <div class="timer-controls">
                         <button class="timer-btn" onclick="resetTimer()" title="I Spoke / Reset">🗣</button>
                         <button class="timer-btn" onclick="toggleAutoStart()" title="Toggle Auto-Start">🤖</button>
+                    </div>
+                    <div class="mic-level-container" id="mic-level-container" style="display: none;">
+                        <div class="mic-level-bar">
+                            <div class="mic-level-fill" id="mic-level-fill"></div>
+                        </div>
+                        <div class="mic-level-text" id="mic-level-text">0%</div>
+                    </div>
+                    <div class="sensitivity-container" id="sensitivity-container" style="display: none;">
+                        <span class="sensitivity-label">Sens:</span>
+                        <input type="range" class="sensitivity-slider" id="sensitivity-slider" 
+                               min="10" max="50" value="25" 
+                               oninput="updateMicSensitivity(this.value)" 
+                               title="Microphone sensitivity for auto-reset">
+                        <span class="sensitivity-label" id="sensitivity-value">25</span>
                     </div>
                 </div>
             </div>
@@ -1075,10 +1809,6 @@
             <button onclick="clearForm()" aria-describedby="clear-all-help" class="danger-button">Clear Everything</button>
             <small id="clear-all-help" class="sr-only">Clear all form fields and delete all saved history</small>
             
-            <!-- Temporary Export Feature -->
-            <button onclick="exportNotesData()" aria-describedby="export-help" class="primary-button" style="margin-top: 10px; background: #6f42c1;">📊 Export Notes Data</button>
-            <small id="export-help" class="sr-only">Export your notes usage data for analysis and improvement</small>
-            
             <div id="tag-recommendations" class="tag-recommendations">
                 <h4>Recommended Tags</h4>
                 <div id="recommended-tags" class="tag-list">
@@ -1113,13 +1843,38 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.0.5', // Update this when you make changes
+            currentVersion: '1.0.8', // Update this when you make changes
             githubRepo: 'shadow11001/IGAPP',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
             // Masked GitHub token (Base64 + simple XOR obfuscation)
             // Your encoded token is now configured
             maskedToken: 'TUNeQl9IdVpLXnUbG2toGRh4bHsaa1ITZ2hMa0dhYWIYdVtvR2saeRx5cEwTYGRsa2hrGh5NR01MT2caWXlMYmhde2tsa3NoHkNZXm54YB5pYxhtGGxpbx5cUEZN', // Your encoded token
+            
+            // Usage tracking for analytics
+            usageTracking: {
+                buttonClicks: {},
+                notePatterns: [],
+                sessionStart: Date.now(),
+                lastReport: null,
+                userHash: null,
+                reportingEnabled: true
+            },
+            
+            // Branch management
+            currentBranch: 'main',
+            branchPasswords: {
+                beta: 'IGISAWESOME',
+                dev: 'freemind596'
+            },
+            
+            // Visual dead air warnings
+            visualDeadAirWarnings: true,
+            
+            // Microphone sensitivity and level tracking
+            micSensitivity: 25, // Default speech threshold
+            currentMicLevel: 0,
+            micLevelHistory: []
         };
 
         // Tag analysis system
@@ -1327,12 +2082,32 @@
 
         function updateTimerVisuals() {
             const timer = document.getElementById('dead-air-timer');
+            const warningOverlay = document.getElementById('dead-air-warning-overlay');
+            
+            // Update timer colors
             timer.classList.remove('warning', 'critical');
             
-            if (AppState.deadAirSeconds >= 30) {
-                timer.classList.add('critical');
-            } else if (AppState.deadAirSeconds >= 25) {
-                timer.classList.add('warning');
+            // Update visual overlay warnings if enabled
+            if (AppState.visualDeadAirWarnings && warningOverlay) {
+                warningOverlay.classList.remove('warning', 'critical');
+                
+                if (AppState.deadAirSeconds >= 30) {
+                    timer.classList.add('critical');
+                    warningOverlay.classList.add('critical');
+                } else if (AppState.deadAirSeconds >= 25) {
+                    timer.classList.add('warning');
+                    warningOverlay.classList.add('warning');
+                }
+            } else if (warningOverlay) {
+                // Remove all visual warnings if disabled
+                warningOverlay.classList.remove('warning', 'critical');
+                
+                // Still update timer colors
+                if (AppState.deadAirSeconds >= 30) {
+                    timer.classList.add('critical');
+                } else if (AppState.deadAirSeconds >= 25) {
+                    timer.classList.add('warning');
+                }
             }
         }
 
@@ -1419,8 +2194,12 @@
                 AppState.micAnalyser.getByteFrequencyData(dataArray);
                 const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
                 
+                // Update microphone level
+                AppState.currentMicLevel = Math.round((average / 255) * 100);
+                updateMicLevelDisplay();
+                
                 const wasSpeaking = AppState.micActive;
-                AppState.micActive = average > AppState.speechThreshold;
+                AppState.micActive = average > AppState.micSensitivity;
                 
                 // Update mic status indicator
                 const micStatus = document.getElementById('mic-status');
@@ -1665,13 +2444,20 @@
                 console.log('GitHub Repo:', AppState.githubRepo);
                 showNotification('Checking for updates...', 'info');
                 
-                // Try multiple possible file names (case sensitivity)
-                const possibleFiles = ['IGAPP.html', 'igapp.html', 'Igapp.html'];
-                let apiUrl, response, data;
+                // Try multiple possible file names (case sensitivity) for current branch
+                const fileName = 'IGAPP.html';
+                const branch = AppState.currentBranch;
                 
-                for (const fileName of possibleFiles) {
+                // Construct API URL for specific branch
+                let apiUrl;
+                if (branch === 'main') {
                     apiUrl = `https://api.github.com/repos/${AppState.githubRepo}/contents/${fileName}`;
-                    console.log('Trying API URL:', apiUrl);
+                } else {
+                    apiUrl = `https://api.github.com/repos/${AppState.githubRepo}/contents/${fileName}?ref=${branch}`;
+                }
+                
+                console.log('Trying API URL:', apiUrl);
+                console.log('Using branch:', branch);
                     
                     // Headers for API request - Updated to latest GitHub API standards
                     const headers = {
@@ -1688,16 +2474,15 @@
                         console.warn('No GitHub token available for private repo access');
                     }
                     
-                    console.log(`Making fetch request for ${fileName}...`);
-                    response = await fetch(apiUrl, { headers });
-                    console.log(`Response status for ${fileName}:`, response.status);
-                    
-                    if (response.ok) {
-                        console.log(`✅ Found file: ${fileName}`);
-                        break;
-                    } else if (response.status === 404) {
-                        console.log(`❌ File not found: ${fileName}`);
-                        continue;
+                console.log(`Making fetch request for ${fileName} on ${branch} branch...`);
+                response = await fetch(apiUrl, { headers });
+                console.log(`Response status for ${fileName}:`, response.status);
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        console.log(`❌ File not found: ${fileName} on ${branch} branch`);
+                        showNotification(`📁 File not found on ${branch} branch`, 'error', 5000);
+                        return;
                     } else {
                         // Non-404 error, handle it
                         const errorText = await response.text();
@@ -1714,30 +2499,7 @@
                     }
                 }
                 
-                // If we get here and response is not ok, none of the files were found
-                if (!response.ok) {
-                    // Let's try to list the repository contents to see what files exist
-                    console.log('No HTML files found, checking repository contents...');
-                    const repoListUrl = `https://api.github.com/repos/${AppState.githubRepo}/contents`;
-                    const repoHeaders = {
-                        'Accept': 'application/vnd.github+json',
-                        'User-Agent': 'IGAPP-AutoUpdater',
-                        'X-GitHub-Api-Version': '2022-11-28'
-                    };
-                    if (AppState.githubToken) {
-                        repoHeaders['Authorization'] = `Bearer ${AppState.githubToken}`;
-                    }
-                    
-                    const repoResponse = await fetch(repoListUrl, { headers: repoHeaders });
-                    if (repoResponse.ok) {
-                        const repoContents = await repoResponse.json();
-                        console.log('Repository contents:', repoContents.map(item => item.name));
-                        showNotification(`📁 No IGAPP.html found. Files in repo: ${repoContents.map(item => item.name).join(', ')}`, 'error', 8000);
-                    } else {
-                        showNotification('📁 Repository or IGAPP.html file not found - Check file name and repository', 'error', 5000);
-                    }
-                    return;
-                }
+                console.log(`✅ Found file: ${fileName} on ${branch} branch`);
                 
                 console.log('Parsing response...');
                 data = await response.json();
@@ -1814,16 +2576,26 @@
             if (staticUpdateBtn) {
                 staticUpdateBtn.style.display = 'flex';
                 staticUpdateBtn.innerHTML = `<i class="fas fa-sync-alt" id="update-icon" aria-hidden="true"></i><span>Update to v${newVersion}</span>`;
+                // Store the update data for when the button is clicked
+                staticUpdateBtn.onclick = () => showUpdateOptions(newVersion, newContent);
             }
             
-            // Add dynamic update button to page
-            addUpdateButton(newVersion, newContent);
+            // Store update data globally for top button as well
+            const staticUpdateBtnTop = document.getElementById('update-btn-top');
+            if (staticUpdateBtnTop) {
+                staticUpdateBtnTop.onclick = () => showUpdateOptions(newVersion, newContent);
+            }
         }
 
-        function addUpdateButton(newVersion, newContent) {
-            // Remove existing dynamic update button if present
-            const existingBtn = document.getElementById('dynamic-update-btn');
-            if (existingBtn) existingBtn.remove();
+        function showUpdateOptions(newVersion, newContent) {
+            // Remove existing dynamic update buttons if present
+            const existingCopyBtn = document.querySelector('.dynamic-update-button');
+            const existingDownloadBtn = document.getElementById('dynamic-update-btn');
+            const existingInstructions = document.querySelector('.update-instructions');
+            
+            if (existingCopyBtn) existingCopyBtn.remove();
+            if (existingDownloadBtn) existingDownloadBtn.remove();
+            if (existingInstructions) existingInstructions.remove();
             
             // Don't show button if already up to date
             if (!isNewerVersion(newVersion, AppState.currentVersion)) {
@@ -1833,7 +2605,7 @@
             // Create primary copy button (better for preserving encoding)
             const copyBtn = document.createElement('button');
             copyBtn.className = 'dynamic-update-button';
-            copyBtn.innerHTML = `� Copy v${newVersion} Code`;
+            copyBtn.innerHTML = `📋 Copy v${newVersion} Code`;
             copyBtn.onclick = () => copyUpdateToClipboard(newContent, newVersion);
             copyBtn.setAttribute('aria-label', `Copy version ${newVersion} code to clipboard`);
             
@@ -1841,24 +2613,13 @@
             const downloadBtn = document.createElement('button');
             downloadBtn.id = 'dynamic-update-btn';
             downloadBtn.className = 'dynamic-update-button-alt';
-            downloadBtn.innerHTML = `� Download v${newVersion}`;
+            downloadBtn.innerHTML = `💾 Download v${newVersion}`;
             downloadBtn.onclick = () => applyUpdate(newContent, newVersion);
             downloadBtn.setAttribute('aria-label', `Download application version ${newVersion}`);
-            
-            // Create instructions
-            const instructions = document.createElement('div');
-            instructions.className = 'update-instructions';
-            instructions.innerHTML = `
-                <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #666;">
-                    Copy code (recommended) or download file<br>
-                    Then replace this file and refresh
-                </div>
-            `;
             
             // Add to page
             document.body.appendChild(copyBtn);
             document.body.appendChild(downloadBtn);
-            document.body.appendChild(instructions);
         }
 
         function copyUpdateToClipboard(newContent, newVersion) {
@@ -2126,6 +2887,1199 @@ ${JSON.stringify(exportData, null, 2)}
             }
         }
 
+        // Usage Analytics System for Central Dashboard
+        function initializeUsageTracking() {
+            // Generate or retrieve anonymous user hash
+            let userHash = localStorage.getItem('userAnalyticsHash');
+            if (!userHash) {
+                userHash = 'user_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('userAnalyticsHash', userHash);
+            }
+            AppState.usageTracking.userHash = userHash;
+            
+            // Load existing button click data
+            const savedClicks = localStorage.getItem('buttonClickAnalytics');
+            if (savedClicks) {
+                try {
+                    AppState.usageTracking.buttonClicks = JSON.parse(savedClicks);
+                } catch (e) {
+                    AppState.usageTracking.buttonClicks = {};
+                }
+            }
+            
+            // Load last report time
+            const lastReport = localStorage.getItem('lastUsageReport');
+            if (lastReport) {
+                AppState.usageTracking.lastReport = parseInt(lastReport);
+            }
+            
+            // Load reporting preference
+            const reportingPref = localStorage.getItem('usageReportingEnabled');
+            if (reportingPref !== null) {
+                AppState.usageTracking.reportingEnabled = reportingPref === 'true';
+            }
+            
+            // Check if reporting should happen (weekly)
+            if (shouldSendUsageReport()) {
+                setTimeout(generateAndSubmitUsageReport, 15000); // Delay 15 seconds after load
+            }
+            
+            console.log('📊 Usage analytics initialized for:', userHash.substring(0, 8) + '...');
+        }
+        
+        function trackButtonClick(buttonName, category = 'general') {
+            if (!AppState.usageTracking.reportingEnabled) return;
+            
+            const key = `${category}:${buttonName}`;
+            AppState.usageTracking.buttonClicks[key] = (AppState.usageTracking.buttonClicks[key] || 0) + 1;
+            
+            // Save to localStorage immediately
+            localStorage.setItem('buttonClickAnalytics', JSON.stringify(AppState.usageTracking.buttonClicks));
+        }
+        
+        function trackNotePattern(noteText) {
+            if (!AppState.usageTracking.reportingEnabled || !noteText) return;
+            
+            // Extract patterns without storing actual content
+            const patterns = {
+                length: noteText.length,
+                wordCount: noteText.split(/\s+/).length,
+                hasNumbers: /\d/.test(noteText),
+                hasSpecialChars: /[!@#$%^&*()]/.test(noteText),
+                timestamp: Date.now()
+            };
+            
+            AppState.usageTracking.notePatterns.push(patterns);
+            
+            // Keep only last 50 patterns to prevent storage bloat
+            if (AppState.usageTracking.notePatterns.length > 50) {
+                AppState.usageTracking.notePatterns = AppState.usageTracking.notePatterns.slice(-50);
+            }
+        }
+        
+        function shouldSendUsageReport() {
+            if (!AppState.usageTracking.reportingEnabled) return false;
+            
+            const lastReport = AppState.usageTracking.lastReport;
+            const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            
+            return !lastReport || lastReport < weekAgo;
+        }
+        
+        async function generateAndSubmitUsageReport() {
+            if (!AppState.usageTracking.reportingEnabled) return;
+            
+            try {
+                console.log('📊 Generating weekly usage report...');
+                
+                const reportData = generateUsageReportData();
+                
+                // Validate we have meaningful data
+                if (!reportData || !reportData.userHash) {
+                    console.warn('⚠️ Report data invalid, skipping submission');
+                    return;
+                }
+                
+                await submitUsageReportToGitHub(reportData);
+                
+                // Update last report timestamp
+                AppState.usageTracking.lastReport = Date.now();
+                localStorage.setItem('lastUsageReport', AppState.usageTracking.lastReport.toString());
+                
+                // Clear session data after successful report
+                AppState.usageTracking.notePatterns = [];
+                
+                showNotification('📊 Anonymous usage data submitted - Thank you for helping improve the app!', 'success', 5000);
+                console.log('✅ Usage report submitted successfully');
+                
+            } catch (error) {
+                console.log('📊 Usage report submission failed (this is normal):', error.message);
+                // Fail silently - don't bother users with analytics failures
+            }
+        }
+        
+        function generateUsageReportData() {
+            // Debug: Check all localStorage like the export function does
+            const allLocalStorageKeys = [];
+            const foundDataSummary = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                allLocalStorageKeys.push(key);
+                const data = localStorage.getItem(key);
+                try {
+                    const parsed = JSON.parse(data);
+                    if (Array.isArray(parsed)) {
+                        foundDataSummary[key] = `Array with ${parsed.length} items`;
+                    } else if (typeof parsed === 'object') {
+                        foundDataSummary[key] = `Object with ${Object.keys(parsed).length} keys`;
+                    } else {
+                        foundDataSummary[key] = typeof parsed;
+                    }
+                } catch (e) {
+                    foundDataSummary[key] = `String: ${data.length} chars`;
+                }
+            }
+            
+            // Try multiple possible keys for notes data
+            const possibleNotesKeys = ['savedNotes', 'notes', 'history', 'formData', 'IGAPP_notes', 'notesHistory', 'notesData'];
+            let savedNotes = [];
+            let notesDataSource = 'none';
+            
+            for (const key of possibleNotesKeys) {
+                try {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        const parsed = JSON.parse(data);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            savedNotes = parsed;
+                            notesDataSource = key;
+                            console.log(`📋 Found notes data in localStorage key: ${key} (${parsed.length} items)`);
+                            break;
+                        }
+                    }
+                } catch (e) {
+                    // Skip invalid JSON
+                }
+            }
+            
+            // If still no notes found, check for any localStorage key containing note-like data
+            if (savedNotes.length === 0) {
+                for (const key of allLocalStorageKeys) {
+                    try {
+                        const data = localStorage.getItem(key);
+                        if (data && data.includes('notes') || data.includes('dae') || data.includes('workOrder')) {
+                            console.log(`📋 Potential notes data found in key: ${key}`);
+                            const parsed = JSON.parse(data);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                savedNotes = parsed;
+                                notesDataSource = key;
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        // Skip invalid data
+                    }
+                }
+            }
+            
+            console.log(`📊 Notes analysis: Found ${savedNotes.length} notes from source: ${notesDataSource}`);
+            
+            // Check for button click analytics
+            const buttonClickData = localStorage.getItem('buttonClickAnalytics');
+            let buttonStats = [];
+            
+            if (buttonClickData) {
+                try {
+                    const clicks = JSON.parse(buttonClickData);
+                    buttonStats = Object.entries(clicks)
+                        .sort(([,a], [,b]) => b - a)
+                        .slice(0, 25);
+                } catch (e) {
+                    console.warn('Error parsing button click data:', e);
+                }
+            }
+            
+            // If no button click data, analyze saved notes for button usage patterns
+            if (buttonStats.length === 0 && savedNotes.length > 0) {
+                console.log('📊 No button click data found, analyzing saved notes for patterns...');
+                const notePatterns = analyzeNotesForButtonPatterns(savedNotes);
+                buttonStats = notePatterns.slice(0, 25);
+            }
+            
+            // Ensure we have some data - add default if empty
+            if (buttonStats.length === 0) {
+                buttonStats.push(['No usage data available', 0]);
+            }
+            
+            // Enhanced note statistics using actual saved notes
+            const notePatternCount = AppState.usageTracking.notePatterns.length;
+            const noteStats = {
+                averageLength: savedNotes.length > 0 ? 
+                    Math.round(savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.length : 0), 0) / savedNotes.length) : 0,
+                averageWordCount: savedNotes.length > 0 ? 
+                    Math.round(savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.split(' ').length : 0), 0) / savedNotes.length) : 0,
+                percentWithNumbers: savedNotes.length > 0 ? 
+                    Math.round(savedNotes.filter(note => note.notes && /\d/.test(note.notes)).length / savedNotes.length * 100) : 0,
+                totalNotesSaved: savedNotes.length,
+                sessionNotesAnalyzed: notePatternCount,
+                notesWithDAE: savedNotes.filter(note => note.dae && note.dae.length > 0).length,
+                notesWithTechName: savedNotes.filter(note => note.techName && note.techName.length > 0).length
+            };
+            
+            // Analyze saved notes for common patterns (anonymized)
+            const commonPhrases = savedNotes.length > 0 ? analyzeCommonPhrasesForButtonSuggestions(savedNotes) : [];
+            
+            const reportData = {
+                userHash: AppState.usageTracking.userHash || 'unknown',
+                reportDate: new Date().toISOString().split('T')[0],
+                sessionDuration: Math.round((Date.now() - AppState.usageTracking.sessionStart) / 1000 / 60), // minutes
+                version: AppState.currentVersion,
+                buttonUsage: buttonStats,
+                noteStatistics: noteStats,
+                buttonSuggestions: commonPhrases,
+                reportingPeriod: '7days',
+                dataQuality: {
+                    hasButtonData: buttonStats.length > 1 || buttonStats[0][0] !== 'No usage data available',
+                    hasNotePatterns: notePatternCount > 0,
+                    hasSavedNotes: savedNotes.length > 0,
+                    localStorageKeys: allLocalStorageKeys,
+                    localStorageData: foundDataSummary,
+                    notesDataSource: notesDataSource,
+                    dataSource: buttonClickData ? 'button_tracking' : (savedNotes.length > 0 ? 'note_analysis' : 'no_data')
+                },
+                // Include condensed notes data for analysis (to avoid GitHub 422 errors)
+                rawNotesData: savedNotes.slice(0, 20).map((note, index) => ({
+                    id: `note_${index + 1}`,
+                    date: note.date || 'unknown',
+                    noteLength: note.notes ? note.notes.length : 0,
+                    wordCount: note.notes ? note.notes.split(' ').length : 0,
+                    hasDAE: !!(note.dae && note.dae.length > 0),
+                    hasTechName: !!(note.techName && note.techName.length > 0),
+                    hasStoreNumber: !!(note.storeNumber && note.storeNumber.length > 0),
+                    hasWorkOrder: !!(note.workOrder && note.workOrder.length > 0),
+                    tags: note.tags || [],
+                    // Include truncated note content to avoid size limits
+                    notesPreview: note.notes ? note.notes.substring(0, 150) + (note.notes.length > 150 ? '...' : '') : '',
+                    daePreview: note.dae ? note.dae.substring(0, 100) + (note.dae.length > 100 ? '...' : '') : '',
+                    techName: note.techName || '',
+                    storeNumber: note.storeNumber || '',
+                    workOrder: note.workOrder || ''
+                })),
+                // Summary of raw data
+                rawDataSummary: {
+                    totalNotes: savedNotes.length,
+                    totalCharacters: savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.length : 0), 0),
+                    totalWords: savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.split(' ').length : 0), 0),
+                    notesWithContent: savedNotes.filter(note => note.notes && note.notes.trim().length > 0).length,
+                    notesWithDAE: savedNotes.filter(note => note.dae && note.dae.length > 0).length,
+                    dateRange: {
+                        earliest: savedNotes.length > 0 ? savedNotes.reduce((earliest, note) => 
+                            note.date && note.date < earliest ? note.date : earliest, 
+                            savedNotes[0]?.date || 'unknown') : 'none',
+                        latest: savedNotes.length > 0 ? savedNotes.reduce((latest, note) => 
+                            note.date && note.date > latest ? note.date : latest, 
+                            savedNotes[0]?.date || 'unknown') : 'none'
+                    }
+                }
+            };
+            
+            // Add full notes data for sub-issue creation
+            reportData.fullNotesData = savedNotes.map((note, index) => ({
+                id: `note_${index + 1}`,
+                date: note.date || 'unknown',
+                noteLength: note.notes ? note.notes.length : 0,
+                wordCount: note.notes ? note.notes.split(' ').length : 0,
+                hasDAE: !!(note.dae && note.dae.length > 0),
+                hasTechName: !!(note.techName && note.techName.length > 0),
+                hasStoreNumber: !!(note.storeNumber && note.storeNumber.length > 0),
+                hasWorkOrder: !!(note.workOrder && note.workOrder.length > 0),
+                tags: note.tags || [],
+                // Include full note content for sub-issues
+                fullContent: note.notes || '',
+                fullDAE: note.dae || '',
+                techName: note.techName || '',
+                storeNumber: note.storeNumber || '',
+                workOrder: note.workOrder || ''
+            }));
+            
+            console.log('📊 Generated report data:', reportData);
+            console.log(`📊 Full notes data created: ${reportData.fullNotesData.length} notes`);
+            return reportData;
+        }
+        
+        function analyzeNotesForButtonPatterns(savedNotes) {
+            const patterns = {};
+            
+            // Common patterns that might indicate button usage
+            const buttonPatterns = {
+                'Escalation': /escalat|escalation|tier|t2|t3/i,
+                'Version Download': /version|download|update|dl/i,
+                'Reboot/Restart': /reboot|restart|reset|power/i,
+                'Connection Issues': /connect|connection|network|wifi|internet/i,
+                'Hardware': /hardware|device|equipment|unit/i,
+                'Software': /software|app|application|program/i,
+                'Store Visit': /visit|onsite|store|location/i,
+                'Remote Access': /remote|anydesk|teamviewer|vnc/i,
+                'Testing': /test|testing|check|verify/i,
+                'Documentation': /document|note|record|log/i
+            };
+            
+            savedNotes.forEach(note => {
+                const noteText = note.notes || '';
+                Object.entries(buttonPatterns).forEach(([buttonName, pattern]) => {
+                    if (pattern.test(noteText)) {
+                        patterns[buttonName] = (patterns[buttonName] || 0) + 1;
+                    }
+                });
+            });
+            
+            return Object.entries(patterns)
+                .sort(([,a], [,b]) => b - a)
+                .map(([name, count]) => [name, count]);
+        }
+        
+        function analyzeCommonPhrasesForButtonSuggestions(savedNotesData) {
+            try {
+                if (!savedNotesData || savedNotesData.length === 0) return [];
+                
+                // Analyze for common patterns that could become buttons
+                const allText = savedNotesData
+                    .map(note => note.notes || '')
+                    .join(' ')
+                    .toLowerCase();
+                
+                if (!allText.trim()) return [];
+                
+                // Look for repeated action phrases
+                const actionPhrases = {};
+                
+                // Common action patterns
+                const actionPatterns = [
+                    /called\s+\w+/gi,
+                    /contacted\s+\w+/gi,
+                    /replaced\s+\w+/gi,
+                    /tested\s+\w+/gi,
+                    /checked\s+\w+/gi,
+                    /updated\s+\w+/gi,
+                    /reset\s+\w+/gi,
+                    /forced\s+\w+/gi,
+                    /performed\s+\w+/gi,
+                    /advised\s+\w+/gi
+                ];
+                
+                actionPatterns.forEach(pattern => {
+                    const matches = allText.match(pattern) || [];
+                    matches.forEach(match => {
+                        const cleanMatch = match.trim();
+                        if (cleanMatch.length > 5 && cleanMatch.length < 30) {
+                            actionPhrases[cleanMatch] = (actionPhrases[cleanMatch] || 0) + 1;
+                        }
+                    });
+                });
+                
+                // Return phrases that appear multiple times and could be buttons
+                return Object.entries(actionPhrases)
+                    .filter(([phrase, count]) => count >= 2) // Used at least twice
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 15)
+                    .map(([phrase, count]) => ({ suggestion: phrase, frequency: count }));
+                    
+            } catch (error) {
+                console.error('Button suggestion analysis failed:', error);
+                return [];
+            }
+        }
+        
+        async function submitUsageReportToGitHub(reportData) {
+            if (!AppState.githubToken || !AppState.githubRepo) {
+                throw new Error('GitHub credentials not available');
+            }
+            
+            // Create a copy without the full notes data for GitHub submission
+            const githubReportData = { ...reportData };
+            delete githubReportData.fullNotesData; // Remove full data to reduce size
+            
+            const issueTitle = `${reportData.isTestReport ? '[TEST] ' : ''}Usage Analytics - ${reportData.reportDate} - ${reportData.userHash.substring(0, 8)}`;
+            const issueBody = `
+## 📊 ${reportData.isTestReport ? 'TEST ' : ''}Weekly Usage Analytics Report
+
+${reportData.isTestReport ? '**⚠️ This is a test report for debugging purposes**\n\n' : ''}**Report Date:** ${reportData.reportDate}
+**User ID:** ${reportData.userHash.substring(0, 8)}...
+**Session Duration:** ${reportData.sessionDuration} minutes
+**App Version:** ${reportData.version}
+
+### � Data Quality Summary
+- **Button Data Available:** ${reportData.dataQuality.hasButtonData ? '✅ Yes' : '❌ No'}
+- **Note Patterns Analyzed:** ${reportData.dataQuality.hasNotePatterns ? '✅ Yes' : '❌ No'}
+- **Saved Notes Available:** ${reportData.dataQuality.hasSavedNotes ? '✅ Yes' : '❌ No'}
+
+### �🔥 Most Used Buttons (Top 25)
+${reportData.buttonUsage.length > 0 ? 
+    reportData.buttonUsage.map(([button, clicks]) => `- **${button}**: ${clicks} clicks`).join('\n') :
+    '- No button usage data available this session'
+}
+
+### 📝 Note Statistics
+- **Total Notes Saved:** ${reportData.noteStatistics.totalNotesSaved}
+- **Session Notes Analyzed:** ${reportData.noteStatistics.sessionNotesAnalyzed}
+- **Average Note Length:** ${reportData.noteStatistics.averageLength} characters
+- **Average Word Count:** ${reportData.noteStatistics.averageWordCount} words
+- **Notes with Numbers:** ${reportData.noteStatistics.percentWithNumbers}%
+
+### 💡 Suggested New Buttons (Based on Common User Patterns)
+${reportData.buttonSuggestions.length > 0 ? 
+    reportData.buttonSuggestions.map(item => `- "${item.suggestion}" (used ${item.frequency} times)`).join('\n') :
+    'No new button suggestions this period (requires more usage data)'
+}
+
+### � Raw Notes Analysis Summary
+${reportData.rawDataSummary ? `
+- **Total Notes with Content:** ${reportData.rawDataSummary.notesWithContent}/${reportData.rawDataSummary.totalNotes}
+- **Total Characters:** ${reportData.rawDataSummary.totalCharacters.toLocaleString()}
+- **Total Words:** ${reportData.rawDataSummary.totalWords.toLocaleString()}
+- **Notes with DAE:** ${reportData.rawDataSummary.notesWithDAE}
+- **Date Range:** ${reportData.rawDataSummary.dateRange.earliest} to ${reportData.rawDataSummary.dateRange.latest}
+` : 'No raw notes data available'}
+
+### �🔍 Raw Analytics Data
+<details>
+<summary>Click to expand raw data (condensed for GitHub limits)</summary>
+
+\`\`\`json
+${JSON.stringify(githubReportData, null, 2)}
+\`\`\`
+</details>
+
+### 📝 Sample Notes Content (First 20 Notes - Condensed)
+${reportData.rawNotesData && reportData.rawNotesData.length > 0 ? 
+    reportData.rawNotesData.map((note, index) => `
+**Note ${index + 1}** (${note.date})
+- Store: ${note.storeNumber || 'N/A'} | WO: ${note.workOrder || 'N/A'} | Tech: ${note.techName || 'N/A'}
+- Content Preview: ${note.notesPreview || 'No content'}
+- DAE Preview: ${note.daePreview || 'None'}
+- Stats: ${note.noteLength} chars, ${note.wordCount} words
+`).join('\n') :
+'No notes content available'
+}
+
+### 💾 Complete Data Access
+✅ **Full notes dataset available as linked sub-issues**  
+The complete untruncated dataset with all ${reportData.rawDataSummary?.totalNotes || 0} notes will be organized into linked sub-issues to avoid GitHub's size limitations. Each sub-issue contains detailed note data and is searchable for analysis.
+
+---
+*This is an automated analytics report to help improve the Quick Notes system based on real usage patterns.*
+            `;
+            
+            // Step 1: Create the main issue
+            const issueResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${AppState.githubToken}`,
+                    'Accept': 'application/vnd.github+json',
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'IGAPP-Analytics'
+                },
+                body: JSON.stringify({
+                    title: issueTitle,
+                    body: issueBody,
+                    labels: ['usage-analytics', 'auto-generated', 'enhancement', 'data']
+                })
+            });
+            
+            if (!issueResponse.ok) {
+                const errorText = await issueResponse.text();
+                throw new Error(`Failed to create GitHub issue: ${issueResponse.status} - ${errorText}`);
+            }
+            
+            const issueData = await issueResponse.json();
+            const issueNumber = issueData.number;
+            
+            console.log(`📊 Main analytics issue created: #${issueNumber}`);
+            
+            // Step 2: Submit full notes data as sub-issues
+            try {
+                console.log('📊 Starting sub-issue creation process...');
+                console.log('Full notes data:', reportData.fullNotesData?.length || 0, 'notes');
+                
+                await submitFullNotesAsSubIssues(issueNumber, reportData.fullNotesData, reportData.reportDate, reportData.userHash);
+                console.log(`📊 Full notes data submitted as sub-issues linked to main issue #${issueNumber}`);
+            } catch (subIssueError) {
+                console.error('❌ Failed to submit full notes as sub-issues:', subIssueError);
+                console.error('Error details:', subIssueError.message);
+                showNotification(`❌ Sub-issues creation failed: ${subIssueError.message}`, 'error', 5000);
+                // Still save locally as backup
+                saveFullAnalyticsDataLocally(reportData);
+            }
+            
+            console.log(`📊 Complete usage report submitted to GitHub issue #${issueNumber}`);
+            
+            // Add final status notification
+            showNotification(`✅ Analytics report #${issueNumber} created successfully`, 'success', 3000);
+        }
+        
+        async function submitFullNotesAsSubIssues(parentIssueNumber, fullNotesData, reportDate, userHash) {
+            console.log('🔍 DEBUG: submitFullNotesAsSubIssues called with:', {
+                parentIssueNumber,
+                fullNotesDataLength: fullNotesData?.length || 0,
+                reportDate,
+                userHashLength: userHash?.length || 0
+            });
+            
+            // Validate GitHub credentials
+            if (!AppState.githubToken || !AppState.githubRepo) {
+                throw new Error('GitHub credentials not available for sub-issue creation');
+            }
+            
+            console.log('🔍 DEBUG: GitHub credentials check passed:', {
+                hasToken: !!AppState.githubToken,
+                repo: AppState.githubRepo
+            });
+            
+            if (!fullNotesData || fullNotesData.length === 0) {
+                console.log('No full notes data to submit as sub-issues');
+                return;
+            }
+            
+            // Split notes into manageable chunks for sub-issues
+            const NOTES_PER_ISSUE = 30; // Optimal chunk size for sub-issues
+            const chunks = [];
+            
+            for (let i = 0; i < fullNotesData.length; i += NOTES_PER_ISSUE) {
+                chunks.push(fullNotesData.slice(i, i + NOTES_PER_ISSUE));
+            }
+            
+            console.log(`📊 Creating ${chunks.length} sub-issues for ${fullNotesData.length} notes...`);
+            
+            const createdSubIssues = [];
+            
+            // Create each chunk as a separate sub-issue
+            for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+                const chunk = chunks[chunkIndex];
+                const startNote = chunkIndex * NOTES_PER_ISSUE + 1;
+                const endNote = Math.min((chunkIndex + 1) * NOTES_PER_ISSUE, fullNotesData.length);
+                
+                const subIssueTitle = `[DATA] Analytics Notes ${startNote}-${endNote} | ${reportDate} | ${userHash.substring(0, 8)}`;
+                const subIssueBody = `
+## 📝 Full Notes Data - Part ${chunkIndex + 1} of ${chunks.length}
+
+**Parent Issue:** #${parentIssueNumber}  
+**Notes Range:** ${startNote}-${endNote} of ${fullNotesData.length} total  
+**Report Date:** ${reportDate}  
+**User ID:** ${userHash.substring(0, 8)}...
+
+---
+
+${chunk.map((note, index) => {
+    const noteNumber = startNote + index;
+    return `## Note ${noteNumber} - ${note.date || 'Unknown Date'}
+
+**📍 Store:** ${note.storeNumber || 'N/A'}  
+**🎫 Work Order:** ${note.workOrder || 'N/A'}  
+**👤 Tech Name:** ${note.techName || 'N/A'}  
+**📏 Note Length:** ${note.noteLength || 0} characters  
+**📊 Word Count:** ${note.wordCount || 0} words
+
+### 📄 Full Content
+\`\`\`
+${note.fullContent || 'No content available'}
+\`\`\`
+
+### 🔧 DAE Content
+\`\`\`
+${note.fullDAE || 'No DAE content'}
+\`\`\`
+
+---`;
+                }).join('\n\n')}
+
+## 📋 Summary
+- **Total Notes in This Issue:** ${chunk.length}
+- **Date Range:** ${chunk[0]?.date || 'Unknown'} to ${chunk[chunk.length - 1]?.date || 'Unknown'}
+- **Generated:** ${new Date().toISOString()}
+
+*This is part ${chunkIndex + 1} of ${chunks.length} data sub-issues for analytics report #${parentIssueNumber}*
+                `;
+                
+                console.log(`🔍 DEBUG: Creating sub-issue ${chunkIndex + 1}/${chunks.length}:`, {
+                    title: subIssueTitle,
+                    bodyLength: subIssueBody.length,
+                    notesRange: `${startNote}-${endNote}`
+                });
+                
+                const subIssueResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${AppState.githubToken}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json',
+                        'User-Agent': 'IGAPP-Analytics'
+                    },
+                    body: JSON.stringify({
+                        title: subIssueTitle,
+                        body: subIssueBody,
+                        labels: ['analytics-data', 'auto-generated', 'notes-archive', `parent-${parentIssueNumber}`]
+                    })
+                });
+                
+                console.log(`🔍 DEBUG: Sub-issue response status:`, subIssueResponse.status);
+                
+                if (!subIssueResponse.ok) {
+                    const errorText = await subIssueResponse.text();
+                    console.error(`❌ Sub-issue creation failed:`, {
+                        status: subIssueResponse.status,
+                        error: errorText,
+                        chunkIndex: chunkIndex + 1
+                    });
+                    throw new Error(`Failed to create sub-issue ${chunkIndex + 1}: ${subIssueResponse.status} - ${errorText}`);
+                }
+                
+                const subIssueData = await subIssueResponse.json();
+                createdSubIssues.push(subIssueData.number);
+                
+                console.log(`📊 Created sub-issue #${subIssueData.number} with notes ${startNote}-${endNote}`);
+                
+                // Small delay between sub-issue creation to be respectful to GitHub API
+                if (chunkIndex < chunks.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 750));
+                }
+            }
+            
+            // Update parent issue with links to sub-issues
+            await updateParentIssueWithSubIssueLinks(parentIssueNumber, createdSubIssues, reportDate);
+            
+            return createdSubIssues;
+        }
+        
+        async function updateParentIssueWithSubIssueLinks(parentIssueNumber, subIssueNumbers, reportDate) {
+            console.log('🔍 DEBUG: Updating parent issue with sub-issue links:', {
+                parentIssueNumber,
+                subIssueNumbers,
+                reportDate
+            });
+            
+            const linksSummary = `
+
+---
+
+## 🔗 Related Data Issues
+
+${subIssueNumbers.map((num, index) => 
+    `- [📝 Data Part ${index + 1}](#${num}) - Issue #${num}`
+).join('\n')}
+
+**Total Data Issues Created:** ${subIssueNumbers.length}  
+**Generated:** ${reportDate}
+
+*Each linked issue contains complete note data with full content and DAE information.*`;
+            
+            // Add comment to parent issue with links
+            const commentResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues/${parentIssueNumber}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${AppState.githubToken}`,
+                    'Accept': 'application/vnd.github+json',
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'IGAPP-Analytics'
+                },
+                body: JSON.stringify({
+                    body: linksSummary
+                })
+            });
+            
+            console.log('🔍 DEBUG: Parent issue comment response:', commentResponse.status);
+            
+            if (commentResponse.ok) {
+                console.log(`📊 Added sub-issue links to parent issue #${parentIssueNumber}`);
+            } else {
+                const errorText = await commentResponse.text();
+                console.warn('Failed to add sub-issue links to parent issue:', errorText);
+            }
+        }
+
+        function saveFullAnalyticsDataLocally(reportData) {
+            try {
+                // Save to localStorage with timestamp
+                const fullDataKey = `analytics_full_${reportData.reportDate}_${Date.now()}`;
+                localStorage.setItem(fullDataKey, JSON.stringify(reportData.fullNotesData));
+                
+                // Log to console
+                console.log('📊 FULL ANALYTICS DATA FOR ANALYSIS:');
+                console.log('='.repeat(50));
+                console.log('Total Notes:', reportData.fullNotesData?.length || 0);
+                console.log('Full Data:', reportData.fullNotesData);
+                console.log('='.repeat(50));
+                console.log(`💾 Full data also saved to localStorage key: ${fullDataKey}`);
+                
+                // Show notification
+                showNotification(`💾 Full analytics data saved locally (${reportData.fullNotesData?.length || 0} notes)`, 'info', 5000);
+                
+            } catch (error) {
+                console.error('Failed to save full data locally:', error);
+            }
+        }
+        
+        function toggleUsageReporting() {
+            AppState.usageTracking.reportingEnabled = !AppState.usageTracking.reportingEnabled;
+            localStorage.setItem('usageReportingEnabled', AppState.usageTracking.reportingEnabled.toString());
+            
+            const status = AppState.usageTracking.reportingEnabled ? 'enabled' : 'disabled';
+            showNotification(`📊 Anonymous usage reporting ${status}`, 'success', 3000);
+            
+            // Update toggle visual state
+            updateSettingsToggles();
+            
+            console.log(`📊 Usage reporting ${status}`);
+        }
+        
+        async function sendUsageReport() {
+            const sendBtn = document.getElementById('send-report-btn');
+            
+            // Check for 24-hour cooldown
+            const lastSent = localStorage.getItem('lastUsageReportSent');
+            const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+            
+            if (lastSent && parseInt(lastSent) > twentyFourHoursAgo) {
+                const hoursLeft = Math.ceil((parseInt(lastSent) + (24 * 60 * 60 * 1000) - Date.now()) / (60 * 60 * 1000));
+                showNotification(`⏰ Usage report already sent today. Try again in ${hoursLeft} hours.`, 'error', 5000);
+                return;
+            }
+            
+            // Disable button during send
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+            
+            try {
+                if (!AppState.usageTracking.reportingEnabled) {
+                    showNotification('⚠️ Enable usage analytics first', 'error', 3000);
+                    return;
+                }
+                
+                console.log('📤 Sending usage report...');
+                
+                // Debug: Show current tracking state
+                console.log('📊 Current tracking state:');
+                console.log('- Session start:', new Date(AppState.usageTracking.sessionStart));
+                console.log('- Button clicks:', Object.keys(AppState.usageTracking.buttonClicks).length, 'tracked');
+                console.log('- Note patterns:', AppState.usageTracking.notePatterns.length, 'patterns');
+                console.log('- User hash:', AppState.usageTracking.userHash);
+                
+                // Add some button clicks if none exist
+                if (Object.keys(AppState.usageTracking.buttonClicks).length === 0) {
+                    console.log('🔧 No button clicks found, adding usage data...');
+                    trackButtonClick('Send Usage Report');
+                    trackButtonClick('Settings Menu');
+                }
+                
+                showNotification('📤 Generating usage report...', 'info', 2000);
+                
+                const reportData = generateUsageReportData();
+                
+                // Remove test indicators for production report
+                reportData.isTestReport = false;
+                reportData.reportTimestamp = new Date().toISOString();
+                reportData.debugInfo = {
+                    trackingInitialized: !!AppState.usageTracking.userHash,
+                    sessionStartTime: AppState.usageTracking.sessionStart,
+                    currentTime: Date.now(),
+                    localStorageWorks: typeof localStorage !== 'undefined'
+                };
+                
+                console.log('📤 Sending report data:', reportData);
+                
+                await submitUsageReportToGitHub(reportData);
+                
+                // Set cooldown timestamp
+                localStorage.setItem('lastUsageReportSent', Date.now().toString());
+                
+                showNotification('✅ Usage report sent successfully!', 'success', 5000);
+                console.log('✅ Usage report submitted successfully');
+                
+            } catch (error) {
+                console.error('❌ Usage report failed:', error);
+                showNotification(`❌ Usage report failed: ${error.message}`, 'error', 5000);
+            } finally {
+                // Re-enable button
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send Now';
+            }
+        }
+
+        async function testUsageReport() {
+            const testBtn = document.getElementById('test-report-btn');
+            
+            // Disable button during test
+            testBtn.disabled = true;
+            testBtn.textContent = 'Sending...';
+            
+            try {
+                if (!AppState.usageTracking.reportingEnabled) {
+                    showNotification('⚠️ Enable usage analytics first', 'error', 3000);
+                    return;
+                }
+                
+                console.log('🧪 Sending test usage report...');
+                
+                // Debug: Show current tracking state
+                console.log('📊 Current tracking state:');
+                console.log('- Session start:', new Date(AppState.usageTracking.sessionStart));
+                console.log('- Button clicks:', Object.keys(AppState.usageTracking.buttonClicks).length, 'tracked');
+                console.log('- Note patterns:', AppState.usageTracking.notePatterns.length, 'patterns');
+                console.log('- User hash:', AppState.usageTracking.userHash);
+                
+                // Add some test button clicks if none exist
+                if (Object.keys(AppState.usageTracking.buttonClicks).length === 0) {
+                    console.log('🔧 No button clicks found, adding test data...');
+                    trackButtonClick('Test Button');
+                    trackButtonClick('Settings Menu');
+                    trackButtonClick('Test Usage Report');
+                }
+                
+                showNotification('🧪 Generating test usage report...', 'info', 2000);
+                
+                const reportData = generateUsageReportData();
+                
+                // Add test indicator to the report
+                reportData.isTestReport = true;
+                reportData.testTimestamp = new Date().toISOString();
+                reportData.debugInfo = {
+                    trackingInitialized: !!AppState.usageTracking.userHash,
+                    sessionStartTime: AppState.usageTracking.sessionStart,
+                    currentTime: Date.now(),
+                    localStorageWorks: typeof localStorage !== 'undefined'
+                };
+                
+                console.log('📤 Sending report data:', reportData);
+                
+                await submitUsageReportToGitHub(reportData);
+                
+                showNotification('✅ Test usage report sent successfully!', 'success', 5000);
+                console.log('✅ Test report submitted successfully');
+                
+            } catch (error) {
+                console.error('❌ Test report failed:', error);
+                showNotification(`❌ Test report failed: ${error.message}`, 'error', 5000);
+            } finally {
+                // Re-enable button
+                testBtn.disabled = false;
+                testBtn.textContent = 'Send Now';
+            }
+        }
+
+        // Settings Menu Functions
+        function toggleSettingsMenu() {
+            const dropdown = document.getElementById('settings-dropdown');
+            const isVisible = dropdown.classList.contains('show');
+            
+            if (isVisible) {
+                dropdown.classList.remove('show');
+            } else {
+                dropdown.classList.add('show');
+                updateSettingsToggles(); // Update toggle states when opening
+            }
+            
+            // Close on outside click
+            if (!isVisible) {
+                setTimeout(() => {
+                    document.addEventListener('click', closeSettingsOnOutsideClick, { once: true });
+                }, 100);
+            }
+        }
+        
+        function closeSettingsOnOutsideClick(event) {
+            const dropdown = document.getElementById('settings-dropdown');
+            const settingsBtn = document.getElementById('settings-btn');
+            
+            if (!dropdown.contains(event.target) && !settingsBtn.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        }
+        
+        function updateSettingsToggles() {
+            // Update analytics toggle
+            const analyticsToggle = document.getElementById('analytics-toggle');
+            if (analyticsToggle) {
+                if (AppState.usageTracking.reportingEnabled) {
+                    analyticsToggle.classList.add('active');
+                } else {
+                    analyticsToggle.classList.remove('active');
+                }
+            }
+            
+            // Update auto-updates toggle
+            const updatesToggle = document.getElementById('updates-toggle');
+            if (updatesToggle) {
+                if (AppState.autoUpdateEnabled) {
+                    updatesToggle.classList.add('active');
+                } else {
+                    updatesToggle.classList.remove('active');
+                }
+            }
+            
+            // Update visual warnings toggle
+            const visualWarningsToggle = document.getElementById('visual-warnings-toggle');
+            if (visualWarningsToggle) {
+                if (AppState.visualDeadAirWarnings) {
+                    visualWarningsToggle.classList.add('active');
+                } else {
+                    visualWarningsToggle.classList.remove('active');
+                }
+            }
+            
+            // Update microphone level toggle
+            const micLevelToggle = document.getElementById('mic-level-toggle');
+            if (micLevelToggle) {
+                const micLevelContainer = document.getElementById('mic-level-container');
+                const isVisible = micLevelContainer && micLevelContainer.style.display !== 'none';
+                if (isVisible) {
+                    micLevelToggle.classList.add('active');
+                } else {
+                    micLevelToggle.classList.remove('active');
+                }
+            }
+        }
+        
+        function toggleAutoUpdateFromSettings() {
+            toggleAutoUpdate();
+            updateSettingsToggles();
+        }
+
+        // Branch Management Functions
+        function initializeBranchSelector() {
+            // Load saved branch preference
+            const savedBranch = localStorage.getItem('selectedBranch') || 'main';
+            AppState.currentBranch = savedBranch;
+            
+            // Update UI
+            const branchSelector = document.getElementById('branch-selector');
+            if (branchSelector) {
+                branchSelector.value = savedBranch;
+            }
+            
+            updateBranchInfo();
+            console.log(`🌿 Current branch: ${savedBranch}`);
+        }
+        
+        function initializeVisualWarnings() {
+            // Load saved visual warnings preference
+            const savedVisualWarnings = localStorage.getItem('visualDeadAirWarnings');
+            if (savedVisualWarnings !== null) {
+                AppState.visualDeadAirWarnings = savedVisualWarnings === 'true';
+            }
+            
+            console.log(`⚠️ Visual dead air warnings: ${AppState.visualDeadAirWarnings ? 'enabled' : 'disabled'}`);
+        }
+        
+        function initializeMicrophoneSettings() {
+            // Load saved microphone sensitivity
+            const savedSensitivity = localStorage.getItem('micSensitivity');
+            if (savedSensitivity !== null) {
+                AppState.micSensitivity = parseInt(savedSensitivity);
+            }
+            
+            // Load microphone level display preference
+            const savedMicLevel = localStorage.getItem('micLevelDisplay');
+            if (savedMicLevel !== null) {
+                const showMicLevel = savedMicLevel === 'true';
+                toggleMicLevelDisplayState(showMicLevel);
+            }
+            
+            // Update UI
+            const sensitivitySlider = document.getElementById('sensitivity-slider');
+            const sensitivityValue = document.getElementById('sensitivity-value');
+            if (sensitivitySlider && sensitivityValue) {
+                sensitivitySlider.value = AppState.micSensitivity;
+                sensitivityValue.textContent = AppState.micSensitivity;
+            }
+            
+            console.log(`🎤 Microphone sensitivity: ${AppState.micSensitivity}`);
+        }
+        
+        function updateMicLevelDisplay() {
+            const micLevelFill = document.getElementById('mic-level-fill');
+            const micLevelText = document.getElementById('mic-level-text');
+            
+            if (micLevelFill && micLevelText) {
+                const level = AppState.currentMicLevel;
+                micLevelFill.style.width = `${level}%`;
+                micLevelText.textContent = `${level}%`;
+                
+                // Add visual feedback when above sensitivity threshold
+                if (level > (AppState.micSensitivity / 255) * 100) {
+                    micLevelFill.style.boxShadow = '0 0 8px rgba(40, 167, 69, 0.6)';
+                } else {
+                    micLevelFill.style.boxShadow = 'none';
+                }
+            }
+        }
+        
+        function updateMicSensitivity(value) {
+            AppState.micSensitivity = parseInt(value);
+            localStorage.setItem('micSensitivity', AppState.micSensitivity.toString());
+            
+            const sensitivityValue = document.getElementById('sensitivity-value');
+            if (sensitivityValue) {
+                sensitivityValue.textContent = value;
+            }
+            
+            console.log(`🎤 Microphone sensitivity updated: ${value}`);
+        }
+        
+        function toggleMicLevelDisplay() {
+            const micLevelContainer = document.getElementById('mic-level-container');
+            const sensitivityContainer = document.getElementById('sensitivity-container');
+            
+            const isVisible = micLevelContainer.style.display !== 'none';
+            const newState = !isVisible;
+            
+            toggleMicLevelDisplayState(newState);
+            localStorage.setItem('micLevelDisplay', newState.toString());
+            
+            const status = newState ? 'enabled' : 'disabled';
+            showNotification(`🎤 Microphone level display ${status}`, 'success', 2000);
+            
+            updateSettingsToggles();
+        }
+        
+        function toggleMicLevelDisplayState(show) {
+            const micLevelContainer = document.getElementById('mic-level-container');
+            const sensitivityContainer = document.getElementById('sensitivity-container');
+            
+            if (micLevelContainer && sensitivityContainer) {
+                micLevelContainer.style.display = show ? 'flex' : 'none';
+                sensitivityContainer.style.display = show ? 'flex' : 'none';
+            }
+        }
+        
+        function handleBranchChange() {
+            const branchSelector = document.getElementById('branch-selector');
+            const selectedBranch = branchSelector.value;
+            
+            if (selectedBranch === 'main') {
+                // Main branch doesn't need password
+                switchToBranch('main');
+            } else {
+                // Protected branches need password
+                promptForBranchPassword(selectedBranch);
+            }
+        }
+        
+        function promptForBranchPassword(branch) {
+            const branchName = branch === 'beta' ? 'Beta' : 'Development';
+            
+            // Create password prompt overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'password-overlay';
+            
+            const prompt = document.createElement('div');
+            prompt.className = 'password-prompt';
+            prompt.innerHTML = `
+                <h3>🔒 ${branchName} Branch Access</h3>
+                <p>This branch requires a password to access.</p>
+                <input type="password" class="password-input" id="branch-password" placeholder="Enter password..." maxlength="50">
+                <div style="margin-top: 15px;">
+                    <button onclick="verifyBranchPassword('${branch}')" class="primary-button" style="margin-right: 10px;">Unlock</button>
+                    <button onclick="cancelBranchSwitch()" class="danger-button">Cancel</button>
+                </div>
+            `;
+            
+            overlay.appendChild(prompt);
+            document.body.appendChild(overlay);
+            
+            // Focus password input
+            setTimeout(() => {
+                document.getElementById('branch-password').focus();
+            }, 100);
+            
+            // Handle Enter key
+            document.getElementById('branch-password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    verifyBranchPassword(branch);
+                }
+            });
+        }
+        
+        function verifyBranchPassword(branch) {
+            const passwordInput = document.getElementById('branch-password');
+            const enteredPassword = passwordInput.value;
+            const correctPassword = AppState.branchPasswords[branch];
+            
+            if (enteredPassword === correctPassword) {
+                // Correct password
+                switchToBranch(branch);
+                closeBranchPasswordPrompt();
+                showNotification(`🌿 Switched to ${branch.charAt(0).toUpperCase() + branch.slice(1)} branch`, 'success', 3000);
+            } else {
+                // Wrong password
+                passwordInput.value = '';
+                passwordInput.style.borderColor = '#dc3545';
+                passwordInput.placeholder = 'Incorrect password. Try again...';
+                showNotification('❌ Incorrect password', 'error', 2000);
+                
+                // Reset border color after 2 seconds
+                setTimeout(() => {
+                    passwordInput.style.borderColor = '';
+                    passwordInput.placeholder = 'Enter password...';
+                }, 2000);
+            }
+        }
+        
+        function cancelBranchSwitch() {
+            // Reset selector to current branch
+            const branchSelector = document.getElementById('branch-selector');
+            branchSelector.value = AppState.currentBranch;
+            
+            closeBranchPasswordPrompt();
+        }
+        
+        function closeBranchPasswordPrompt() {
+            const overlay = document.querySelector('.password-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+        
+        function switchToBranch(branch) {
+            AppState.currentBranch = branch;
+            localStorage.setItem('selectedBranch', branch);
+            
+            // Update GitHub repo reference based on branch
+            if (branch === 'main') {
+                AppState.githubRepo = 'shadow11001/IGAPP';
+            } else if (branch === 'beta') {
+                AppState.githubRepo = 'shadow11001/IGAPP'; // Same repo, beta branch
+            } else if (branch === 'dev') {
+                AppState.githubRepo = 'shadow11001/IGAPP'; // Same repo, dev branch
+            }
+            
+            updateBranchInfo();
+            
+            console.log(`🌿 Switched to ${branch} branch`);
+        }
+        
+        function updateBranchInfo() {
+            const branchInfo = document.getElementById('branch-info');
+            if (branchInfo) {
+                let branchDisplay = '';
+                switch(AppState.currentBranch) {
+                    case 'main':
+                        branchDisplay = 'Stable (Recommended)';
+                        break;
+                    case 'beta':
+                        branchDisplay = 'Beta (Testing Features)';
+                        break;
+                    case 'dev':
+                        branchDisplay = 'Development (Experimental)';
+                        break;
+                }
+                branchInfo.textContent = `Currently using: ${branchDisplay}`;
+            }
+        }
+        
+        // Visual Dead Air Warnings Toggle
+        function toggleVisualDeadAirWarnings() {
+            AppState.visualDeadAirWarnings = !AppState.visualDeadAirWarnings;
+            localStorage.setItem('visualDeadAirWarnings', AppState.visualDeadAirWarnings.toString());
+            
+            const status = AppState.visualDeadAirWarnings ? 'enabled' : 'disabled';
+            showNotification(`⚠️ Visual dead air warnings ${status}`, 'success', 3000);
+            
+            // Update toggle visual state
+            updateSettingsToggles();
+            
+            // Clear any existing warnings if disabled
+            if (!AppState.visualDeadAirWarnings) {
+                const warningOverlay = document.getElementById('dead-air-warning-overlay');
+                if (warningOverlay) {
+                    warningOverlay.classList.remove('warning', 'critical');
+                }
+            } else {
+                // Reapply current warning state if enabled
+                updateTimerVisuals();
+            }
+            
+            console.log(`⚠️ Visual dead air warnings ${status}`);
+        }
+
         function applyUpdate(newContent, newVersion) {
             const updateChoice = confirm(`Update to version ${newVersion}?\n\nThis will download the new version. You'll need to replace your current file manually.`);
             if (!updateChoice) {
@@ -2158,8 +4112,8 @@ ${JSON.stringify(exportData, null, 2)}
                 // Clean up the URL object
                 URL.revokeObjectURL(url);
                 
-                // Show detailed instructions
-                showUpdateInstructions(newVersion, currentFileName);
+                // Show simple success notification
+                showNotification(`💾 v${newVersion} downloaded successfully!`, 'success', 5000);
                 
                 // Remove the update button since update is "applied"
                 const dynamicBtn = document.getElementById('dynamic-update-btn');
@@ -2175,34 +4129,7 @@ ${JSON.stringify(exportData, null, 2)}
             }
         }
 
-        function showUpdateInstructions(newVersion, fileName) {
-            // Create modal overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'update-modal-overlay';
-            overlay.innerHTML = `
-                <div class="update-modal">
-                    <h3>🎉 v${newVersion} Downloaded!</h3>
-                    <div class="update-steps">
-                        <div class="update-note">
-                            ⚠️ <strong>Important:</strong> If icons appear as strange text after updating, use the "Copy Code" method instead for better character encoding.
-                        </div>
-                        <p><strong>Follow these steps to complete the update:</strong></p>
-                        <ol>
-                            <li>📁 Go to your Downloads folder</li>
-                            <li>🔍 Find the file: <code>${fileName}</code></li>
-                            <li>📋 Copy this new file</li>
-                            <li>📂 Navigate to where your current IGAPP file is located</li>
-                            <li>🔄 Replace the old file with the new one</li>
-                            <li>🔄 Refresh this page (F5 or Ctrl+R)</li>
-                        </ol>
-                        <p><strong>Alternative:</strong> Use the "📋 Copy Code" button for better character preservation.</p>
-                    </div>
-                    <button onclick="this.parentElement.parentElement.remove()" class="update-modal-btn">Got it!</button>
-                </div>
-            `;
-            
-            document.body.appendChild(overlay);
-        }
+
 
         function setGitHubToken() {
             const token = prompt('Enter your GitHub Personal Access Token for private repo access:\n\n(Leave blank to cancel)');
@@ -2391,6 +4318,147 @@ ${JSON.stringify(exportData, null, 2)}
             console.log('VCC audio monitoring started successfully');
         }
 
+        // Tab System Functions
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const selectedTab = document.getElementById(tabName);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+        
+        // QA Checklist Functions
+        function toggleChecklistItem(item) {
+            const checkbox = item.querySelector('.checklist-checkbox');
+            
+            // Toggle checkbox state
+            checkbox.checked = !checkbox.checked;
+            
+            // Toggle visual state
+            if (checkbox.checked) {
+                item.classList.add('completed');
+            } else {
+                item.classList.remove('completed');
+            }
+            
+            // Save checklist state to localStorage
+            saveChecklistState();
+        }
+        
+        function saveChecklistState() {
+            const checklistItems = document.querySelectorAll('.checklist-item');
+            const states = [];
+            
+            checklistItems.forEach((item, index) => {
+                const checkbox = item.querySelector('.checklist-checkbox');
+                states.push(checkbox.checked);
+            });
+            
+            localStorage.setItem('qaChecklistState', JSON.stringify(states));
+        }
+        
+        function loadChecklistState() {
+            const savedStates = localStorage.getItem('qaChecklistState');
+            if (savedStates) {
+                const states = JSON.parse(savedStates);
+                const checklistItems = document.querySelectorAll('.checklist-item');
+                
+                checklistItems.forEach((item, index) => {
+                    if (index < states.length) {
+                        const checkbox = item.querySelector('.checklist-checkbox');
+                        checkbox.checked = states[index];
+                        
+                        if (states[index]) {
+                            item.classList.add('completed');
+                        } else {
+                            item.classList.remove('completed');
+                        }
+                    }
+                });
+            }
+        }
+        
+        function resetChecklist() {
+            const checklistItems = document.querySelectorAll('.checklist-item');
+            checklistItems.forEach(item => {
+                const checkbox = item.querySelector('.checklist-checkbox');
+                checkbox.checked = false;
+                item.classList.remove('completed');
+            });
+            
+            localStorage.removeItem('qaChecklistState');
+        }
+        
+        // Agent name customization functions
+        function toggleNameSetting() {
+            const nameSetting = document.getElementById('name-setting');
+            if (nameSetting) {
+                nameSetting.classList.toggle('expanded');
+                
+                // Focus the input when expanding
+                if (nameSetting.classList.contains('expanded')) {
+                    setTimeout(() => {
+                        const nameInput = document.getElementById('agent-name');
+                        if (nameInput) {
+                            nameInput.focus();
+                        }
+                    }, 300);
+                }
+            }
+        }
+        
+        function autoCollapseNameSetting() {
+            // Auto-collapse after a short delay when focus is lost
+            setTimeout(() => {
+                const nameSetting = document.getElementById('name-setting');
+                if (nameSetting && nameSetting.classList.contains('expanded')) {
+                    nameSetting.classList.remove('expanded');
+                }
+            }, 200);
+        }
+        
+        function updateAgentName() {
+            const nameInput = document.getElementById('agent-name');
+            const nameDisplay = document.getElementById('agent-name-display');
+            
+            if (nameInput && nameDisplay) {
+                const name = nameInput.value.trim();
+                if (name) {
+                    nameDisplay.textContent = name;
+                    localStorage.setItem('agentName', name);
+                } else {
+                    nameDisplay.textContent = '[NAME]';
+                    localStorage.removeItem('agentName');
+                }
+            }
+        }
+        
+        function loadAgentName() {
+            const savedName = localStorage.getItem('agentName');
+            const nameInput = document.getElementById('agent-name');
+            const nameDisplay = document.getElementById('agent-name-display');
+            
+            if (savedName && nameInput && nameDisplay) {
+                nameInput.value = savedName;
+                nameDisplay.textContent = savedName;
+            }
+        }
+
         // Enhanced Quick Notes to auto-reset timer
         function addQuickNote(noteText) {
             const notesTextarea = document.getElementById('notes');
@@ -2401,6 +4469,10 @@ ${JSON.stringify(exportData, null, 2)}
             } else {
                 notesTextarea.value = noteText;
             }
+            
+            // Track button usage for analytics
+            trackButtonClick(noteText, 'quick-note');
+            trackNotePattern(notesTextarea.value);
             
             // Auto-reset dead air timer (indicates speaking)
             if (AppState.timerRunning) {
@@ -2856,6 +4928,106 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             }
         }
 
+        function addShutdownCircuitNote() {
+            const circuit = window.prompt('Enter circuit to shutdown:\n\nExamples:\n• A3\n• B2\n• Circuit 5\n• Comp 1');
+            if (circuit === null || circuit.trim() === '') return;
+            
+            const note = `Shutdown circuit ${circuit.trim()}.`;
+            addQuickNote(note);
+        }
+
+        function addCheckBreakersNote() {
+            // First add the initial check breakers note
+            addQuickNote('Checked breakers.');
+            
+            // Ask if they want to add detailed breaker information
+            const addDetails = window.confirm('Add detailed breaker panel information?');
+            if (!addDetails) return;
+            
+            let breakerDetails = [];
+            let addMore = true;
+            
+            while (addMore && breakerDetails.length < 5) { // Limit to 5 panels max
+                const panel = window.prompt(`Enter breaker panel name:\n\nCommon examples:\n• H1P1\n• H1P2\n• H1P\n• H2P\n• L1P\n• L2P\n• Panel A\n\n${breakerDetails.length > 0 ? 'Or leave blank to finish' : ''}`);
+                
+                if (panel === null || panel.trim() === '') {
+                    break; // User cancelled or left blank
+                }
+                
+                const breakers = window.prompt(`Enter breaker numbers for panel ${panel.trim()}:\n\nExamples:\n• 15, 16, 17, 18\n• 12, 13, 14\n• 1, 2, 3, 4, 5`);
+                
+                if (breakers === null || breakers.trim() === '') {
+                    continue; // Skip this panel if no breakers entered
+                }
+                
+                const status = window.prompt(`Enter status for these breakers:\n\nCommon statuses:\n• Not Present\n• Faulted On\n• Faulted Off\n• Normal\n• Tripped`);
+                
+                if (status === null || status.trim() === '') {
+                    continue; // Skip this panel if no status entered
+                }
+                
+                breakerDetails.push({
+                    panel: panel.trim(),
+                    breakers: breakers.trim(),
+                    status: status.trim()
+                });
+                
+                // Ask if they want to add another panel
+                if (breakerDetails.length < 5) {
+                    addMore = window.confirm('Add another breaker panel?');
+                } else {
+                    addMore = false;
+                    alert('Maximum of 5 panels reached.');
+                }
+            }
+            
+            // Add the detailed breaker information
+            breakerDetails.forEach(detail => {
+                const note = `For breaker panel ${detail.panel}, breakers ${detail.breakers}, are showing as ${detail.status}.`;
+                addQuickNote(note);
+            });
+        }
+
+        function addAdvisoryNote() {
+            const issue = window.prompt('Enter issue to advise tech about:\n\nExamples:\n• NSRM email\n• comm loss\n• controller issue\n• parameter deviation');
+            if (issue === null || issue.trim() === '') return;
+            
+            const note = `Adv tech of ${issue.trim()}.`;
+            addQuickNote(note);
+        }
+
+        function addTechQuestionNote() {
+            const question = window.prompt('What did the tech want to know?\n\nExamples:\n• how to access the controller\n• what the alarm means\n• if the system is working properly');
+            if (question === null || question.trim() === '') return;
+            
+            const note = `Tech wanted to know ${question.trim()}.`;
+            addQuickNote(note);
+        }
+
+        function addStatusUpdateNote() {
+            const item = window.prompt('What status update did the tech request?\n\nExamples:\n• the work order\n• the repair progress\n• the controller status');
+            if (item === null || item.trim() === '') return;
+            
+            const note = `Tech wanted a status update on ${item.trim()}.`;
+            addQuickNote(note);
+        }
+
+        function addTechRefusedNote() {
+            const action = window.prompt('What did the tech refuse to do?\n\nExamples:\n• power cycle the controller\n• check the breakers\n• wait for the download');
+            if (action === null || action.trim() === '') return;
+            
+            const note = `Tech refused ${action.trim()}.`;
+            addQuickNote(note);
+        }
+
+        function addDefrostAlreadyRunningNote() {
+            const circuit = window.prompt('Enter circuit that is already defrosting:\n\nExamples:\n• C2\n• B3\n• Circuit 5');
+            if (circuit === null || circuit.trim() === '') return;
+            
+            const note = `${circuit.trim()} is already defrosting.`;
+            addQuickNote(note);
+        }
+
         function addSetpointNote() {
             const coolTemp = window.prompt('Enter cooling setpoint (°F):\n\nExample: 72');
             if (coolTemp === null || coolTemp.trim() === '') return;
@@ -2970,9 +5142,36 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
 
                 // Use helper for overwrite confirmation
                 if (shouldOverwriteDAENotes(notesBox)) {
-                    notesBox.value = selectedText;
+                    // Get store number and work order for DAE inclusion
+                    const storeNumber = document.getElementById('store-number').value.trim() || 'N/A';
+                    const workOrder = document.getElementById('work-order').value.trim() || 'N/A';
+                    
+                    // Insert template with store/work order info
+                    let templateContent = selectedText;
+                    
+                    // Replace placeholders in template if they exist
+                    templateContent = templateContent.replace(/Store #[\s]*/, `Store # ${storeNumber}\n`);
+                    templateContent = templateContent.replace(/WO#[\s]*-[\s]*/, `WO# - ${workOrder}\n`);
+                    templateContent = templateContent.replace(/WO:[\s]*/, `WO: ${workOrder}\n`);
+                    templateContent = templateContent.replace(/Store number:[\s]*/, `Store number: ${storeNumber}\n`);
+                    
+                    // If template doesn't have store/WO placeholders, add them at the beginning for specific templates
+                    if (!templateContent.includes('Store #') && !templateContent.includes('Store number:')) {
+                        if (selectedOption.includes('Help Desk Post')) {
+                            templateContent = templateContent.replace(/Store #[\s]*/, `Store # ${storeNumber}\n`);
+                            templateContent = templateContent.replace(/WO#[\s]*-[\s]*/, `WO# - ${workOrder}\n`);
+                        } else {
+                            templateContent = `Store number: ${storeNumber}\nWO: ${workOrder}\n\n` + templateContent;
+                        }
+                    }
+                    
+                    notesBox.value = templateContent;
                     notesBox.dataset.userEdited = 'false';
-                    showNotification('Template loaded', 'success', 1500);
+                    
+                    // Track DAE template usage
+                    trackButtonClick(selectedOption, 'dae-template');
+                    
+                    showNotification('Template loaded with store/WO info', 'success', 1500);
                     
                     // Update tag recommendations after loading template
                     analyzeNotesForTags();
@@ -3293,7 +5492,20 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 // Load saved settings and initialize GitHub token
                 initializeGitHubToken();
                 
-                const savedAutoUpdate = localStorage.getItem('autoUpdateEnabled');
+            // Initialize usage tracking and analytics
+            initializeUsageTracking();
+            
+            // Initialize branch selector
+            initializeBranchSelector();
+            
+            // Initialize visual warnings
+            initializeVisualWarnings();
+            
+            // Initialize microphone settings
+            initializeMicrophoneSettings();
+            
+            // Initialize auto-update setting
+            const savedAutoUpdate = localStorage.getItem('autoUpdateEnabled');
                 if (savedAutoUpdate !== null) {
                     AppState.autoUpdateEnabled = savedAutoUpdate === 'true';
                 }
@@ -3304,6 +5516,10 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                         checkForUpdates();
                     }, 5000);
                 }
+                
+                // Load QA checklist state
+                loadChecklistState();
+                loadAgentName();
                 
                 console.log('QA Checklist App initialized successfully');
                 
