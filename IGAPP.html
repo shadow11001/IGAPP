@@ -2974,8 +2974,8 @@ ${reportData.rawNotesData && reportData.rawNotesData.length > 0 ?
 }
 
 ### 💾 Complete Data Access
-✅ **Full notes dataset available as comments below**  
-The complete untruncated dataset with all ${reportData.rawDataSummary?.totalNotes || 0} notes will be posted as comments to avoid GitHub's issue size limitations. This provides complete access to all historical data for analysis.
+✅ **Full notes dataset available as linked sub-issues**  
+The complete untruncated dataset with all ${reportData.rawDataSummary?.totalNotes || 0} notes will be organized into linked sub-issues to avoid GitHub's size limitations. Each sub-issue contains detailed note data and is searchable for analysis.
 
 ---
 *This is an automated analytics report to help improve the Quick Notes system based on real usage patterns.*
@@ -3007,12 +3007,12 @@ The complete untruncated dataset with all ${reportData.rawDataSummary?.totalNote
             
             console.log(`📊 Main analytics issue created: #${issueNumber}`);
             
-            // Step 2: Submit full notes data as comments
+            // Step 2: Submit full notes data as sub-issues
             try {
-                await submitFullNotesAsComments(issueNumber, reportData.fullNotesData, reportData.reportDate);
-                console.log(`📊 Full notes data submitted as comments to issue #${issueNumber}`);
-            } catch (commentError) {
-                console.warn('Failed to submit full notes as comments:', commentError);
+                await submitFullNotesAsSubIssues(issueNumber, reportData.fullNotesData, reportData.reportDate, reportData.userHash);
+                console.log(`📊 Full notes data submitted as sub-issues linked to main issue #${issueNumber}`);
+            } catch (subIssueError) {
+                console.warn('Failed to submit full notes as sub-issues:', subIssueError);
                 // Still save locally as backup
                 saveFullAnalyticsDataLocally(reportData);
             }
@@ -3020,52 +3020,57 @@ The complete untruncated dataset with all ${reportData.rawDataSummary?.totalNote
             console.log(`📊 Complete usage report submitted to GitHub issue #${issueNumber}`);
         }
         
-        async function submitFullNotesAsComments(issueNumber, fullNotesData, reportDate) {
+        async function submitFullNotesAsSubIssues(parentIssueNumber, fullNotesData, reportDate, userHash) {
             if (!fullNotesData || fullNotesData.length === 0) {
-                console.log('No full notes data to submit as comments');
+                console.log('No full notes data to submit as sub-issues');
                 return;
             }
             
-            // Split notes into manageable chunks for comments
-            const NOTES_PER_COMMENT = 25; // Smaller chunks to avoid size limits
+            // Split notes into manageable chunks for sub-issues
+            const NOTES_PER_ISSUE = 30; // Optimal chunk size for sub-issues
             const chunks = [];
             
-            for (let i = 0; i < fullNotesData.length; i += NOTES_PER_COMMENT) {
-                chunks.push(fullNotesData.slice(i, i + NOTES_PER_COMMENT));
+            for (let i = 0; i < fullNotesData.length; i += NOTES_PER_ISSUE) {
+                chunks.push(fullNotesData.slice(i, i + NOTES_PER_ISSUE));
             }
             
-            console.log(`📊 Submitting ${fullNotesData.length} notes in ${chunks.length} comment chunks...`);
+            console.log(`📊 Creating ${chunks.length} sub-issues for ${fullNotesData.length} notes...`);
             
-            // Submit each chunk as a separate comment
+            const createdSubIssues = [];
+            
+            // Create each chunk as a separate sub-issue
             for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
                 const chunk = chunks[chunkIndex];
-                const startNote = chunkIndex * NOTES_PER_COMMENT + 1;
-                const endNote = Math.min((chunkIndex + 1) * NOTES_PER_COMMENT, fullNotesData.length);
+                const startNote = chunkIndex * NOTES_PER_ISSUE + 1;
+                const endNote = Math.min((chunkIndex + 1) * NOTES_PER_ISSUE, fullNotesData.length);
                 
-                const commentBody = `
-## 📝 Full Notes Data - Part ${chunkIndex + 1}/${chunks.length}
+                const subIssueTitle = `[DATA] Analytics Notes ${startNote}-${endNote} | ${reportDate} | ${userHash.substring(0, 8)}`;
+                const subIssueBody = `
+## 📝 Full Notes Data - Part ${chunkIndex + 1} of ${chunks.length}
 
-**Notes ${startNote}-${endNote} of ${fullNotesData.length} total**
+**Parent Issue:** #${parentIssueNumber}  
+**Notes Range:** ${startNote}-${endNote} of ${fullNotesData.length} total  
+**Report Date:** ${reportDate}  
+**User ID:** ${userHash.substring(0, 8)}...
 
-<details>
-<summary>Click to expand complete notes data (${chunk.length} notes)</summary>
+---
 
 ${chunk.map((note, index) => {
     const noteNumber = startNote + index;
-    return `### Note ${noteNumber} - ${note.date || 'Unknown Date'}
+    return `## Note ${noteNumber} - ${note.date || 'Unknown Date'}
 
-**Store:** ${note.storeNumber || 'N/A'}  
-**Work Order:** ${note.workOrder || 'N/A'}  
-**Tech Name:** ${note.techName || 'N/A'}  
-**Note Length:** ${note.noteLength || 0} characters  
-**Word Count:** ${note.wordCount || 0} words
+**📍 Store:** ${note.storeNumber || 'N/A'}  
+**🎫 Work Order:** ${note.workOrder || 'N/A'}  
+**👤 Tech Name:** ${note.techName || 'N/A'}  
+**📏 Note Length:** ${note.noteLength || 0} characters  
+**📊 Word Count:** ${note.wordCount || 0} words
 
-**Full Content:**
+### 📄 Full Content
 \`\`\`
 ${note.fullContent || 'No content available'}
 \`\`\`
 
-**DAE Content:**
+### 🔧 DAE Content
 \`\`\`
 ${note.fullDAE || 'No DAE content'}
 \`\`\`
@@ -3073,12 +3078,15 @@ ${note.fullDAE || 'No DAE content'}
 ---`;
                 }).join('\n\n')}
 
-</details>
+## 📋 Summary
+- **Total Notes in This Issue:** ${chunk.length}
+- **Date Range:** ${chunk[0]?.date || 'Unknown'} to ${chunk[chunk.length - 1]?.date || 'Unknown'}
+- **Generated:** ${new Date().toISOString()}
 
-*Part ${chunkIndex + 1} of ${chunks.length} - Generated: ${reportDate}*
+*This is part ${chunkIndex + 1} of ${chunks.length} data sub-issues for analytics report #${parentIssueNumber}*
                 `;
                 
-                const commentResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues/${issueNumber}/comments`, {
+                const subIssueResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${AppState.githubToken}`,
@@ -3087,21 +3095,68 @@ ${note.fullDAE || 'No DAE content'}
                         'User-Agent': 'IGAPP-Analytics'
                     },
                     body: JSON.stringify({
-                        body: commentBody
+                        title: subIssueTitle,
+                        body: subIssueBody,
+                        labels: ['analytics-data', 'auto-generated', 'notes-archive', `parent-${parentIssueNumber}`]
                     })
                 });
                 
-                if (!commentResponse.ok) {
-                    const errorText = await commentResponse.text();
-                    throw new Error(`Failed to submit comment ${chunkIndex + 1}: ${commentResponse.status} - ${errorText}`);
+                if (!subIssueResponse.ok) {
+                    const errorText = await subIssueResponse.text();
+                    throw new Error(`Failed to create sub-issue ${chunkIndex + 1}: ${subIssueResponse.status} - ${errorText}`);
                 }
                 
-                console.log(`📊 Submitted comment ${chunkIndex + 1}/${chunks.length} with notes ${startNote}-${endNote}`);
+                const subIssueData = await subIssueResponse.json();
+                createdSubIssues.push(subIssueData.number);
                 
-                // Small delay between comments to be respectful to GitHub API
+                console.log(`📊 Created sub-issue #${subIssueData.number} with notes ${startNote}-${endNote}`);
+                
+                // Small delay between sub-issue creation to be respectful to GitHub API
                 if (chunkIndex < chunks.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await new Promise(resolve => setTimeout(resolve, 750));
                 }
+            }
+            
+            // Update parent issue with links to sub-issues
+            await updateParentIssueWithSubIssueLinks(parentIssueNumber, createdSubIssues, reportDate);
+            
+            return createdSubIssues;
+        }
+        
+        async function updateParentIssueWithSubIssueLinks(parentIssueNumber, subIssueNumbers, reportDate) {
+            const linksSummary = `
+
+---
+
+## 🔗 Related Data Issues
+
+${subIssueNumbers.map((num, index) => 
+    `- [📝 Data Part ${index + 1}](#${num}) - Issue #${num}`
+).join('\n')}
+
+**Total Data Issues Created:** ${subIssueNumbers.length}  
+**Generated:** ${reportDate}
+
+*Each linked issue contains complete note data with full content and DAE information.*`;
+            
+            // Add comment to parent issue with links
+            const commentResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues/${parentIssueNumber}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${AppState.githubToken}`,
+                    'Accept': 'application/vnd.github+json',
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'IGAPP-Analytics'
+                },
+                body: JSON.stringify({
+                    body: linksSummary
+                })
+            });
+            
+            if (commentResponse.ok) {
+                console.log(`📊 Added sub-issue links to parent issue #${parentIssueNumber}`);
+            } else {
+                console.warn('Failed to add sub-issue links to parent issue');
             }
         }
 
