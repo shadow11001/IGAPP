@@ -2650,13 +2650,70 @@ ${JSON.stringify(exportData, null, 2)}
         }
         
         function generateUsageReportData() {
-            const savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-            
-            // Debug: Get all localStorage data like export function does
+            // Debug: Check all localStorage like the export function does
             const allLocalStorageKeys = [];
+            const foundDataSummary = {};
             for (let i = 0; i < localStorage.length; i++) {
-                allLocalStorageKeys.push(localStorage.key(i));
+                const key = localStorage.key(i);
+                allLocalStorageKeys.push(key);
+                const data = localStorage.getItem(key);
+                try {
+                    const parsed = JSON.parse(data);
+                    if (Array.isArray(parsed)) {
+                        foundDataSummary[key] = `Array with ${parsed.length} items`;
+                    } else if (typeof parsed === 'object') {
+                        foundDataSummary[key] = `Object with ${Object.keys(parsed).length} keys`;
+                    } else {
+                        foundDataSummary[key] = typeof parsed;
+                    }
+                } catch (e) {
+                    foundDataSummary[key] = `String: ${data.length} chars`;
+                }
             }
+            
+            // Try multiple possible keys for notes data
+            const possibleNotesKeys = ['savedNotes', 'notes', 'history', 'formData', 'IGAPP_notes', 'notesHistory', 'notesData'];
+            let savedNotes = [];
+            let notesDataSource = 'none';
+            
+            for (const key of possibleNotesKeys) {
+                try {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        const parsed = JSON.parse(data);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            savedNotes = parsed;
+                            notesDataSource = key;
+                            console.log(`📋 Found notes data in localStorage key: ${key} (${parsed.length} items)`);
+                            break;
+                        }
+                    }
+                } catch (e) {
+                    // Skip invalid JSON
+                }
+            }
+            
+            // If still no notes found, check for any localStorage key containing note-like data
+            if (savedNotes.length === 0) {
+                for (const key of allLocalStorageKeys) {
+                    try {
+                        const data = localStorage.getItem(key);
+                        if (data && data.includes('notes') || data.includes('dae') || data.includes('workOrder')) {
+                            console.log(`📋 Potential notes data found in key: ${key}`);
+                            const parsed = JSON.parse(data);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                savedNotes = parsed;
+                                notesDataSource = key;
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        // Skip invalid data
+                    }
+                }
+            }
+            
+            console.log(`📊 Notes analysis: Found ${savedNotes.length} notes from source: ${notesDataSource}`);
             
             // Check for button click analytics
             const buttonClickData = localStorage.getItem('buttonClickAnalytics');
@@ -2701,7 +2758,7 @@ ${JSON.stringify(exportData, null, 2)}
             };
             
             // Analyze saved notes for common patterns (anonymized)
-            const commonPhrases = analyzeCommonPhrasesForButtonSuggestions(savedNotes);
+            const commonPhrases = savedNotes.length > 0 ? analyzeCommonPhrasesForButtonSuggestions(savedNotes) : [];
             
             const reportData = {
                 userHash: AppState.usageTracking.userHash || 'unknown',
@@ -2717,6 +2774,8 @@ ${JSON.stringify(exportData, null, 2)}
                     hasNotePatterns: notePatternCount > 0,
                     hasSavedNotes: savedNotes.length > 0,
                     localStorageKeys: allLocalStorageKeys,
+                    localStorageData: foundDataSummary,
+                    notesDataSource: notesDataSource,
                     dataSource: buttonClickData ? 'button_tracking' : (savedNotes.length > 0 ? 'note_analysis' : 'no_data')
                 }
             };
