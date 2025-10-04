@@ -517,6 +517,421 @@
             color: #2c3e50;
         }
 
+        /* War Room Styles */
+        .war-room-container {
+            padding: 20px;
+        }
+        
+        .war-room-container h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .war-room-settings {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .store-assignment {
+            margin-bottom: 15px;
+        }
+        
+        .store-assignment label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+        
+        #assigned-stores {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        
+        .war-room-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .progress-tracker {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-tracker h4 {
+            margin: 0 0 10px 0;
+            color: #1976d2;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        
+        .store-checker {
+            background: #fff3e0;
+            border: 1px solid #ff9800;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .store-checker h4 {
+            margin: 0 0 15px 0;
+            color: #f57c00;
+        }
+        
+        .system-selection {
+            margin-bottom: 20px;
+        }
+        
+        .system-selection label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+        
+        #control-system {
+            width: 200px;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        
+        .rack-checker {
+            margin-bottom: 20px;
+        }
+        
+        .rack-checker h5 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        
+        .rack-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .rack-item label {
+            min-width: 60px;
+            font-weight: bold;
+        }
+        
+        .rack-item select {
+            min-width: 120px;
+            padding: 5px;
+        }
+        
+        .rack-item input[type="text"] {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        
+        .alarm-status {
+            margin-bottom: 15px;
+        }
+        
+        .alarm-status label {
+            display: block;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .alarm-status input[type="radio"] {
+            margin-right: 8px;
+        }
+        
+        .alarm-details {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .alarm-details label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .alarm-details textarea {
+            width: 100%;
+            min-height: 80px;
+            margin-bottom: 10px;
+        }
+        
+        .alarm-details input {
+            width: 200px;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .work-order-section {
+            margin-bottom: 20px;
+        }
+        
+        .work-order-section h5 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        
+        .work-order-list {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            min-height: 60px;
+        }
+        
+        .work-order-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .work-order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .store-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .war-room-results {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .war-room-results h4 {
+            margin: 0 0 15px 0;
+            color: #2e7d32;
+        }
+        
+        #results-content {
+            background: white;
+            border: 1px solid #c8e6c9;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .template-config {
+            background: #f3e5f5;
+            border: 1px solid #9c27b0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .template-config h4 {
+            margin: 0 0 15px 0;
+            color: #7b1fa2;
+        }
+        
+        .template-settings {
+            margin-bottom: 20px;
+        }
+        
+        .template-settings label {
+            display: block;
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+            color: #495057;
+        }
+        
+        .template-settings input,
+        .template-settings select,
+        .template-settings textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .template-settings textarea {
+            min-height: 200px;
+            font-family: monospace;
+        }
+        
+        .template-preview {
+            margin-bottom: 20px;
+        }
+        
+        .template-preview h5 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        
+        #template-preview-text {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .template-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* Dark mode for War Room */
+        body.dark-mode .war-room-container h3 {
+            color: #e1e8ed;
+            border-bottom-color: #1da1f2;
+        }
+        
+        body.dark-mode .war-room-settings {
+            background: #2f3349;
+            border-color: #495057;
+        }
+        
+        body.dark-mode .store-assignment label,
+        body.dark-mode .system-selection label,
+        body.dark-mode .rack-checker h5,
+        body.dark-mode .work-order-section h5,
+        body.dark-mode .template-settings label {
+            color: #adb5bd;
+        }
+        
+        body.dark-mode #assigned-stores,
+        body.dark-mode #control-system,
+        body.dark-mode .rack-item select,
+        body.dark-mode .rack-item input,
+        body.dark-mode .alarm-details textarea,
+        body.dark-mode .alarm-details input,
+        body.dark-mode .template-settings input,
+        body.dark-mode .template-settings select,
+        body.dark-mode .template-settings textarea {
+            background: #495057;
+            border-color: #6c757d;
+            color: #f8f9fa;
+        }
+        
+        body.dark-mode .progress-tracker {
+            background: #1a2332;
+            border-color: #1da1f2;
+        }
+        
+        body.dark-mode .progress-tracker h4,
+        body.dark-mode .progress-text {
+            color: #1da1f2;
+        }
+        
+        body.dark-mode .store-checker {
+            background: #2d1f0f;
+            border-color: #ff9800;
+        }
+        
+        body.dark-mode .store-checker h4 {
+            color: #ffb74d;
+        }
+        
+        body.dark-mode .rack-item {
+            background: #495057;
+        }
+        
+        body.dark-mode .alarm-status label {
+            background: #495057;
+            color: #f8f9fa;
+        }
+        
+        body.dark-mode .alarm-details {
+            background: #2d2418;
+            border-color: #806d47;
+        }
+        
+        body.dark-mode .work-order-list {
+            background: #495057;
+            border-color: #6c757d;
+        }
+        
+        body.dark-mode .war-room-results {
+            background: #1a2e1a;
+            border-color: #4caf50;
+        }
+        
+        body.dark-mode .war-room-results h4 {
+            color: #66bb6a;
+        }
+        
+        body.dark-mode #results-content {
+            background: #2f3349;
+            border-color: #4caf50;
+            color: #f8f9fa;
+        }
+        
+        body.dark-mode .template-config {
+            background: #2a1f2e;
+            border-color: #9c27b0;
+        }
+        
+        body.dark-mode .template-config h4 {
+            color: #ba68c8;
+        }
+        
+        body.dark-mode #template-preview-text {
+            background: #2f3349;
+            border-color: #6c757d;
+            color: #f8f9fa;
+        }
+
         .button-group {
             display: flex;
             flex-wrap: wrap;
@@ -1646,6 +2061,78 @@
             border-color: #666;
             color: white;
         }
+
+        /* Suggestion Box Styles */
+        .settings-separator {
+            border-top: 1px solid #e0e0e0;
+            margin: 10px 0;
+        }
+
+        body.dark-mode .settings-separator {
+            border-color: #555;
+        }
+
+        .suggestion-box {
+            flex-direction: column;
+            align-items: stretch !important;
+        }
+
+        .suggestion-container {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        #suggestion-text {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 12px;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+        }
+
+        body.dark-mode #suggestion-text {
+            background: #444;
+            border-color: #666;
+            color: white;
+        }
+
+        #suggestion-text::placeholder {
+            color: #999;
+            font-size: 12px;
+        }
+
+        body.dark-mode #suggestion-text::placeholder {
+            color: #aaa;
+        }
+
+        .suggestion-submit-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .suggestion-submit-btn:hover {
+            background: linear-gradient(135deg, #218838 0%, #1dad8a 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .suggestion-submit-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
     </style>
 </head>
 <body class="light-mode">
@@ -1732,6 +2219,22 @@
                 <div class="settings-toggle-slider"></div>
             </div>
         </div>
+        <div class="settings-item">
+            <span class="settings-label">🎯 War Room Check</span>
+            <div class="settings-toggle" id="war-room-toggle" onclick="toggleWarRoom()">
+                <div class="settings-toggle-slider"></div>
+            </div>
+        </div>
+        <div class="settings-separator"></div>
+        <div class="settings-item suggestion-box">
+            <span class="settings-label">💡 Suggestions & Feedback</span>
+            <div class="suggestion-container">
+                <textarea id="suggestion-text" placeholder="Share your ideas, report issues, or suggest improvements..." rows="3"></textarea>
+                <button class="suggestion-submit-btn" onclick="submitSuggestion()" title="Submit feedback with usage report">
+                    📤 Submit Feedback
+                </button>
+            </div>
+        </div>
     </div>
     </button>
 
@@ -1743,6 +2246,7 @@
                     <button class="tab-btn active" onclick="switchTab('quick-notes')">Quick Notes</button>
                     <button class="tab-btn" onclick="switchTab('qa-checklist')">QA Checklist</button>
                     <button class="tab-btn" onclick="switchTab('email-processing')">📧 Email</button>
+                    <button class="tab-btn" onclick="switchTab('war-room')" id="war-room-tab" style="display: none;">🎯 War Room</button>
                 </div>
                 
                 <!-- Quick Notes Tab Content -->
@@ -1920,6 +2424,132 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- War Room Tab Content -->
+                <div id="war-room" class="tab-content">
+                    <div class="war-room-container">
+                        <h3>🎯 War Room Check</h3>
+                        
+                        <!-- Template Configuration -->
+                        <div id="template-config" class="template-config" style="display: none;">
+                            <h4>📝 Configure Your War Room Template</h4>
+                            
+                            <div class="template-settings">
+                                <label>Template Name:</label>
+                                <input type="text" id="template-name" placeholder="My War Room Format">
+                                
+                                <label>Site Header Format:</label>
+                                <input type="text" id="site-header" placeholder="*Site {STORE}" value="*Site {STORE}">
+                                
+                                <label>System Verification Format:</label>
+                                <input type="text" id="system-format" placeholder="Verified in {SYSTEM}:" value="Verified in {SYSTEM}:">
+                                
+                                <label>Rack/Component Format:</label>
+                                <select id="rack-format">
+                                    <option value="detailed">Detailed (LTA: No Alarms)</option>
+                                    <option value="condensed">Condensed (LTA/LTB/MTC-No Alarms)</option>
+                                    <option value="simple">Simple (No Alarms Found)</option>
+                                </select>
+                                
+                                <label>
+                                    <input type="checkbox" id="include-wo-section" checked> Include Work Orders Section
+                                </label>
+                                
+                                <label>Custom Template:</label>
+                                <textarea id="custom-template" rows="10" placeholder="Create your own template using variables:&#10;{STORE} - Store number&#10;{SYSTEM} - Control system name&#10;{RACKS} - Rack status list&#10;{WORK_ORDERS} - Work order section"></textarea>
+                            </div>
+                            
+                            <div class="template-preview">
+                                <h5>📋 Preview:</h5>
+                                <pre id="template-preview-text"></pre>
+                            </div>
+                            
+                            <div class="template-controls">
+                                <button onclick="saveWarRoomTemplate()" class="success-button">💾 Save Template</button>
+                                <button onclick="loadPresetTemplate()" class="primary-button">📋 Load Preset</button>
+                                <button onclick="resetWarRoomTemplate()" class="danger-button">🔄 Reset</button>
+                                <button onclick="hideTemplateConfig()" class="secondary-button">❌ Close</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Main War Room Interface -->
+                        <div id="war-room-main">
+                            <!-- Settings Panel -->
+                            <div class="war-room-settings">
+                                <div class="store-assignment">
+                                    <label>Assigned Stores:</label>
+                                    <textarea id="assigned-stores" placeholder="Standard War Room Sites:&#10;4&#10;1407&#10;5152&#10;&#10;(Edit as needed for your assignment)"></textarea>
+                                </div>
+                                
+                                <div class="war-room-controls">
+                                    <button onclick="startWarRoomCheck()" class="primary-button">🚀 Start War Room Check</button>
+                                    <button onclick="showTemplateConfig()" class="success-button">⚙️ Configure Template</button>
+                                    <button onclick="generateWarRoomTemplate()" class="secondary-button">📋 Generate Report</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Progress Tracker -->
+                            <div id="war-room-progress" class="progress-tracker" style="display: none;">
+                                <h4>📊 Progress</h4>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progress-fill"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span id="progress-current">0</span> / <span id="progress-total">0</span> stores checked
+                                </div>
+                            </div>
+                            
+                            <!-- Store Checker -->
+                            <div id="store-checker" class="store-checker" style="display: none;">
+                                <h4>🏪 Current Store: <span id="current-store">----</span></h4>
+                                
+                                <div class="system-selection">
+                                    <label>Control System:</label>
+                                    <select id="control-system" onchange="generateRackInterface(this.value)">
+                                        <option value="">Select System...</option>
+                                        <option value="Carel Boss">Carel Boss</option>
+                                        <option value="Danfoss">Danfoss</option>
+                                        <option value="CPC">CPC</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="rack-checker">
+                                    <h5>Rack/Component Status:</h5>
+                                    <div id="rack-list">
+                                        <p>Select a control system to see available racks/components</p>
+                                    </div>
+                                    <button onclick="addCustomRack()" class="secondary-button">➕ Add Custom Rack</button>
+                                </div>
+                                
+                                <div class="work-order-section">
+                                    <h5>Work Orders:</h5>
+                                    <div id="work-order-list" class="work-order-list">
+                                        <p>No work orders created for this store</p>
+                                    </div>
+                                    <button onclick="addWorkOrder()" class="primary-button">📝 Add Work Order</button>
+                                </div>
+                                
+                                <div class="store-controls">
+                                    <button onclick="saveStoreData()" class="success-button">✅ Save Store</button>
+                                    <button onclick="nextStore()" class="primary-button">➡️ Next Store</button>
+                                    <button onclick="skipStore()" class="secondary-button">⏭️ Skip Store</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Results Summary -->
+                            <div id="war-room-results" class="war-room-results" style="display: none;">
+                                <h4>📋 War Room Summary</h4>
+                                <div id="results-content"></div>
+                                <div class="template-controls">
+                                    <button onclick="copyWarRoomResults()" class="success-button">📋 Copy Report</button>
+                                    <button onclick="editWarRoomResults()" class="primary-button">✏️ Edit Report</button>
+                                    <button onclick="startNewWarRoom()" class="secondary-button">🔄 Start New Check</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2038,7 +2668,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.1.0', // Update this when you make changes
+            currentVersion: '1.1.1', // Update this when you make changes
             githubRepo: 'shadow11001/IGAPP',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -4011,11 +4641,183 @@ ${subIssueNumbers.map((num, index) =>
                     micLevelToggle.classList.remove('active');
                 }
             }
+            
+            // Update War Room toggle
+            const warRoomToggle = document.getElementById('war-room-toggle');
+            if (warRoomToggle) {
+                if (WAR_ROOM_SYSTEM.state.isEnabled) {
+                    warRoomToggle.classList.add('active');
+                } else {
+                    warRoomToggle.classList.remove('active');
+                }
+            }
         }
         
         function toggleAutoUpdateFromSettings() {
             toggleAutoUpdate();
             updateSettingsToggles();
+        }
+
+        // Suggestion & Feedback Functions
+        async function submitSuggestion() {
+            const suggestionText = document.getElementById('suggestion-text').value.trim();
+            const submitBtn = document.querySelector('.suggestion-submit-btn');
+            
+            if (!suggestionText) {
+                showNotification('💡 Please enter your feedback before submitting', 'error', 3000);
+                return;
+            }
+            
+            // Disable button during submission
+            submitBtn.disabled = true;
+            submitBtn.textContent = '📤 Submitting...';
+            
+            try {
+                showNotification('📊 Generating feedback report...', 'info', 2000);
+                
+                // Generate detailed usage report
+                const usageData = generateUsageReportData();
+                
+                // Create comprehensive feedback report
+                const feedbackReport = {
+                    timestamp: new Date().toISOString(),
+                    userFeedback: suggestionText,
+                    feedbackType: 'user_suggestion',
+                    sessionInfo: {
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toLocaleString(),
+                        sessionDuration: Date.now() - AppState.usageTracking.sessionStart,
+                        currentBranch: AppState.currentBranch || 'main'
+                    },
+                    systemInfo: {
+                        screenResolution: `${screen.width}x${screen.height}`,
+                        colorDepth: screen.colorDepth,
+                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                        language: navigator.language,
+                        platform: navigator.platform,
+                        cookieEnabled: navigator.cookieEnabled,
+                        onlineStatus: navigator.onLine
+                    },
+                    featureUsage: {
+                        warRoomEnabled: localStorage.getItem('warRoomEnabled') === 'true',
+                        visualWarningsEnabled: localStorage.getItem('visualDeadAirWarnings') === 'true',
+                        micLevelEnabled: localStorage.getItem('micLevelDisplay') === 'true',
+                        analyticsEnabled: AppState.usageTracking.reportingEnabled,
+                        autoUpdatesEnabled: AppState.autoUpdate.enabled,
+                        currentTheme: document.body.classList.contains('dark-mode') ? 'dark' : 'light'
+                    },
+                    usageStatistics: {
+                        buttonClicks: Object.keys(usageData.buttonClicks || {}).length,
+                        notesCreated: (usageData.notes || []).length,
+                        sessionCount: usageData.sessionCount || 0,
+                        totalTimeSpent: usageData.totalTimeSpent || 0
+                    },
+                    technicalData: usageData
+                };
+                
+                // Submit to GitHub (bypasses 24-hour limit)
+                showNotification('📤 Sending feedback to GitHub...', 'info', 3000);
+                await submitFeedbackToGitHub(feedbackReport);
+                
+                // Clear the suggestion box
+                document.getElementById('suggestion-text').value = '';
+                
+                showNotification('✅ Feedback successfully submitted to GitHub! Thank you for your input.', 'success', 8000);
+                
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                showNotification(`❌ Failed to submit feedback: ${error.message}`, 'error', 8000);
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = '📤 Submit Feedback';
+            }
+        }
+
+        async function submitFeedbackToGitHub(feedbackData) {
+            if (!AppState.githubToken || !AppState.githubRepo) {
+                throw new Error('GitHub credentials not available');
+            }
+
+            const issueTitle = `💡 User Feedback - ${new Date().toLocaleDateString()} - ${feedbackData.technicalData.userHash?.substring(0, 8) || 'unknown'}`;
+            
+            const issueBody = `
+## � User Feedback Report
+
+**Submitted:** ${feedbackData.timestamp}
+**User ID:** ${feedbackData.technicalData.userHash?.substring(0, 8) || 'unknown'}...
+**Session Duration:** ${Math.round(feedbackData.sessionInfo.sessionDuration / 60000)} minutes
+**Current Branch:** ${feedbackData.sessionInfo.currentBranch}
+
+### 📝 User Feedback
+${feedbackData.userFeedback}
+
+### 📊 Session Information
+- **Submitted:** ${feedbackData.sessionInfo.timestamp}
+- **Session Duration:** ${Math.round(feedbackData.sessionInfo.sessionDuration / 60000)} minutes
+- **Current Branch:** ${feedbackData.sessionInfo.currentBranch}
+- **User Agent:** ${feedbackData.sessionInfo.userAgent}
+
+### 🖥️ System Information
+- **Screen Resolution:** ${feedbackData.systemInfo.screenResolution}
+- **Platform:** ${feedbackData.systemInfo.platform}
+- **Language:** ${feedbackData.systemInfo.language}
+- **Timezone:** ${feedbackData.systemInfo.timezone}
+- **Online Status:** ${feedbackData.systemInfo.onlineStatus}
+
+### ⚙️ Feature Configuration
+- **War Room:** ${feedbackData.featureUsage.warRoomEnabled ? '✅ Enabled' : '❌ Disabled'}
+- **Visual Warnings:** ${feedbackData.featureUsage.visualWarningsEnabled ? '✅ Enabled' : '❌ Disabled'}
+- **Mic Level Display:** ${feedbackData.featureUsage.micLevelEnabled ? '✅ Enabled' : '❌ Disabled'}
+- **Analytics:** ${feedbackData.featureUsage.analyticsEnabled ? '✅ Enabled' : '❌ Disabled'}
+- **Auto Updates:** ${feedbackData.featureUsage.autoUpdatesEnabled ? '✅ Enabled' : '❌ Disabled'}
+- **Theme:** ${feedbackData.featureUsage.currentTheme === 'dark' ? '🌙 Dark' : '☀️ Light'}
+
+### 📈 Usage Statistics
+- **Button Clicks Tracked:** ${feedbackData.usageStatistics.buttonClicks}
+- **Notes Created:** ${feedbackData.usageStatistics.notesCreated}
+- **Total Sessions:** ${feedbackData.usageStatistics.sessionCount}
+- **Total Time Spent:** ${feedbackData.usageStatistics.totalTimeSpent} minutes
+
+### � Technical Data
+<details>
+<summary>Click to expand full technical data</summary>
+
+\`\`\`json
+${JSON.stringify(feedbackData.technicalData, null, 2)}
+\`\`\`
+</details>
+
+---
+*This feedback was submitted directly through the IGAPP suggestion system and includes comprehensive technical context for debugging and feature development.*
+            `;
+
+            // Create GitHub issue
+            const issueResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${AppState.githubToken}`,
+                    'Accept': 'application/vnd.github+json',
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'IGAPP-Feedback'
+                },
+                body: JSON.stringify({
+                    title: issueTitle,
+                    body: issueBody,
+                    labels: ['feedback', 'user-suggestion', 'enhancement', 'auto-generated']
+                })
+            });
+
+            if (!issueResponse.ok) {
+                const errorText = await issueResponse.text();
+                console.error('GitHub API Error:', errorText);
+                throw new Error(`GitHub submission failed: ${issueResponse.status} ${issueResponse.statusText}`);
+            }
+
+            const issueData = await issueResponse.json();
+            console.log('✅ Feedback submitted to GitHub:', issueData.html_url);
+            
+            return issueData;
         }
 
         // Branch Management Functions
@@ -4534,7 +5336,22 @@ ${subIssueNumbers.map((num, index) =>
             }
             
             // Add active class to clicked button
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // Fallback: find button by tab name
+                const targetButton = document.querySelector(`button[onclick="switchTab('${tabName}')"]`);
+                if (targetButton) {
+                    targetButton.classList.add('active');
+                }
+            }
+            
+            // Special handling for war room tab
+            if (tabName === 'war-room' && !WAR_ROOM_SYSTEM.state.isEnabled) {
+                showNotification('🎯 War Room is disabled. Enable it in settings first.', 'info', 3000);
+                setTimeout(() => switchTab('quick-notes'), 100);
+                return;
+            }
         }
         
         // QA Checklist Functions
@@ -5026,6 +5843,591 @@ ${subIssueNumbers.map((num, index) =>
             document.getElementById('generated-response').style.backgroundColor = '';
             
             showNotification('🗑️ Email processor cleared', 'success', 2000);
+        }
+
+        // War Room System
+        const WAR_ROOM_SYSTEM = {
+            state: {
+                isEnabled: false,
+                assignedStores: [],
+                currentStoreIndex: 0,
+                storeResults: [],
+                currentTemplate: null,
+                sessionStartTime: null,
+                sessionId: null
+            },
+            
+            templates: {
+                presets: {
+                    'detailed_format': {
+                        name: "Detailed Format",
+                        siteHeader: "*Site {STORE}",
+                        systemFormat: "Verified in {SYSTEM}:",
+                        rackFormat: "detailed",
+                        includeWorkOrders: true,
+                        customTemplate: `*Site {STORE}
+Verified in {SYSTEM}:
+{RACKS}
+
+Open WorkOrders:
+
+Site {STORE}:
+{WORK_ORDERS}`
+                    },
+                    
+                    'condensed_format': {
+                        name: "Condensed Format",
+                        siteHeader: "Site {STORE}",
+                        systemFormat: "Verified in {SYSTEM}:",
+                        rackFormat: "condensed",
+                        includeWorkOrders: false,
+                        customTemplate: `Site {STORE}
+Verified in {SYSTEM}:
+{RACKS}`
+                    },
+                    
+                    'simple_format': {
+                        name: "Simple Format",
+                        siteHeader: "Site {STORE}",
+                        systemFormat: "verified in {SYSTEM}",
+                        rackFormat: "simple",
+                        includeWorkOrders: false,
+                        customTemplate: `Site {STORE}
+verified in {SYSTEM}
+{RACKS}`
+                    }
+                }
+            },
+            
+            systemRacks: {
+                'Carel Boss': ['LTA', 'LTB', 'MTC', 'MTD', 'RCU'],
+                'Danfoss': ['LTA', 'LTB', 'MTC', 'MTD'],
+                'CPC': ['CKTS'],
+                'Other': []
+            },
+            
+            // Predefined War Room sites with their systems
+            warRoomSites: {
+                '4': 'Carel Boss',
+                '1407': 'Danfoss',
+                '5152': 'CPC'
+            },
+            
+            getSystemForSite(site) {
+                return this.warRoomSites[site] || null;
+            },
+            
+            generateSessionId() {
+                const timestamp = Date.now();
+                const random = Math.random().toString(36).substring(2);
+                const userHash = localStorage.getItem('agentName') || 'user';
+                return `WR_${userHash.substring(0,3)}_${timestamp}_${random}`;
+            },
+            
+            generateVerificationCode() {
+                const factors = [
+                    localStorage.getItem('agentName') || 'unknown',
+                    new Date().getTime(),
+                    Math.random().toString(36).substring(7),
+                    navigator.userAgent.slice(-10)
+                ];
+                return btoa(factors.join('')).slice(0, 12);
+            },
+            
+            generateRackStatus(racks, format) {
+                switch(format) {
+                    case 'detailed':
+                        return racks.map(rack => `  ${rack.name}: ${rack.status}`).join('\\n');
+                        
+                    case 'condensed':
+                        const noAlarmRacks = racks.filter(r => r.status === 'No Alarms');
+                        const alarmRacks = racks.filter(r => r.status !== 'No Alarms');
+                        
+                        let result = '';
+                        if (noAlarmRacks.length > 0) {
+                            result += `${noAlarmRacks.map(r => r.name).join('/')}-No Alarms on monitored assets\\n`;
+                        }
+                        if (alarmRacks.length > 0) {
+                            result += alarmRacks.map(r => `${r.name} in alarm (${r.status})`).join('\\n');
+                        }
+                        return result;
+                        
+                    case 'simple':
+                        const hasAlarms = racks.some(r => r.status !== 'No Alarms');
+                        return hasAlarms ? 'Alarms Found' : 'No Alarms Found';
+                        
+                    default:
+                        return racks.map(rack => `${rack.name}: ${rack.status}`).join('\\n');
+                }
+            },
+            
+            applyTemplate(storeData, template) {
+                let result = template.customTemplate;
+                
+                result = result.replace(/{STORE}/g, storeData.store);
+                result = result.replace(/{SYSTEM}/g, storeData.system);
+                result = result.replace(/{RACKS}/g, this.generateRackStatus(storeData.racks, template.rackFormat));
+                result = result.replace(/{WORK_ORDERS}/g, storeData.workOrders.length > 0 ? 
+                    storeData.workOrders.map(wo => `  - ${wo}`).join('\\n') : '  - None');
+                
+                return result;
+            }
+        };
+
+        // War Room Functions
+        function toggleWarRoom() {
+            WAR_ROOM_SYSTEM.state.isEnabled = !WAR_ROOM_SYSTEM.state.isEnabled;
+            localStorage.setItem('warRoomEnabled', WAR_ROOM_SYSTEM.state.isEnabled.toString());
+            
+            const warRoomTab = document.getElementById('war-room-tab');
+            if (WAR_ROOM_SYSTEM.state.isEnabled) {
+                warRoomTab.style.display = 'block';
+                showNotification('🎯 War Room check enabled', 'success', 3000);
+            } else {
+                warRoomTab.style.display = 'none';
+                showNotification('🎯 War Room check disabled', 'info', 3000);
+            }
+            
+            updateSettingsToggles();
+        }
+        
+        function initializeWarRoom() {
+            const savedState = localStorage.getItem('warRoomEnabled');
+            if (savedState === 'true') {
+                WAR_ROOM_SYSTEM.state.isEnabled = true;
+                document.getElementById('war-room-tab').style.display = 'block';
+            }
+            
+            // Pre-populate assigned stores with standard War Room sites
+            const assignedStoresField = document.getElementById('assigned-stores');
+            if (assignedStoresField && !assignedStoresField.value.trim()) {
+                assignedStoresField.placeholder = 'Standard War Room Sites:\n4\n1407\n5152\n\n(Edit as needed for your assignment)';
+                assignedStoresField.value = '4\n1407\n5152';
+            }
+            
+            // Load saved template
+            const savedTemplate = localStorage.getItem('warRoomTemplate');
+            if (savedTemplate) {
+                try {
+                    WAR_ROOM_SYSTEM.state.currentTemplate = JSON.parse(savedTemplate);
+                } catch (e) {
+                    WAR_ROOM_SYSTEM.state.currentTemplate = WAR_ROOM_SYSTEM.templates.presets.detailed_format;
+                }
+            } else {
+                WAR_ROOM_SYSTEM.state.currentTemplate = WAR_ROOM_SYSTEM.templates.presets.detailed_format;
+            }
+        }
+        
+        function showTemplateConfig() {
+            document.getElementById('template-config').style.display = 'block';
+            document.getElementById('war-room-main').style.display = 'none';
+            
+            // Load current template into form
+            const template = WAR_ROOM_SYSTEM.state.currentTemplate || WAR_ROOM_SYSTEM.templates.presets.detailed_format;
+            document.getElementById('template-name').value = template.name || '';
+            document.getElementById('site-header').value = template.siteHeader || '*Site {STORE}';
+            document.getElementById('system-format').value = template.systemFormat || 'Verified in {SYSTEM}:';
+            document.getElementById('rack-format').value = template.rackFormat || 'detailed';
+            document.getElementById('include-wo-section').checked = template.includeWorkOrders !== false;
+            document.getElementById('custom-template').value = template.customTemplate || '';
+            
+            updateTemplatePreview();
+        }
+        
+        function hideTemplateConfig() {
+            document.getElementById('template-config').style.display = 'none';
+            document.getElementById('war-room-main').style.display = 'block';
+        }
+        
+        function updateTemplatePreview() {
+            const template = {
+                siteHeader: document.getElementById('site-header').value,
+                systemFormat: document.getElementById('system-format').value,
+                rackFormat: document.getElementById('rack-format').value,
+                includeWorkOrders: document.getElementById('include-wo-section').checked,
+                customTemplate: document.getElementById('custom-template').value
+            };
+            
+            // Use actual War Room sites for preview
+            const sampleData = {
+                store: '4',
+                system: 'Carel Boss',
+                racks: [
+                    { name: 'LTA', status: 'No Alarms' },
+                    { name: 'LTB', status: 'No Alarms' },
+                    { name: 'MTC', status: 'No Alarms' },
+                    { name: 'MTD', status: 'No Alarms' },
+                    { name: 'RCU', status: 'No Alarms' }
+                ],
+                workOrders: []
+            };
+            
+            const preview = WAR_ROOM_SYSTEM.applyTemplate(sampleData, template);
+            document.getElementById('template-preview-text').textContent = preview;
+        }
+        
+        function saveWarRoomTemplate() {
+            const template = {
+                name: document.getElementById('template-name').value || 'Custom Template',
+                siteHeader: document.getElementById('site-header').value,
+                systemFormat: document.getElementById('system-format').value,
+                rackFormat: document.getElementById('rack-format').value,
+                includeWorkOrders: document.getElementById('include-wo-section').checked,
+                customTemplate: document.getElementById('custom-template').value
+            };
+            
+            WAR_ROOM_SYSTEM.state.currentTemplate = template;
+            localStorage.setItem('warRoomTemplate', JSON.stringify(template));
+            
+            showNotification('💾 War Room template saved', 'success', 3000);
+            hideTemplateConfig();
+        }
+        
+        function loadPresetTemplate() {
+            const presets = Object.keys(WAR_ROOM_SYSTEM.templates.presets);
+            const selected = prompt(`Choose a preset template:\\n${presets.map((p, i) => `${i+1}. ${WAR_ROOM_SYSTEM.templates.presets[p].name}`).join('\\n')}\\n\\nEnter number (1-${presets.length}):`);
+            
+            if (selected && selected >= 1 && selected <= presets.length) {
+                const presetKey = presets[selected - 1];
+                const preset = WAR_ROOM_SYSTEM.templates.presets[presetKey];
+                
+                document.getElementById('template-name').value = preset.name;
+                document.getElementById('site-header').value = preset.siteHeader;
+                document.getElementById('system-format').value = preset.systemFormat;
+                document.getElementById('rack-format').value = preset.rackFormat;
+                document.getElementById('include-wo-section').checked = preset.includeWorkOrders;
+                document.getElementById('custom-template').value = preset.customTemplate;
+                
+                updateTemplatePreview();
+                showNotification(`📋 Loaded preset: ${preset.name}`, 'success', 3000);
+            }
+        }
+        
+        function resetWarRoomTemplate() {
+            if (confirm('Reset template to default? This will lose any custom changes.')) {
+                const defaultTemplate = WAR_ROOM_SYSTEM.templates.presets.detailed_format;
+                
+                document.getElementById('template-name').value = defaultTemplate.name;
+                document.getElementById('site-header').value = defaultTemplate.siteHeader;
+                document.getElementById('system-format').value = defaultTemplate.systemFormat;
+                document.getElementById('rack-format').value = defaultTemplate.rackFormat;
+                document.getElementById('include-wo-section').checked = defaultTemplate.includeWorkOrders;
+                document.getElementById('custom-template').value = defaultTemplate.customTemplate;
+                
+                updateTemplatePreview();
+                showNotification('🔄 Template reset to default', 'info', 3000);
+            }
+        }
+        
+        function startWarRoomCheck() {
+            const storesText = document.getElementById('assigned-stores').value.trim();
+            if (!storesText) {
+                showNotification('❌ Please enter store numbers first', 'error', 3000);
+                return;
+            }
+            
+            // Parse store numbers
+            WAR_ROOM_SYSTEM.state.assignedStores = storesText.split('\n')
+                .map(line => line.trim())
+                .filter(line => line && /^\d+$/.test(line));
+            
+            if (WAR_ROOM_SYSTEM.state.assignedStores.length === 0) {
+                showNotification('❌ No valid store numbers found', 'error', 3000);
+                return;
+            }
+            
+            // Initialize session
+            WAR_ROOM_SYSTEM.state.currentStoreIndex = 0;
+            WAR_ROOM_SYSTEM.state.storeResults = [];
+            WAR_ROOM_SYSTEM.state.sessionStartTime = new Date();
+            WAR_ROOM_SYSTEM.state.sessionId = WAR_ROOM_SYSTEM.generateSessionId();
+            
+            // Show progress tracker and store checker
+            document.getElementById('war-room-progress').style.display = 'block';
+            document.getElementById('store-checker').style.display = 'block';
+            document.getElementById('war-room-results').style.display = 'none';
+            
+            updateProgress();
+            loadCurrentStore();
+            
+            showNotification(`🚀 War Room check started: ${WAR_ROOM_SYSTEM.state.assignedStores.length} stores`, 'success', 3000);
+        }
+        
+        function updateProgress() {
+            const current = WAR_ROOM_SYSTEM.state.currentStoreIndex;
+            const total = WAR_ROOM_SYSTEM.state.assignedStores.length;
+            const percentage = total > 0 ? (current / total) * 100 : 0;
+            
+            document.getElementById('progress-current').textContent = current;
+            document.getElementById('progress-total').textContent = total;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+        }
+        
+        function loadCurrentStore() {
+            const currentStore = WAR_ROOM_SYSTEM.state.assignedStores[WAR_ROOM_SYSTEM.state.currentStoreIndex];
+            document.getElementById('current-store').textContent = currentStore || '----';
+            
+            // Auto-detect control system for known sites
+            const knownSystem = WAR_ROOM_SYSTEM.getSystemForSite(currentStore);
+            const systemSelect = document.getElementById('control-system');
+            
+            if (knownSystem) {
+                systemSelect.value = knownSystem;
+                generateRackInterface(knownSystem);
+                showNotification(`🎯 Auto-detected: ${currentStore} uses ${knownSystem}`, 'info', 3000);
+            } else {
+                // Reset form for unknown sites
+                systemSelect.value = '';
+                document.getElementById('rack-list').innerHTML = '<p>Select a control system to see available racks/components</p>';
+            }
+            
+            // Reset work orders
+            document.getElementById('work-order-list').innerHTML = '<p>No work orders created for this store</p>';
+        }
+        
+        function generateRackInterface(system) {
+            const racks = WAR_ROOM_SYSTEM.systemRacks[system] || [];
+            const rackListElement = document.getElementById('rack-list');
+            
+            if (racks.length === 0) {
+                rackListElement.innerHTML = '<p>No predefined racks for this system. Use "Add Custom Rack" button.</p>';
+                return;
+            }
+            
+            rackListElement.innerHTML = racks.map(rack => `
+                <div class="rack-item">
+                    <label>${rack}:</label>
+                    <select name="rack-${rack}" onchange="toggleRackDetails('${rack}', this.value)">
+                        <option value="No Alarms">No Alarms</option>
+                        <option value="Alarm Found">Alarm Found</option>
+                        <option value="Not Monitored">Not Monitored</option>
+                        <option value="System Down">System Down</option>
+                    </select>
+                    <input type="text" placeholder="Alarm details (if any)" name="rack-${rack}-details" style="display: none;">
+                </div>
+            `).join('');
+        }
+        
+        function toggleRackDetails(rackName, status) {
+            const detailsInput = document.querySelector(`input[name="rack-${rackName}-details"]`);
+            if (detailsInput) {
+                detailsInput.style.display = (status === 'Alarm Found') ? 'block' : 'none';
+                if (status !== 'Alarm Found') {
+                    detailsInput.value = '';
+                }
+            }
+        }
+        
+        function addCustomRack() {
+            const rackName = prompt('Enter custom rack/component name:');
+            if (!rackName) return;
+            
+            const rackList = document.getElementById('rack-list');
+            const customRackHTML = `
+                <div class="rack-item">
+                    <label>${rackName}:</label>
+                    <select name="rack-${rackName}" onchange="toggleRackDetails('${rackName}', this.value)">
+                        <option value="No Alarms">No Alarms</option>
+                        <option value="Alarm Found">Alarm Found</option>
+                        <option value="Not Monitored">Not Monitored</option>
+                        <option value="System Down">System Down</option>
+                    </select>
+                    <input type="text" placeholder="Alarm details (if any)" name="rack-${rackName}-details" style="display: none;">
+                    <button onclick="this.parentElement.remove()" class="danger-button" style="padding: 2px 6px; font-size: 12px;">✕</button>
+                </div>
+            `;
+            
+            if (rackList.innerHTML.includes('No predefined racks') || rackList.innerHTML.includes('Select a control system')) {
+                rackList.innerHTML = customRackHTML;
+            } else {
+                rackList.innerHTML += customRackHTML;
+            }
+        }
+        
+        function addWorkOrder() {
+            const workOrderNumber = prompt('Enter work order number:');
+            if (!workOrderNumber) return;
+            
+            const description = prompt('Enter work order description (optional):') || 'Standard work order';
+            
+            const workOrderList = document.getElementById('work-order-list');
+            const workOrderHTML = `
+                <div class="work-order-item">
+                    <strong>${workOrderNumber}</strong> - ${description}
+                    <button onclick="this.parentElement.remove()" class="danger-button" style="float: right; padding: 2px 6px; font-size: 12px;">✕</button>
+                </div>
+            `;
+            
+            if (workOrderList.innerHTML.includes('No work orders')) {
+                workOrderList.innerHTML = workOrderHTML;
+            } else {
+                workOrderList.innerHTML += workOrderHTML;
+            }
+        }
+        
+        function saveStoreData() {
+            const currentStore = WAR_ROOM_SYSTEM.state.assignedStores[WAR_ROOM_SYSTEM.state.currentStoreIndex];
+            const system = document.getElementById('control-system').value;
+            
+            if (!system) {
+                showNotification('❌ Please select a control system', 'error', 3000);
+                return;
+            }
+            
+            // Collect rack data
+            const racks = [];
+            const rackSelects = document.querySelectorAll('select[name^="rack-"]');
+            rackSelects.forEach(select => {
+                const rackName = select.name.replace('rack-', '');
+                const status = select.value;
+                const detailsInput = document.querySelector(`input[name="rack-${rackName}-details"]`);
+                const details = detailsInput ? detailsInput.value : '';
+                
+                racks.push({
+                    name: rackName,
+                    status: status,
+                    details: details
+                });
+            });
+            
+            // Collect work orders
+            const workOrders = [];
+            const workOrderItems = document.querySelectorAll('.work-order-item');
+            workOrderItems.forEach(item => {
+                const text = item.textContent.replace('✕', '').trim();
+                if (text && !text.includes('No work orders')) {
+                    workOrders.push(text);
+                }
+            });
+            
+            // Store the data
+            const storeData = {
+                store: currentStore,
+                system: system,
+                racks: racks,
+                workOrders: workOrders,
+                timestamp: new Date().toISOString(),
+                hasAlarms: racks.some(r => r.status === 'Alarm Found')
+            };
+            
+            WAR_ROOM_SYSTEM.state.storeResults.push(storeData);
+            
+            showNotification(`✅ Store ${currentStore} data saved`, 'success', 2000);
+            nextStore();
+        }
+        
+        function nextStore() {
+            WAR_ROOM_SYSTEM.state.currentStoreIndex++;
+            
+            if (WAR_ROOM_SYSTEM.state.currentStoreIndex >= WAR_ROOM_SYSTEM.state.assignedStores.length) {
+                // All stores completed
+                completeWarRoomCheck();
+            } else {
+                updateProgress();
+                loadCurrentStore();
+            }
+        }
+        
+        function skipStore() {
+            if (confirm('Skip this store? No data will be recorded.')) {
+                nextStore();
+            }
+        }
+        
+        function completeWarRoomCheck() {
+            // Hide progress and checker
+            document.getElementById('war-room-progress').style.display = 'none';
+            document.getElementById('store-checker').style.display = 'none';
+            
+            // Generate final report
+            generateWarRoomTemplate();
+            
+            // Show results
+            document.getElementById('war-room-results').style.display = 'block';
+            
+            showNotification('🎉 War Room check completed!', 'success', 5000);
+        }
+        
+        function generateWarRoomTemplate() {
+            const template = WAR_ROOM_SYSTEM.state.currentTemplate || WAR_ROOM_SYSTEM.templates.presets.detailed_format;
+            let finalReport = '';
+            
+            // Generate report for each store
+            WAR_ROOM_SYSTEM.state.storeResults.forEach(storeData => {
+                finalReport += WAR_ROOM_SYSTEM.applyTemplate(storeData, template) + '\\n\\n';
+            });
+            
+            // Add summary
+            finalReport += `\\n--- WAR ROOM SUMMARY ---\\n`;
+            finalReport += `Session ID: ${WAR_ROOM_SYSTEM.state.sessionId}\\n`;
+            finalReport += `Agent: ${localStorage.getItem('agentName') || 'Unknown'}\\n`;
+            finalReport += `Total Stores Checked: ${WAR_ROOM_SYSTEM.state.storeResults.length}\\n`;
+            finalReport += `Stores with Alarms: ${WAR_ROOM_SYSTEM.state.storeResults.filter(s => s.hasAlarms).length}\\n`;
+            finalReport += `Work Orders Created: ${WAR_ROOM_SYSTEM.state.storeResults.reduce((total, s) => total + s.workOrders.length, 0)}\\n`;
+            finalReport += `Check Started: ${WAR_ROOM_SYSTEM.state.sessionStartTime.toLocaleString()}\\n`;
+            finalReport += `Check Completed: ${new Date().toLocaleString()}\\n`;
+            finalReport += `Verification Code: ${WAR_ROOM_SYSTEM.generateVerificationCode()}\\n`;
+            
+            // Convert newlines to <br> tags for HTML display
+            const displayReport = finalReport.replace(/\\n/g, '<br>');
+            document.getElementById('results-content').innerHTML = displayReport;
+        }
+        
+        function copyWarRoomResults() {
+            // Get the HTML content and convert <br> tags back to newlines
+            let resultsText = document.getElementById('results-content').innerHTML;
+            resultsText = resultsText.replace(/<br>/g, '\n');
+            
+            // Also handle any remaining literal \n characters
+            resultsText = resultsText.replace(/\\n/g, '\n');
+            
+            navigator.clipboard.writeText(resultsText).then(() => {
+                showNotification('📋 War Room report copied to clipboard', 'success', 3000);
+            }).catch(() => {
+                showNotification('❌ Failed to copy report', 'error', 3000);
+            });
+        }
+        
+        function editWarRoomResults() {
+            const resultsContent = document.getElementById('results-content');
+            const currentText = resultsContent.textContent;
+            
+            // Make the content editable
+            resultsContent.contentEditable = true;
+            resultsContent.style.border = '2px solid #007bff';
+            resultsContent.style.outline = 'none';
+            resultsContent.focus();
+            
+            // Change button text
+            const editBtn = event.target;
+            editBtn.textContent = '💾 Save Changes';
+            editBtn.onclick = function() {
+                resultsContent.contentEditable = false;
+                resultsContent.style.border = '1px solid #c8e6c9';
+                editBtn.textContent = '✏️ Edit Report';
+                editBtn.onclick = editWarRoomResults;
+                showNotification('💾 Report changes saved', 'success', 2000);
+            };
+        }
+        
+        function startNewWarRoom() {
+            if (confirm('Start a new War Room check? Current results will be cleared.')) {
+                // Reset state
+                WAR_ROOM_SYSTEM.state.currentStoreIndex = 0;
+                WAR_ROOM_SYSTEM.state.storeResults = [];
+                WAR_ROOM_SYSTEM.state.sessionStartTime = null;
+                WAR_ROOM_SYSTEM.state.sessionId = null;
+                
+                // Hide all sections
+                document.getElementById('war-room-progress').style.display = 'none';
+                document.getElementById('store-checker').style.display = 'none';
+                document.getElementById('war-room-results').style.display = 'none';
+                
+                // Clear form
+                document.getElementById('assigned-stores').value = '';
+                
+                showNotification('🔄 Ready for new War Room check', 'info', 3000);
+            }
         }
 
         // Enhanced Quick Notes to auto-reset timer
@@ -6072,6 +7474,21 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             
             // Initialize microphone settings
             initializeMicrophoneSettings();
+            
+            // Initialize War Room system
+            initializeWarRoom();
+            
+            // Add War Room template preview event listeners
+            setTimeout(() => {
+                const templateFields = ['site-header', 'system-format', 'rack-format', 'include-wo-section', 'custom-template'];
+                templateFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.addEventListener('input', updateTemplatePreview);
+                        field.addEventListener('change', updateTemplatePreview);
+                    }
+                });
+            }, 100);
             
             // Initialize auto-update setting
             const savedAutoUpdate = localStorage.getItem('autoUpdateEnabled');

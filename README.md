@@ -5,7 +5,7 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 ## 🌟 Features
 
 ### 📑 Tab-Based Interface
-- **Three-tab system** - Quick Notes, QA Checklist, and Email Processing
+- **Four-tab system** - Quick Notes, QA Checklist, Email Processing, and War Room
 - **Smooth transitions** - CSS-based tab switching with visual feedback
 - **Independent workflows** - Each tab maintains its own state and functionality
 - **Responsive design** - Tabs adapt to screen size and device type
@@ -32,6 +32,23 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 - **Work order detection** - Recognizes 9-digit work order patterns and auto-populates main form
 - **Smart form integration** - Seamlessly transfers parsed data to the main Quick Notes form
 - **Response management** - Copy to clipboard or edit responses before sending
+
+### 🎯 War Room System
+- **Systematic store checking** - Configure templates for comprehensive store monitoring
+- **Template engine** - Configurable templates with variable replacement ({STORE}, {SYSTEM}, {RACKS}, {WORK_ORDERS})
+- **Progress tracking** - Visual progress indicators and completion status
+- **Control system integration** - Auto-detection for Carel Boss, Danfoss, and CPC systems
+- **Anti-copy protection** - Unique session IDs and verification codes to prevent template copying
+- **Professional reporting** - Structured reports with session summaries and verification codes
+- **Settings integration** - Enable/disable War Room functionality through settings menu
+
+### 💡 Feedback & Suggestion System
+- **Integrated feedback collection** - Built-in suggestion box in settings menu
+- **Comprehensive reporting** - Automatically includes system info, feature usage, and technical data
+- **Direct GitHub integration** - Submits feedback as GitHub issues with proper labeling
+- **No rate limiting** - Bypasses 24-hour cooldown for immediate feedback submission
+- **Professional formatting** - Well-organized GitHub issues with collapsible technical sections
+- **Rich context** - Includes session data, browser info, feature settings, and usage statistics
 
 ### ⏱️ Dead Air Timer & Audio Detection
 - **Automatic dead air monitoring** with visual warnings at 25+ seconds
@@ -117,6 +134,14 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 - **Review parsed information** - Work orders, store numbers, case numbers, tech names
 - **Use generated response** - Copy to clipboard or edit as needed
 - **Auto-form population** - Parsed work orders automatically fill main form
+
+#### War Room Tab
+- **Enable in Settings** - Toggle War Room functionality through settings menu
+- **Configure templates** - Set up custom templates with variable replacement
+- **Systematic checking** - Go through assigned stores one by one
+- **Progress tracking** - Visual indicators show completion status
+- **Generate reports** - Professional formatted reports with session summaries
+- **Copy functionality** - Export reports to clipboard for documentation
 
 ### Email Processing Features
 - **Work Order Detection** - Recognizes 9-digit patterns (e.g., 123456789)
@@ -228,10 +253,13 @@ IGAPP/
 ### Data Privacy
 - **No external servers** - All data stays in your browser
 - **No tracking** - No analytics or user tracking  
-- **Local only** - Data never leaves your device
+- **Local only** - Data never leaves your device (except for GitHub feedback submission)
 - **Encrypted tokens** - GitHub tokens are obfuscated using XOR encryption
 - **QA checklist persistence** - Checklist state and agent names stored locally
 - **Email processing** - All email parsing and analysis happens locally
+- **War Room data** - Store checking progress and templates stored locally
+- **Feedback submission** - Only submitted when user explicitly requests through suggestion system
+- **Optional GitHub integration** - Feedback and usage reports only sent when user chooses to submit
 
 ## 🛠️ Advanced Features
 
@@ -386,6 +414,37 @@ IGAPP/
 - **TextDecoder API**: Required for proper UTF-8 handling in updates
 
 ## 📋 Detailed Changelog
+
+### Version 1.1.1 - Feedback System & War Room Enhancement (October 2025)
+
+#### 💡 Integrated Feedback & Suggestion System
+- **Comprehensive feedback collection** - New suggestion box in Settings menu for user feedback and bug reports
+- **Rich context reporting** - Automatically includes system information, feature usage stats, and technical data
+- **Direct GitHub integration** - Submits feedback as properly formatted GitHub issues with appropriate labels
+- **No rate limiting** - Bypasses 24-hour cooldown restriction for immediate feedback submission
+- **Professional issue formatting** - Well-organized GitHub issues with collapsible technical sections
+- **Session data inclusion** - Captures browser info, screen resolution, platform details, and timezone
+- **Feature usage tracking** - Reports current settings for War Room, analytics, theme, and other features
+- **Technical debugging data** - Includes full usage statistics and technical context for issue resolution
+
+#### 🎯 War Room System Enhancements
+- **Display formatting fixes** - Resolved literal `\n` character display issues in report viewing
+- **Copy functionality improvement** - Enhanced clipboard functionality with proper newline conversion
+- **Template engine refinement** - Improved variable replacement and formatting consistency
+- **Visual display optimization** - Better HTML rendering with `<br>` tag conversion for proper line breaks
+- **Professional report generation** - Clean, properly formatted War Room reports for documentation
+
+#### 🔧 Technical Infrastructure Improvements
+- **HTML/text conversion system** - Sophisticated handling of display vs. copy formatting
+- **Error handling enhancement** - Better GitHub API error handling with specific error messages
+- **User feedback optimization** - Clear submission status and success notifications
+- **Code organization** - Modular feedback system with dedicated `submitFeedbackToGitHub()` function
+
+#### 🛠️ Bug Fixes and Refinements
+- **War Room report display** - Fixed literal newline character showing in display box
+- **Copy functionality reliability** - Improved clipboard operations with proper text formatting
+- **GitHub issue creation** - Enhanced issue title and body formatting for better organization
+- **Settings integration** - Seamless feedback system integration into existing settings menu
 
 ### Version 1.1.0 - Major Feature Release (October 2025)
 
