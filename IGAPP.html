@@ -352,6 +352,170 @@
         body.dark-mode .checklist-item.completed .checklist-text {
             color: #ecf0f1;
         }
+        
+        /* Email Processing Styles */
+        .email-processor {
+            margin-top: 10px;
+        }
+        
+        .email-processor h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+        
+        .email-input-section {
+            margin-bottom: 20px;
+        }
+        
+        .email-input-section label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+        
+        .email-textarea, .response-textarea {
+            width: calc(100% - 20px);
+            max-width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            color: #495057;
+            resize: vertical;
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+        
+        .email-textarea:focus, .response-textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        
+        .email-controls, .response-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .email-analysis {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .email-analysis h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .extracted-info {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        
+        .info-item {
+            display: flex;
+            margin-bottom: 8px;
+            align-items: flex-start;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 80px;
+            margin-right: 8px;
+        }
+        
+        .info-value {
+            color: #333;
+            flex: 1;
+        }
+        
+        .info-value.highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 3px;
+            padding: 2px 6px;
+            color: #856404;
+            font-weight: 600;
+        }
+        
+        .email-type-badge {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        
+        /* Dark mode for email processing */
+        body.dark-mode .email-processor h3 {
+            color: #ecf0f1;
+        }
+        
+        body.dark-mode .email-input-section label {
+            color: #bdc3c7;
+        }
+        
+        body.dark-mode .email-textarea, 
+        body.dark-mode .response-textarea {
+            background: #34495e;
+            border-color: #4a5f7a;
+            color: #ecf0f1;
+        }
+        
+        body.dark-mode .email-textarea:focus, 
+        body.dark-mode .response-textarea:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.25);
+        }
+        
+        body.dark-mode .email-analysis {
+            background: #2c3e50;
+            border-color: #34495e;
+        }
+        
+        body.dark-mode .email-analysis h4 {
+            color: #bdc3c7;
+        }
+        
+        body.dark-mode .extracted-info {
+            background: #34495e;
+            border-color: #4a5f7a;
+        }
+        
+        body.dark-mode .info-label {
+            color: #bdc3c7;
+        }
+        
+        body.dark-mode .info-value {
+            color: #ecf0f1;
+        }
+        
+        body.dark-mode .info-value.highlight {
+            background: #f39c12;
+            border-color: #e67e22;
+            color: #2c3e50;
+        }
 
         .button-group {
             display: flex;
@@ -1578,6 +1742,7 @@
                 <div class="tab-buttons">
                     <button class="tab-btn active" onclick="switchTab('quick-notes')">Quick Notes</button>
                     <button class="tab-btn" onclick="switchTab('qa-checklist')">QA Checklist</button>
+                    <button class="tab-btn" onclick="switchTab('email-processing')">📧 Email</button>
                 </div>
                 
                 <!-- Quick Notes Tab Content -->
@@ -1725,6 +1890,36 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Email Processing Tab Content -->
+                <div id="email-processing" class="tab-content">
+                    <div class="email-processor">
+                        <h3>📧 Email Processor</h3>
+                        
+                        <div class="email-input-section">
+                            <label for="email-input">Paste Email Content:</label>
+                            <textarea id="email-input" class="email-textarea" placeholder="Paste the full email content here (subject and body)..." rows="8"></textarea>
+                            
+                            <div class="email-controls">
+                                <button onclick="processEmail()" class="primary-button">🔍 Process Email</button>
+                                <button onclick="clearEmailProcessor()" class="danger-button">Clear</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Extracted Information Display -->
+                        <div id="email-analysis" class="email-analysis" style="display: none;">
+                            <h4>📋 Extracted Information:</h4>
+                            <div id="extracted-info" class="extracted-info"></div>
+                            
+                            <h4>📝 Generated Response:</h4>
+                            <textarea id="generated-response" class="response-textarea" rows="8" readonly></textarea>
+                            <div class="response-controls">
+                                <button onclick="copyEmailResponse()" class="success-button">📋 Copy Response</button>
+                                <button onclick="editResponse()" class="primary-button">✏️ Edit Response</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1843,7 +2038,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.0.8', // Update this when you make changes
+            currentVersion: '1.1.0', // Update this when you make changes
             githubRepo: 'shadow11001/IGAPP',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -4457,6 +4652,380 @@ ${subIssueNumbers.map((num, index) =>
                 nameInput.value = savedName;
                 nameDisplay.textContent = savedName;
             }
+        }
+
+        // Email Processing System
+        const EMAIL_PROCESSOR = {
+            // Email type patterns based on content analysis
+            emailTypes: {
+                'Defrost Request': {
+                    patterns: [/defrost/gi, /emergency\s+defrost/gi, /forced\s+defrost/gi],
+                    template: 'defrost'
+                },
+                'MasterMind': {
+                    patterns: [/mastermind/gi, /master\s+mind/gi],
+                    template: 'mastermind'
+                },
+                'RTU Setpoint': {
+                    patterns: [/rtu/gi, /setpoint/gi, /set\s+point/gi, /temperature/gi],
+                    template: 'general'
+                },
+                'Fan Control': {
+                    patterns: [/fan/gi, /continuous/gi, /fan.*continuous/gi, /continuous.*fan/gi],
+                    template: 'general'
+                },
+                'Lighting': {
+                    patterns: [/light/gi, /lighting/gi, /lamp/gi],
+                    template: 'general'
+                },
+                'PDR Request': {
+                    patterns: [/parameter/gi, /deviation/gi, /pdr/gi, /outside.*parameter/gi],
+                    template: 'pdr'
+                },
+                'PCR Request': {
+                    patterns: [/point.*change/gi, /pcr/gi, /board.*point/gi],
+                    template: 'pcr'
+                },
+                'Escalation': {
+                    patterns: [/escalat/gi, /urgent/gi, /emergency/gi, /critical/gi],
+                    template: 'escalation'
+                },
+                'Status Update': {
+                    patterns: [/status/gi, /update/gi, /progress/gi, /completed/gi],
+                    template: 'general'
+                },
+                'General Inquiry': {
+                    patterns: [/question/gi, /inquiry/gi, /help/gi, /can\s+you/gi],
+                    template: 'general'
+                }
+            },
+
+            // Extract work order in various formats (always 9 digits)
+            extractWorkOrder(text) {
+                const patterns = [
+                    /(?:work\s*order|wo|w\/o)[#:\s]*(\d{9})\b/gi,
+                    /\bWO(\d{9})\b/gi,
+                    /\b(\d{9})\b/g // Just 9-digit numbers - removed 'i' flag and made more permissive
+                ];
+                
+                for (const pattern of patterns) {
+                    const matches = [...text.matchAll(pattern)]; // Use matchAll for better matching
+                    if (matches.length > 0) {
+                        // Extract just the 9-digit number from first match
+                        for (const match of matches) {
+                            const fullMatch = match[0];
+                            const numberMatch = fullMatch.match(/(\d{9})/);
+                            if (numberMatch) {
+                                console.log('Work order found:', numberMatch[1]);
+                                return numberMatch[1];
+                            }
+                        }
+                    }
+                }
+                return null;
+            },
+
+            // Extract store number (1-4 digits, context-aware)
+            extractStoreNumber(text) {
+                // Look for store number patterns
+                const storePatterns = [
+                    /(?:store|site)[#:\s]*(\d{1,4})\b/gi,
+                    /subject:\s*(\d{1,4})\b/gi, // Store number in subject line
+                    /(?:^|\s)(\d{1,4})(?:\s|$)/gm // Standalone numbers in subject/beginning
+                ];
+                
+                for (const pattern of storePatterns) {
+                    const matches = [...text.matchAll(pattern)];
+                    if (matches.length > 0) {
+                        for (const match of matches) {
+                            const fullMatch = match[0];
+                            const numberMatch = fullMatch.match(/(\d{1,4})/);
+                            if (numberMatch) {
+                                const num = parseInt(numberMatch[1]);
+                                // Store numbers are typically 1-4 digits, not 9 (work orders)
+                                if (num >= 1 && num <= 9999 && numberMatch[1].length <= 4) {
+                                    console.log('Store number found:', numberMatch[1]);
+                                    return numberMatch[1];
+                                }
+                            }
+                        }
+                    }
+                }
+                return null;
+            },
+
+            // Extract case number (like A2, B1, C3, etc.)
+            extractCaseNumber(text) {
+                const casePatterns = [
+                    /\b([A-Z]\d+)\b/g, // Pattern like A2, B1, C3
+                    /case\s*([A-Z]\d+)/gi,
+                    /defrost.*?([A-Z]\d+)/gi
+                ];
+                
+                for (const pattern of casePatterns) {
+                    const matches = [...text.matchAll(pattern)];
+                    if (matches.length > 0) {
+                        const caseNum = matches[0][1];
+                        console.log('Case number found:', caseNum);
+                        return caseNum;
+                    }
+                }
+                return null;
+            },
+
+            // Extract technician name from email signature or content
+            extractTechName(text) {
+                // Common patterns for tech names in signatures
+                const namePatterns = [
+                    /(?:thanks|regards|sincerely)[,:\s]*\n?\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/gi,
+                    /\n\s*([A-Z][a-z]+\s+[A-Z][a-z]+)\s*\n/g, // Name on its own line
+                    /^([A-Z][a-z]+\s+[A-Z][a-z]+)\s*$/gm // Name at end/start of lines
+                ];
+                
+                for (const pattern of namePatterns) {
+                    const matches = [...text.matchAll(pattern)];
+                    if (matches.length > 0) {
+                        const name = matches[0][1].trim();
+                        console.log('Tech name found:', name);
+                        return name;
+                    }
+                }
+                return null;
+            },
+
+            // Classify email type based on content
+            classifyEmail(text) {
+                const lowerText = text.toLowerCase();
+                let bestMatch = { type: 'General Inquiry', confidence: 0 };
+                
+                for (const [type, config] of Object.entries(this.emailTypes)) {
+                    let matches = 0;
+                    for (const pattern of config.patterns) {
+                        const found = lowerText.match(pattern);
+                        if (found) {
+                            matches += found.length;
+                        }
+                    }
+                    
+                    if (matches > bestMatch.confidence) {
+                        bestMatch = { type, confidence: matches, template: config.template };
+                    }
+                }
+                
+                return bestMatch;
+            },
+
+            // Get time-based greeting
+            getTimeBasedGreeting() {
+                const hour = new Date().getHours();
+                if (hour >= 8 && hour < 12) return 'morning';
+                if (hour >= 12 && hour < 16) return 'afternoon';
+                return 'evening';
+            },
+
+            // Generate response based on email type and extracted data
+            generateResponse(emailData) {
+                const greeting = this.getTimeBasedGreeting();
+                // Extract first name from full name
+                const firstName = emailData.techName ? emailData.techName.split(' ')[0] : 'there';
+                
+                let response = `Good ${greeting} ${firstName}!\n\nThank you for contacting Walmart Digital Assets!\n\n`;
+                
+                // Add template-specific response
+                switch (emailData.emailType.template) {
+                    case 'defrost':
+                        const caseNumber = emailData.caseNumber || '[CASE NUMBER]';
+                        response += `The defrost you have requested for store ${emailData.storeNumber || '[STORE NUMBER]'},${caseNumber} has been completed. Please see screenshot below:`;
+                        break;
+                        
+                    case 'pdr':
+                        response += `The request you have made is outside of the Walmart Parameters and requires a Parameter Deviation Request (PDR). Your request has been submitted. A member of our team will reach out to you as soon as your request has been reviewed and is approved or denied.`;
+                        break;
+                        
+                    case 'pcr':
+                        response += `The request you have made requires a Point Change Request. Your request has been submitted.\nA member of our team will reach out as soon as your request has been completed.`;
+                        break;
+                        
+                    case 'escalation':
+                        response += `The request you have made requires a Digital Assets Escalation. Your request has been escalated. Your work order number is: ${emailData.workOrder || '[WORK ORDER]'}`;
+                        break;
+                        
+                    case 'mastermind':
+                        response += `Master Mind Report Notes Show:\n\nPlease Email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site date and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri`;
+                        break;
+                        
+                    default:
+                        if (emailData.workOrder) {
+                            response += `I have received your request regarding store ${emailData.storeNumber || '[STORE NUMBER]'}. This has been logged under work order ${emailData.workOrder}. I will review your request and provide an update shortly.`;
+                        } else {
+                            response += `The request you have made requires more information. Please provide the best contact number for reaching you.\nA member of our team will reach out via phone as soon as possible.`;
+                        }
+                        break;
+                }
+                
+                return response;
+            }
+        };
+
+        // Email processing functions
+        function processEmail() {
+            const emailInput = document.getElementById('email-input');
+            const emailText = emailInput.value.trim();
+            
+            if (!emailText) {
+                showNotification('❌ Please paste email content first', 'error', 3000);
+                return;
+            }
+            
+            showNotification('🔍 Processing email...', 'info', 2000);
+            
+            // Extract information
+            const emailData = {
+                workOrder: EMAIL_PROCESSOR.extractWorkOrder(emailText),
+                storeNumber: EMAIL_PROCESSOR.extractStoreNumber(emailText),
+                caseNumber: EMAIL_PROCESSOR.extractCaseNumber(emailText),
+                techName: EMAIL_PROCESSOR.extractTechName(emailText),
+                emailType: EMAIL_PROCESSOR.classifyEmail(emailText),
+                rawContent: emailText
+            };
+            
+            // Generate response
+            emailData.response = EMAIL_PROCESSOR.generateResponse(emailData);
+            
+            // Display results
+            displayEmailAnalysis(emailData);
+            
+            // Auto-populate main form if work order detected
+            if (emailData.workOrder) {
+                populateMainForm(emailData);
+            }
+        }
+
+        function displayEmailAnalysis(emailData) {
+            const analysisDiv = document.getElementById('email-analysis');
+            const extractedInfoDiv = document.getElementById('extracted-info');
+            const responseTextarea = document.getElementById('generated-response');
+            
+            // Build extracted info display
+            let infoHTML = '';
+            
+            if (emailData.workOrder) {
+                infoHTML += `<div class="info-item">
+                    <span class="info-label">Work Order:</span>
+                    <span class="info-value highlight">${emailData.workOrder}</span>
+                </div>`;
+            }
+            
+            if (emailData.storeNumber) {
+                infoHTML += `<div class="info-item">
+                    <span class="info-label">Store:</span>
+                    <span class="info-value highlight">${emailData.storeNumber}</span>
+                </div>`;
+            }
+            
+            if (emailData.caseNumber) {
+                infoHTML += `<div class="info-item">
+                    <span class="info-label">Case:</span>
+                    <span class="info-value highlight">${emailData.caseNumber}</span>
+                </div>`;
+            }
+            
+            if (emailData.techName) {
+                infoHTML += `<div class="info-item">
+                    <span class="info-label">Tech Name:</span>
+                    <span class="info-value">${emailData.techName}</span>
+                </div>`;
+            }
+            
+            infoHTML += `<div class="info-item">
+                <span class="info-label">Email Type:</span>
+                <span class="info-value">
+                    <span class="email-type-badge">${emailData.emailType.type}</span>
+                    ${emailData.emailType.confidence > 1 ? `(${emailData.emailType.confidence} matches)` : ''}
+                </span>
+            </div>`;
+            
+            // Notes are ALWAYS needed when work order is present
+            if (emailData.workOrder) {
+                infoHTML += `<div class="info-item">
+                    <span class="info-label">Notes Needed:</span>
+                    <span class="info-value highlight">Yes - Work Order ${emailData.workOrder} detected</span>
+                </div>`;
+            } else {
+                infoHTML += `<div class="info-item">
+                    <span class="info-label">Notes Needed:</span>
+                    <span class="info-value">No - Template response only</span>
+                </div>`;
+            }
+            
+            extractedInfoDiv.innerHTML = infoHTML;
+            responseTextarea.value = emailData.response;
+            analysisDiv.style.display = 'block';
+            
+            showNotification('✅ Email processed successfully!', 'success', 3000);
+        }
+
+        function populateMainForm(emailData) {
+            // Switch to Quick Notes tab
+            switchTab('quick-notes');
+            
+            // Populate form fields
+            if (emailData.workOrder) {
+                document.getElementById('work-order').value = emailData.workOrder;
+            }
+            
+            if (emailData.storeNumber) {
+                document.getElementById('store-number').value = emailData.storeNumber;
+            }
+            
+            if (emailData.techName) {
+                document.getElementById('tech-name').value = emailData.techName;
+            }
+            
+            // Show notification
+            showNotification(`📝 Work order ${emailData.workOrder} detected - Form populated. Please add your notes!`, 'info', 5000);
+            
+            // Focus on notes field
+            setTimeout(() => {
+                const notesField = document.getElementById('notes');
+                if (notesField) {
+                    notesField.focus();
+                }
+            }, 500);
+        }
+
+        function copyEmailResponse() {
+            const responseTextarea = document.getElementById('generated-response');
+            const responseText = responseTextarea.value;
+            
+            if (!responseText) {
+                showNotification('❌ No response to copy', 'error', 2000);
+                return;
+            }
+            
+            navigator.clipboard.writeText(responseText).then(() => {
+                showNotification('📋 Email response copied to clipboard!', 'success', 3000);
+            }).catch(() => {
+                showNotification('❌ Failed to copy response', 'error', 3000);
+            });
+        }
+
+        function editResponse() {
+            const responseTextarea = document.getElementById('generated-response');
+            responseTextarea.readOnly = false;
+            responseTextarea.style.backgroundColor = '#fff3cd';
+            responseTextarea.focus();
+            
+            showNotification('✏️ Response is now editable', 'info', 2000);
+        }
+
+        function clearEmailProcessor() {
+            document.getElementById('email-input').value = '';
+            document.getElementById('email-analysis').style.display = 'none';
+            document.getElementById('generated-response').readOnly = true;
+            document.getElementById('generated-response').style.backgroundColor = '';
+            
+            showNotification('🗑️ Email processor cleared', 'success', 2000);
         }
 
         // Enhanced Quick Notes to auto-reset timer

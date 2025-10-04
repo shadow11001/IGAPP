@@ -4,12 +4,34 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 
 ## 🌟 Features
 
+### 📑 Tab-Based Interface
+- **Three-tab system** - Quick Notes, QA Checklist, and Email Processing
+- **Smooth transitions** - CSS-based tab switching with visual feedback
+- **Independent workflows** - Each tab maintains its own state and functionality
+- **Responsive design** - Tabs adapt to screen size and device type
+
 ### 🎯 Quick Notes System
 - **AutoHotkey-style quick buttons** organized by category for rapid note entry
 - **Smart categorization** - System Login, Diagnostics, Actions, Downloads, Call Status, and Recommendations
 - **Circuit-specific controls** - Updated Defrost button prompts for "Enter circuit:"
 - **RTU/AHU management** - RTU Setpoint button with specialized prompts for RTU/AHU units
 - **Equipment replacement** - Updated examples including RIM board replacements
+- **New utility buttons** - Shutdown Circuit, Check Breakers, Advisory, and enhanced functionality
+
+### ✅ QA Checklist System
+- **Customizable agent names** - Save and recall your name for consistent identification
+- **Comprehensive checklist** - 10-item quality assurance checklist for call validation
+- **Persistent state** - Checklist progress saved automatically across sessions
+- **Visual indicators** - Clear checkmarks and progress tracking
+- **Professional standards** - Covers greeting, verification, troubleshooting, resolution, and closing
+
+### 📧 Email Processing System
+- **Intelligent email parsing** - Automatically extracts work orders, store numbers, case numbers, and tech names
+- **Template-based responses** - Pre-built templates for defrost, PDR, PCR, escalation, and general responses
+- **Time-based greetings** - Automatic morning/afternoon/evening greetings based on current time
+- **Work order detection** - Recognizes 9-digit work order patterns and auto-populates main form
+- **Smart form integration** - Seamlessly transfers parsed data to the main Quick Notes form
+- **Response management** - Copy to clipboard or edit responses before sending
 
 ### ⏱️ Dead Air Timer & Audio Detection
 - **Automatic dead air monitoring** with visual warnings at 25+ seconds
@@ -65,22 +87,65 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 ## 📖 Usage Guide
 
 ### Basic Workflow
-1. **Use Quick Notes buttons** on the left for rapid note entry
-2. **Monitor the dead air timer** in the top-right during calls
-3. **Fill in technician information** (Name, Store Number, Work Order)
-4. **Select a DAE template** if applicable for escalations
-5. **Add your call notes** using quick buttons and manual entry
-6. **Review tag recommendations** and select relevant ones
-7. **Copy notes** to clipboard when ready
-8. **Data is automatically saved** to history
+1. **Choose your tab** - Quick Notes for call documentation, QA Checklist for quality assurance, Email Processing for automated responses
+2. **Use Quick Notes buttons** on the left for rapid note entry
+3. **Monitor the dead air timer** in the top-right during calls
+4. **Fill in technician information** (Name, Store Number, Work Order)
+5. **Select a DAE template** if applicable for escalations
+6. **Add your call notes** using quick buttons and manual entry
+7. **Review tag recommendations** and select relevant ones
+8. **Copy notes** to clipboard when ready
+9. **Data is automatically saved** to history
+
+### Tab System Usage
+
+#### Quick Notes Tab
+- **Primary call documentation** interface with all quick buttons
+- **Note templates** and smart tag recommendations
+- **Auto-save functionality** and history management
+- **Dead air timer** and audio detection features
+
+#### QA Checklist Tab
+- **Set your agent name** - Click "Set Name" to customize identification
+- **Work through checklist** - 10 quality standards for professional calls
+- **Track progress** - Visual indicators show completion status
+- **Persistent state** - Progress saved automatically between sessions
+
+#### Email Processing Tab
+- **Paste email content** into the large text area
+- **Click "Process Email"** to analyze and generate response
+- **Review parsed information** - Work orders, store numbers, case numbers, tech names
+- **Use generated response** - Copy to clipboard or edit as needed
+- **Auto-form population** - Parsed work orders automatically fill main form
+
+### Email Processing Features
+- **Work Order Detection** - Recognizes 9-digit patterns (e.g., 123456789)
+- **Store Number Extraction** - Finds 1-4 digit store numbers
+- **Case Number Parsing** - Identifies patterns like A2, B1, C3, etc.
+- **Tech Name Recognition** - Extracts technician names from email signatures
+- **Email Classification** - Automatically categorizes email types (defrost, PDR, PCR, escalation)
+- **Template Selection** - Chooses appropriate response template based on content
+- **Time-Aware Greetings** - Morning (before 12 PM), Afternoon (12-5 PM), Evening (after 5 PM)
+
+### QA Checklist Items
+1. **Professional greeting** - Used appropriate greeting and identified myself
+2. **Customer verification** - Verified customer identity and store information
+3. **Issue understanding** - Listened actively and understood the issue completely
+4. **Troubleshooting steps** - Followed proper diagnostic procedures
+5. **Clear communication** - Explained steps and findings clearly
+6. **Resolution confirmation** - Confirmed issue was resolved to customer satisfaction
+7. **Documentation** - Properly documented all actions and findings
+8. **Professional closing** - Thanked customer and offered additional assistance
+9. **Follow-up planning** - Scheduled appropriate follow-up if needed
+10. **Call wrap-up** - Completed all required post-call documentation
 
 ### Quick Notes Categories
 - **System Login** - Novar, Opus Arch, Opus Mag, CPC, AKA65, Storeview
 - **Diagnostics** - Comms, Temps, Alarms, Clocks, Ping, Test
 - **Ping Results** - Good Ping (green), Ping Timeout (red)
-- **Actions** - Defrost (circuit-specific), Force On/Off, RTU Setpoint, Reset Clocks
+- **Actions** - Defrost (circuit-specific), Force On/Off, RTU Setpoint, Reset Clocks, Shutdown Circuit, Check Breakers
 - **Downloads** - Version, Load Change, Comms+LC, Main+LC, Full DL
-- **Call Status** - All Good, No Good, Tech T/S, Call Done, Escalate
+- **Call Status** - All Good, No Good, Tech T/S, Call Done, Escalate, Advisory
 - **Special Cases** - Call Dropped, NSRM, Power Cycle
 - **Recommendations** - Monitor, Contact, Replace (including RIM board)
 
@@ -157,12 +222,16 @@ IGAPP/
 - **Infraction tracking** - Maintains total infraction count across sessions
 - **Selected tags** - Remembers tag selections for current session
 - **GitHub token** - Securely stores encrypted authentication token
+- **QA checklist state** - Saves completion status and agent name preferences
+- **Tab preferences** - Remembers last active tab selection
 
 ### Data Privacy
 - **No external servers** - All data stays in your browser
-- **No tracking** - No analytics or user tracking
+- **No tracking** - No analytics or user tracking  
 - **Local only** - Data never leaves your device
 - **Encrypted tokens** - GitHub tokens are obfuscated using XOR encryption
+- **QA checklist persistence** - Checklist state and agent names stored locally
+- **Email processing** - All email parsing and analysis happens locally
 
 ## 🛠️ Advanced Features
 
@@ -316,37 +385,191 @@ IGAPP/
 - **Clipboard API**: Required for seamless copy operations
 - **TextDecoder API**: Required for proper UTF-8 handling in updates
 
-## 📋 Changelog
+## 📋 Detailed Changelog
 
-### Version 1.0.5 - Latest Release
-- ✅ **UTF-8 encoding fixes** - Proper character preservation during updates
-- ✅ **Enhanced Quick Notes** - Circuit-specific defrost prompts
-- ✅ **RTU Setpoint improvements** - Updated to RTU/AHU with new examples (RTU 1, AHU 2, RG3, RE4)
-- ✅ **Equipment replacement updates** - RIM board examples in replace function
-- ✅ **Private repository support** - Bearer token authentication for GitHub API
-- ✅ **Improved error handling** - Better debugging and fallback mechanisms
-- ✅ **Variable scope fixes** - Resolved update mechanism issues
+### Version 1.1.0 - Major Feature Release (October 2025)
 
-### Previous Major Features
-- ✅ Enhanced accessibility with ARIA labels
-- ✅ Auto-save functionality with duplicate prevention
-- ✅ Dead air timer with microphone detection
-- ✅ Smart tag recommendation system
-- ✅ Infraction tracking with session/total counters
-- ✅ Auto-update system with GitHub integration
-- ✅ Stacked notification system
-- ✅ Mobile-responsive design improvements
-- ✅ Keyboard navigation enhancements
-- ✅ Visual feedback system with toast notifications
-- ✅ Input validation for store numbers
-- ✅ Loading indicators for async operations
+#### 🎯 Tab-Based Interface System
+- **Complete UI restructure** - Implemented three-tab navigation system replacing single-page layout
+- **Tab components**: Quick Notes (primary documentation), QA Checklist (quality assurance), Email Processing (automation)
+- **CSS transitions** - Smooth tab switching with fade effects and visual feedback
+- **State persistence** - Each tab maintains independent state and data
+- **Responsive adaptation** - Tabs stack on mobile devices, full width on desktop
+- **Navigation memory** - System remembers last active tab across sessions
 
-### Recent Fixes
-- 🔧 **Character encoding corruption** - Fixed emoji/icon preservation during updates
-- 🔧 **GitHub API authentication** - Updated to Bearer token standard
-- 🔧 **Scope resolution** - Fixed remoteContent variable accessibility
-- 🔧 **Update mechanism** - Enhanced UTF-8 decoding using TextDecoder API
-- 🔧 **Button prompt updates** - More accurate terminology for equipment types
+#### ✅ QA Checklist Management System
+- **10-item professional checklist** - Comprehensive quality standards covering entire call lifecycle
+- **Agent name customization** - Personalized identification with "Set Name" functionality
+- **Persistent state tracking** - Checklist progress automatically saved using localStorage
+- **Visual progress indicators** - Real-time checkmarks and completion status
+- **Professional standards coverage**:
+  - Greeting and identification protocols
+  - Customer verification procedures
+  - Active listening and issue comprehension
+  - Systematic troubleshooting methodology
+  - Clear communication standards
+  - Resolution confirmation processes
+  - Documentation requirements
+  - Professional closing procedures
+  - Follow-up planning protocols
+  - Post-call wrap-up completion
+
+#### 📧 Email Processing Engine
+- **Intelligent email parsing system** - Advanced regex-based content analysis
+- **Multi-pattern work order detection** - Recognizes 9-digit work order formats with high accuracy
+- **Store number extraction** - Identifies 1-4 digit store numbers in various email contexts
+- **Case number parsing** - Detects alphanumeric patterns (A2, B1, C3, etc.) for case tracking
+- **Tech name recognition** - Extracts technician names from email signatures and "Thanks," patterns
+- **Email classification engine** - Automatically categorizes emails into defrost, PDR, PCR, escalation types
+- **Template response system** - Pre-built professional responses for each email category
+- **Time-aware greetings** - Dynamic greeting generation based on current time (morning/afternoon/evening)
+- **Smart form integration** - Automatic population of main Quick Notes form with parsed data
+- **Response management** - Copy to clipboard functionality with edit-before-send options
+
+#### 🎯 Enhanced Quick Notes System
+- **New utility buttons** added to Actions category:
+  - **Shutdown Circuit** - Prompts for specific circuit identification
+  - **Check Breakers** - Standardized breaker inspection protocol
+  - **Advisory** - Professional advisory communication template
+- **Improved button organization** - Better categorization and visual grouping
+- **Enhanced functionality** - More detailed prompts and context-aware responses
+
+#### 🔧 Technical Infrastructure Improvements
+- **Advanced regex patterns** - Multiple pattern matching using `matchAll()` for improved accuracy
+- **Error handling enhancement** - Comprehensive try-catch blocks with detailed logging
+- **Memory management** - Efficient localStorage usage with automatic cleanup
+- **Performance optimization** - Reduced DOM manipulation and improved rendering
+- **Code organization** - Modular EMAIL_PROCESSOR object with dedicated methods
+- **Debugging capabilities** - Console logging for development and troubleshooting
+
+#### 🛠️ Bug Fixes and Refinements
+- **Work order detection accuracy** - Fixed false positives and improved pattern matching
+- **Tech name extraction reliability** - Enhanced detection from various email signature formats
+- **Case number parsing consistency** - Standardized pattern recognition across different case formats
+- **Form auto-population logic** - Seamless data transfer between email processing and main form
+- **Notes requirement handling** - Proper logic for when notes are required vs template-only responses
+- **Cross-tab data synchronization** - Ensuring data consistency across tab switches
+
+### Version 1.0.8 - Stability and Enhancement Release
+- **UTF-8 encoding preservation** - Fixed character corruption during auto-updates
+- **Circuit-specific defrost prompts** - Enhanced user experience with targeted input requests
+- **RTU/AHU terminology updates** - More accurate equipment type references (RTU 1, AHU 2, RG3, RE4)
+- **RIM board replacement examples** - Updated equipment replacement scenarios
+- **GitHub API modernization** - Bearer token authentication for secure private repository access
+- **Error handling improvements** - Better debugging capabilities and graceful failure handling
+- **Variable scope resolution** - Fixed remoteContent accessibility issues in update mechanism
+
+### Version 1.0.7 - Foundation and Core Features
+- **Enhanced accessibility implementation** - Complete ARIA labels and screen reader support
+- **Auto-save system introduction** - 30-second interval automatic form data preservation
+- **Duplicate prevention algorithm** - Intelligent filtering to prevent redundant history entries
+- **Dead air timer integration** - Real-time microphone monitoring with Web Audio API
+- **Smart tag recommendation engine** - AI-powered content analysis for relevant tag suggestions
+- **Infraction tracking system** - Session and total counters for dead air violations
+- **GitHub integration framework** - Automated update system with repository connectivity
+- **Notification system overhaul** - Stacked notifications with proper z-index management
+- **Mobile responsiveness improvements** - Touch-friendly interface optimization
+- **Keyboard navigation enhancement** - Complete accessibility for keyboard-only users
+- **Visual feedback system** - Toast notifications and loading indicators
+- **Store number input validation** - Real-time validation with immediate feedback
+- **Async operation indicators** - Loading states for all background processes
+
+### Version 1.0.6 - Performance and Polish
+- **Template system expansion** - 16 comprehensive DAE templates for common scenarios
+- **Copy functionality enhancement** - Improved clipboard API integration
+- **Theme persistence** - Reliable light/dark mode state management
+- **Mobile layout optimization** - Better responsive design for tablet and phone usage
+- **History management** - 7-day retention with automatic cleanup
+- **Tag selection memory** - Session-based tag state persistence
+- **Input handling improvements** - Better form validation and error messaging
+- **Performance optimization** - Reduced DOM manipulation and improved rendering speed
+
+### Version 1.0.5 - Encoding and Compatibility
+- **UTF-8 character preservation** - Fixed emoji and special character corruption during updates
+- **Cross-browser compatibility** - Enhanced support for Safari, Firefox, and Edge
+- **Local storage optimization** - More efficient data structure and storage patterns
+- **Update mechanism reliability** - Improved GitHub API integration with better error handling
+- **User experience polish** - Smoother animations and transitions
+- **Security enhancements** - XOR encryption for stored authentication tokens
+
+### Version 1.0.4 - Quick Notes Enhancement
+- **Button categorization** - Organized quick notes into logical groups (System, Diagnostics, Actions, etc.)
+- **Circuit-specific controls** - Enhanced defrost button with circuit prompts
+- **Equipment type accuracy** - Updated RTU/AHU terminology and examples
+- **Replacement scenarios** - Added RIM board and other component replacement workflows
+- **User interaction improvements** - Better prompts and confirmation dialogs
+- **Visual hierarchy** - Improved button layout and grouping
+
+### Version 1.0.3 - Audio Detection Foundation
+- **Web Audio API integration** - Real-time microphone input analysis
+- **Voice activity detection** - Automatic dead air timer reset when speaking
+- **Call detection system** - Automatic timer activation during phone calls
+- **Manual override controls** - "I Spoke" button and auto-start toggle
+- **Threshold configuration** - Customizable dead air warning and violation timers
+- **Visual warning system** - Color-coded timer states (normal, warning, violation)
+
+### Version 1.0.2 - Data Management
+- **localStorage implementation** - Browser-based data persistence
+- **History tracking** - Comprehensive call note history with timestamps
+- **Data export functionality** - Usage analytics and note export capabilities
+- **Cleanup automation** - Automatic removal of old entries
+- **Privacy protection** - Local-only data storage with no external transmission
+- **Backup and restore** - Manual data export for backup purposes
+
+### Version 1.0.1 - Core Infrastructure
+- **Single-file architecture** - Self-contained HTML application
+- **Font Awesome integration** - Icon system and theme toggle functionality
+- **Basic form structure** - Technician information and note fields
+- **Theme system foundation** - Light/dark mode toggle with F2 shortcut
+- **Responsive layout** - Mobile-first design approach
+- **Basic validation** - Input field validation and error handling
+
+### Version 1.0.0 - Initial Release
+- **Basic quick notes system** - Fundamental button-based note entry
+- **Simple form interface** - Technician name, store number, work order fields
+- **Note copying functionality** - Basic clipboard integration
+- **Theme toggle** - Initial light/dark mode implementation
+- **Mobile compatibility** - Basic responsive design
+- **Local storage** - Simple preference persistence
+
+### Recent Fixes and Refinements
+
+#### Email Processing System Fixes (v1.1.0)
+- **🔧 Work order regex accuracy** - Enhanced pattern matching from single `match()` to `matchAll()` for comprehensive detection
+- **🔧 Tech name extraction reliability** - Improved detection algorithm to handle various signature formats including "Thanks," patterns
+- **🔧 Case number parsing completeness** - Added comprehensive regex for alphanumeric case patterns (A1-Z9 format variations)
+- **🔧 Form auto-population seamless integration** - Fixed data transfer between email processing and main Quick Notes form
+- **🔧 Response template logic enhancement** - Improved email classification accuracy for better template selection
+- **🔧 Notes requirement conditional logic** - Refined logic for determining when notes are required vs template-only responses
+- **🔧 Error handling robustness** - Added comprehensive try-catch blocks with detailed console logging for debugging
+
+#### Core System Stability Fixes (v1.0.8)
+- **🔧 Character encoding corruption resolution** - Fixed UTF-8 preservation during auto-update process using TextDecoder API
+- **🔧 GitHub API authentication modernization** - Updated from deprecated token format to Bearer token standard
+- **🔧 Variable scope accessibility** - Resolved remoteContent variable access issues in update mechanism
+- **🔧 Update mechanism UTF-8 enhancement** - Implemented proper character encoding handling for international characters
+- **🔧 Button prompt terminology accuracy** - Updated equipment type references for better user clarity
+
+#### User Interface Polish (v1.0.7)
+- **🔧 Mobile layout responsive fixes** - Improved touch target sizes and layout adaptation
+- **🔧 Theme persistence reliability** - Fixed occasional theme reset issues on page reload
+- **🔧 Clipboard API fallback handling** - Added graceful degradation for older browsers
+- **🔧 Notification z-index management** - Fixed stacking issues with multiple simultaneous notifications
+- **🔧 Focus management accessibility** - Improved keyboard navigation focus indicators
+
+#### Performance and Optimization (v1.0.6)
+- **🔧 DOM manipulation efficiency** - Reduced unnecessary re-renders and improved performance
+- **🔧 Memory leak prevention** - Proper cleanup of event listeners and timers
+- **🔧 Storage quota management** - Intelligent cleanup to prevent localStorage overflow
+- **🔧 Async operation handling** - Improved error handling for network requests and audio processing
+- **🔧 CSS animation optimization** - Smoother transitions with hardware acceleration
+
+#### Audio System Refinements (v1.0.5)
+- **🔧 Microphone permission handling** - Better user guidance for browser permission requests
+- **🔧 Voice detection sensitivity** - Improved algorithm for distinguishing speech from background noise
+- **🔧 Call detection reliability** - Enhanced audio level analysis for automatic timer activation
+- **🔧 Cross-browser audio compatibility** - Fixed Web Audio API implementation differences across browsers
+- **🔧 Timer accuracy improvements** - More precise timing calculations and visual updates
 
 ## 📄 License & Credits
 
