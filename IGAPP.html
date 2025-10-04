@@ -1312,11 +1312,15 @@
             <div class="button-group">
                 <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn" title="Communications Check">Comms ✓</button>
                 <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn" title="Communications Loss">Comms ✗</button>
+                <button onclick="addQuickNote('Still in comm loss.')" class="quick-note-btn error-quick" title="Communication Loss Status">Comm Loss</button>
                 <button onclick="addQuickNote('Checked temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
                 <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
                 <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn" title="Clock Check">Clocks</button>
+                <button onclick="addQuickNote('Checked settings.')" class="quick-note-btn" title="Settings Check">Settings</button>
                 <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn" title="Ping Test">Ping</button>
                 <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Test</button>
+                <button onclick="addQuickNote('Tested fans.')" class="quick-note-btn" title="Fan Test">Test Fans</button>
+                <button onclick="addQuickNote('Tested case.')" class="quick-note-btn" title="Case Test">Test Case</button>
             </div>
 
             <h4>Ping Results</h4>
@@ -1333,6 +1337,8 @@
                 <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
                 <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
                 <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
+                <button onclick="addQuickNoteWithInput('Forced OAT to ', 'Enter temperature (e.g., 80 degrees):')" class="quick-note-btn" title="Force Outside Air Temperature">Force OAT</button>
+                <button onclick="addQuickNoteWithInput('Shutdown ', 'Enter circuit/equipment:')" class="quick-note-btn" title="Shutdown Equipment">Shutdown</button>
                 <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">RTU Setpoint</button>
                 <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
             </div>
