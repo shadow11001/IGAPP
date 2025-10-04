@@ -2777,6 +2777,40 @@ ${JSON.stringify(exportData, null, 2)}
                     localStorageData: foundDataSummary,
                     notesDataSource: notesDataSource,
                     dataSource: buttonClickData ? 'button_tracking' : (savedNotes.length > 0 ? 'note_analysis' : 'no_data')
+                },
+                // Include anonymized notes data for analysis
+                rawNotesData: savedNotes.map((note, index) => ({
+                    id: `note_${index + 1}`,
+                    date: note.date || 'unknown',
+                    noteLength: note.notes ? note.notes.length : 0,
+                    wordCount: note.notes ? note.notes.split(' ').length : 0,
+                    hasDAE: !!(note.dae && note.dae.length > 0),
+                    hasTechName: !!(note.techName && note.techName.length > 0),
+                    hasStoreNumber: !!(note.storeNumber && note.storeNumber.length > 0),
+                    hasWorkOrder: !!(note.workOrder && note.workOrder.length > 0),
+                    tags: note.tags || [],
+                    // Include actual note content for analysis
+                    notesContent: note.notes || '',
+                    daeContent: note.dae || '',
+                    techName: note.techName || '',
+                    storeNumber: note.storeNumber || '',
+                    workOrder: note.workOrder || ''
+                })),
+                // Summary of raw data
+                rawDataSummary: {
+                    totalNotes: savedNotes.length,
+                    totalCharacters: savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.length : 0), 0),
+                    totalWords: savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.split(' ').length : 0), 0),
+                    notesWithContent: savedNotes.filter(note => note.notes && note.notes.trim().length > 0).length,
+                    notesWithDAE: savedNotes.filter(note => note.dae && note.dae.length > 0).length,
+                    dateRange: {
+                        earliest: savedNotes.length > 0 ? savedNotes.reduce((earliest, note) => 
+                            note.date && note.date < earliest ? note.date : earliest, 
+                            savedNotes[0]?.date || 'unknown') : 'none',
+                        latest: savedNotes.length > 0 ? savedNotes.reduce((latest, note) => 
+                            note.date && note.date > latest ? note.date : latest, 
+                            savedNotes[0]?.date || 'unknown') : 'none'
+                    }
                 }
             };
             
@@ -2905,7 +2939,16 @@ ${reportData.buttonSuggestions.length > 0 ?
     'No new button suggestions this period (requires more usage data)'
 }
 
-### 🔍 Raw Analytics Data
+### � Raw Notes Analysis Summary
+${reportData.rawDataSummary ? `
+- **Total Notes with Content:** ${reportData.rawDataSummary.notesWithContent}/${reportData.rawDataSummary.totalNotes}
+- **Total Characters:** ${reportData.rawDataSummary.totalCharacters.toLocaleString()}
+- **Total Words:** ${reportData.rawDataSummary.totalWords.toLocaleString()}
+- **Notes with DAE:** ${reportData.rawDataSummary.notesWithDAE}
+- **Date Range:** ${reportData.rawDataSummary.dateRange.earliest} to ${reportData.rawDataSummary.dateRange.latest}
+` : 'No raw notes data available'}
+
+### �🔍 Raw Analytics Data
 <details>
 <summary>Click to expand raw data</summary>
 
@@ -2913,6 +2956,17 @@ ${reportData.buttonSuggestions.length > 0 ?
 ${JSON.stringify(reportData, null, 2)}
 \`\`\`
 </details>
+
+### 📝 Sample Notes Content (First 10 Notes)
+${reportData.rawNotesData && reportData.rawNotesData.length > 0 ? 
+    reportData.rawNotesData.slice(0, 10).map((note, index) => `
+**Note ${index + 1}** (${note.date})
+- Store: ${note.storeNumber || 'N/A'} | WO: ${note.workOrder || 'N/A'} | Tech: ${note.techName || 'N/A'}
+- Content: ${note.notesContent.substring(0, 200)}${note.notesContent.length > 200 ? '...' : ''}
+- DAE: ${note.daeContent.substring(0, 100)}${note.daeContent.length > 100 ? '...' : note.daeContent || 'None'}
+`).join('\n') :
+'No notes content available'
+}
 
 ---
 *This is an automated analytics report to help improve the Quick Notes system based on real usage patterns.*
