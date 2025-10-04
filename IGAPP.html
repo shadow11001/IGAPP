@@ -2814,7 +2814,27 @@ ${JSON.stringify(exportData, null, 2)}
                 }
             };
             
+            // Add full notes data for sub-issue creation
+            reportData.fullNotesData = savedNotes.map((note, index) => ({
+                id: `note_${index + 1}`,
+                date: note.date || 'unknown',
+                noteLength: note.notes ? note.notes.length : 0,
+                wordCount: note.notes ? note.notes.split(' ').length : 0,
+                hasDAE: !!(note.dae && note.dae.length > 0),
+                hasTechName: !!(note.techName && note.techName.length > 0),
+                hasStoreNumber: !!(note.storeNumber && note.storeNumber.length > 0),
+                hasWorkOrder: !!(note.workOrder && note.workOrder.length > 0),
+                tags: note.tags || [],
+                // Include full note content for sub-issues
+                fullContent: note.notes || '',
+                fullDAE: note.dae || '',
+                techName: note.techName || '',
+                storeNumber: note.storeNumber || '',
+                workOrder: note.workOrder || ''
+            }));
+            
             console.log('📊 Generated report data:', reportData);
+            console.log(`📊 Full notes data created: ${reportData.fullNotesData.length} notes`);
             return reportData;
         }
         
@@ -3009,18 +3029,43 @@ The complete untruncated dataset with all ${reportData.rawDataSummary?.totalNote
             
             // Step 2: Submit full notes data as sub-issues
             try {
+                console.log('📊 Starting sub-issue creation process...');
+                console.log('Full notes data:', reportData.fullNotesData?.length || 0, 'notes');
+                
                 await submitFullNotesAsSubIssues(issueNumber, reportData.fullNotesData, reportData.reportDate, reportData.userHash);
                 console.log(`📊 Full notes data submitted as sub-issues linked to main issue #${issueNumber}`);
             } catch (subIssueError) {
-                console.warn('Failed to submit full notes as sub-issues:', subIssueError);
+                console.error('❌ Failed to submit full notes as sub-issues:', subIssueError);
+                console.error('Error details:', subIssueError.message);
+                showNotification(`❌ Sub-issues creation failed: ${subIssueError.message}`, 'error', 5000);
                 // Still save locally as backup
                 saveFullAnalyticsDataLocally(reportData);
             }
             
             console.log(`📊 Complete usage report submitted to GitHub issue #${issueNumber}`);
+            
+            // Add final status notification
+            showNotification(`✅ Analytics report #${issueNumber} created successfully`, 'success', 3000);
         }
         
         async function submitFullNotesAsSubIssues(parentIssueNumber, fullNotesData, reportDate, userHash) {
+            console.log('🔍 DEBUG: submitFullNotesAsSubIssues called with:', {
+                parentIssueNumber,
+                fullNotesDataLength: fullNotesData?.length || 0,
+                reportDate,
+                userHashLength: userHash?.length || 0
+            });
+            
+            // Validate GitHub credentials
+            if (!AppState.githubToken || !AppState.githubRepo) {
+                throw new Error('GitHub credentials not available for sub-issue creation');
+            }
+            
+            console.log('🔍 DEBUG: GitHub credentials check passed:', {
+                hasToken: !!AppState.githubToken,
+                repo: AppState.githubRepo
+            });
+            
             if (!fullNotesData || fullNotesData.length === 0) {
                 console.log('No full notes data to submit as sub-issues');
                 return;
@@ -3086,6 +3131,12 @@ ${note.fullDAE || 'No DAE content'}
 *This is part ${chunkIndex + 1} of ${chunks.length} data sub-issues for analytics report #${parentIssueNumber}*
                 `;
                 
+                console.log(`🔍 DEBUG: Creating sub-issue ${chunkIndex + 1}/${chunks.length}:`, {
+                    title: subIssueTitle,
+                    bodyLength: subIssueBody.length,
+                    notesRange: `${startNote}-${endNote}`
+                });
+                
                 const subIssueResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues`, {
                     method: 'POST',
                     headers: {
@@ -3101,8 +3152,15 @@ ${note.fullDAE || 'No DAE content'}
                     })
                 });
                 
+                console.log(`🔍 DEBUG: Sub-issue response status:`, subIssueResponse.status);
+                
                 if (!subIssueResponse.ok) {
                     const errorText = await subIssueResponse.text();
+                    console.error(`❌ Sub-issue creation failed:`, {
+                        status: subIssueResponse.status,
+                        error: errorText,
+                        chunkIndex: chunkIndex + 1
+                    });
                     throw new Error(`Failed to create sub-issue ${chunkIndex + 1}: ${subIssueResponse.status} - ${errorText}`);
                 }
                 
@@ -3124,6 +3182,12 @@ ${note.fullDAE || 'No DAE content'}
         }
         
         async function updateParentIssueWithSubIssueLinks(parentIssueNumber, subIssueNumbers, reportDate) {
+            console.log('🔍 DEBUG: Updating parent issue with sub-issue links:', {
+                parentIssueNumber,
+                subIssueNumbers,
+                reportDate
+            });
+            
             const linksSummary = `
 
 ---
@@ -3153,10 +3217,13 @@ ${subIssueNumbers.map((num, index) =>
                 })
             });
             
+            console.log('🔍 DEBUG: Parent issue comment response:', commentResponse.status);
+            
             if (commentResponse.ok) {
                 console.log(`📊 Added sub-issue links to parent issue #${parentIssueNumber}`);
             } else {
-                console.warn('Failed to add sub-issue links to parent issue');
+                const errorText = await commentResponse.text();
+                console.warn('Failed to add sub-issue links to parent issue:', errorText);
             }
         }
 
