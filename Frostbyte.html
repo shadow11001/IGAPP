@@ -3889,6 +3889,10 @@ ${JSON.stringify(exportData, null, 2)}
             }
             AppState.usageTracking.userHash = userHash;
             
+            // Initialize session start time for this session
+            AppState.usageTracking.sessionStart = Date.now();
+            localStorage.setItem('sessionStartTime', AppState.usageTracking.sessionStart.toString());
+            
             // Load existing button click data
             const savedClicks = localStorage.getItem('buttonClickAnalytics');
             if (savedClicks) {
@@ -3917,6 +3921,7 @@ ${JSON.stringify(exportData, null, 2)}
             }
             
             console.log('📊 Usage analytics initialized for:', userHash.substring(0, 8) + '...');
+            console.log('📊 Session started at:', new Date(AppState.usageTracking.sessionStart).toLocaleString());
         }
         
         function trackButtonClick(buttonName, category = 'general') {
@@ -3927,6 +3932,11 @@ ${JSON.stringify(exportData, null, 2)}
             
             // Save to localStorage immediately
             localStorage.setItem('buttonClickAnalytics', JSON.stringify(AppState.usageTracking.buttonClicks));
+            
+            // Update session start time to ensure accurate duration tracking
+            localStorage.setItem('sessionStartTime', AppState.usageTracking.sessionStart.toString());
+            
+            console.log('📊 Button tracked:', key, '- Total clicks:', AppState.usageTracking.buttonClicks[key]);
         }
         
         function trackNotePattern(noteText) {
@@ -4146,10 +4156,21 @@ ${JSON.stringify(exportData, null, 2)}
             // Analyze saved notes for common patterns (anonymized)
             const commonPhrases = savedNotes.length > 0 ? analyzeCommonPhrasesForButtonSuggestions(savedNotes) : [];
             
+            // Calculate session duration - use persisted sessionStart if available
+            const savedSessionStart = localStorage.getItem('sessionStartTime');
+            const sessionStartTime = savedSessionStart ? parseInt(savedSessionStart) : AppState.usageTracking.sessionStart;
+            const sessionDuration = Math.round((Date.now() - sessionStartTime) / 1000 / 60); // minutes
+            
+            console.log('📊 Session duration calculation:', {
+                sessionStartTime: new Date(sessionStartTime).toLocaleString(),
+                currentTime: new Date().toLocaleString(),
+                durationMinutes: sessionDuration
+            });
+            
             const reportData = {
                 userHash: AppState.usageTracking.userHash || 'unknown',
                 reportDate: new Date().toISOString().split('T')[0],
-                sessionDuration: Math.round((Date.now() - AppState.usageTracking.sessionStart) / 1000 / 60), // minutes
+                sessionDuration: sessionDuration,
                 version: AppState.currentVersion,
                 buttonUsage: buttonStats,
                 noteStatistics: noteStats,
