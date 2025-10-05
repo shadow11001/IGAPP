@@ -7418,8 +7418,20 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 notesTextarea.value = noteText;
             }
             
+            // Track button usage for analytics
+            trackButtonClick(noteText, 'quick-note');
+            trackNotePattern(notesTextarea.value);
+            
+            // Auto-reset dead air timer (indicates speaking)
+            if (AppState.timerRunning) {
+                resetTimer();
+            }
+            
             // Trigger auto-save
             scheduleAutoSave();
+            
+            // Update tag recommendations after adding note
+            analyzeNotesForTags();
             
             // Visual feedback
             showNotification(`Added: ${noteText}`, 'success', 2000);
