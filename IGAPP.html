@@ -5,8 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Walmart Digital Assets QA Checklist and Notes Application">
     <title>Walmart Digital Assets - QA Checklist</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
+        /* Fix Font Awesome font display issues */
+        .fa, .fas, .far, .fab, .fal, .fad, .fat {
+            font-display: swap !important;
+        }
+        
+        /* Suppress font warnings */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
         body {
             transition: background-color 0.3s, color 0.3s;
         }
@@ -2845,7 +2856,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.1.2', // Update this when you make changes
+            currentVersion: '1.1.3', // Update this when you make changes
             githubRepo: 'shadow11001/Frostbyte',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -3363,15 +3374,11 @@
 
         function decodeToken(maskedToken) {
             try {
-                console.log('Decoding token of length:', maskedToken.length);
                 const key = 42; // Same XOR key
                 const decoded = atob(maskedToken);
-                console.log('Base64 decoded length:', decoded.length);
                 const result = decoded.split('').map(char => 
                     String.fromCharCode(char.charCodeAt(0) ^ key)
                 ).join('');
-                console.log('XOR decoded result length:', result.length);
-                console.log('XOR decoded starts with:', result.substring(0, 4));
                 return result;
             } catch (error) {
                 console.error('Token decode failed:', error);
@@ -3382,20 +3389,14 @@
         function initializeGitHubToken() {
             // Try to decode the masked token first
             if (AppState.maskedToken && AppState.maskedToken !== 'Z2hwX0VYQU1QTEVfVE9LRU5fUkVQTEFDRV9NRQ==') {
-                console.log('Attempting to decode masked token...');
                 const decodedToken = decodeToken(AppState.maskedToken);
-                console.log('Decoded token length:', decodedToken ? decodedToken.length : 0);
-                console.log('Decoded token starts with:', decodedToken ? decodedToken.substring(0, 4) : 'null');
                 
                 if (decodedToken && decodedToken.length > 10) { // More flexible check
                     AppState.githubToken = decodedToken;
-                    console.log('✅ GitHub token loaded from masked token');
                     return;
                 } else {
                     console.error('❌ Failed to decode masked token or token is invalid');
                 }
-            } else {
-                console.log('No valid masked token found');
             }
             
             // Fall back to saved token in localStorage
@@ -3442,7 +3443,6 @@
             
             try {
                 console.log('Checking for updates...');
-                console.log('GitHub Token present:', !!AppState.githubToken);
                 console.log('GitHub Repo:', AppState.githubRepo);
                 showNotification('Checking for updates...', 'info');
                 
@@ -3471,14 +3471,11 @@
                     // Add authentication for private repo
                     if (AppState.githubToken) {
                         headers['Authorization'] = `Bearer ${AppState.githubToken}`;
-                        console.log('Added Bearer token to headers');
                     } else {
                         console.warn('No GitHub token available for private repo access');
                     }
                     
-                console.log(`Making fetch request for ${fileName} on ${branch} branch...`);
                 response = await fetch(apiUrl, { headers });
-                console.log(`Response status for ${fileName}:`, response.status);
                 
                 if (!response.ok) {
                     if (response.status === 404) {
@@ -3503,17 +3500,13 @@
                 
                 console.log(`✅ Found file: ${fileName} on ${branch} branch`);
                 
-                console.log('Parsing response...');
                 data = await response.json();
-                console.log('API Response data keys:', Object.keys(data));
-                console.log('Content encoding:', data.encoding);
                 
                 // Properly decode UTF-8 content from GitHub API
                 let remoteContent;
                 if (data.encoding === 'base64') {
                     // GitHub returns base64-encoded content
                     const base64Content = data.content.replace(/\s/g, '');
-                    console.log('Base64 content length:', base64Content.length);
                     
                     try {
                         // Use proper UTF-8 decoding instead of atob
@@ -3523,8 +3516,6 @@
                             bytes[i] = binaryString.charCodeAt(i);
                         }
                         remoteContent = new TextDecoder('utf-8').decode(bytes);
-                        console.log('UTF-8 decoded content length:', remoteContent.length);
-                        console.log('Content starts with:', remoteContent.substring(0, 50));
                     } catch (decodeError) {
                         console.error('UTF-8 decode failed, falling back to atob:', decodeError);
                         remoteContent = atob(base64Content);
@@ -3533,7 +3524,6 @@
                     // Content is not base64 encoded
                     remoteContent = data.content;
                 }
-                console.log('Final decoded content length:', remoteContent.length);
                 
                 // Extract version from remote content
                 const versionMatch = remoteContent.match(/currentVersion:\s*['"`]([^'"`]+)['"`]/);
@@ -4446,22 +4436,10 @@ The complete untruncated dataset with all ${reportData.rawDataSummary?.totalNote
         }
         
         async function submitFullNotesAsSubIssues(parentIssueNumber, fullNotesData, reportDate, userHash) {
-            console.log('🔍 DEBUG: submitFullNotesAsSubIssues called with:', {
-                parentIssueNumber,
-                fullNotesDataLength: fullNotesData?.length || 0,
-                reportDate,
-                userHashLength: userHash?.length || 0
-            });
-            
             // Validate GitHub credentials
             if (!AppState.githubToken || !AppState.githubRepo) {
                 throw new Error('GitHub credentials not available for sub-issue creation');
             }
-            
-            console.log('🔍 DEBUG: GitHub credentials check passed:', {
-                hasToken: !!AppState.githubToken,
-                repo: AppState.githubRepo
-            });
             
             if (!fullNotesData || fullNotesData.length === 0) {
                 console.log('No full notes data to submit as sub-issues');
@@ -4528,12 +4506,6 @@ ${note.fullDAE || 'No DAE content'}
 *This is part ${chunkIndex + 1} of ${chunks.length} data sub-issues for analytics report #${parentIssueNumber}*
                 `;
                 
-                console.log(`🔍 DEBUG: Creating sub-issue ${chunkIndex + 1}/${chunks.length}:`, {
-                    title: subIssueTitle,
-                    bodyLength: subIssueBody.length,
-                    notesRange: `${startNote}-${endNote}`
-                });
-                
                 const subIssueResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues`, {
                     method: 'POST',
                     headers: {
@@ -4548,8 +4520,6 @@ ${note.fullDAE || 'No DAE content'}
                         labels: ['analytics-data', 'auto-generated', 'notes-archive', `parent-${parentIssueNumber}`]
                     })
                 });
-                
-                console.log(`🔍 DEBUG: Sub-issue response status:`, subIssueResponse.status);
                 
                 if (!subIssueResponse.ok) {
                     const errorText = await subIssueResponse.text();
@@ -4579,12 +4549,6 @@ ${note.fullDAE || 'No DAE content'}
         }
         
         async function updateParentIssueWithSubIssueLinks(parentIssueNumber, subIssueNumbers, reportDate) {
-            console.log('🔍 DEBUG: Updating parent issue with sub-issue links:', {
-                parentIssueNumber,
-                subIssueNumbers,
-                reportDate
-            });
-            
             const linksSummary = `
 
 ---
@@ -4629,14 +4593,6 @@ ${subIssueNumbers.map((num, index) =>
                 // Save to localStorage with timestamp
                 const fullDataKey = `analytics_full_${reportData.reportDate}_${Date.now()}`;
                 localStorage.setItem(fullDataKey, JSON.stringify(reportData.fullNotesData));
-                
-                // Log to console
-                console.log('📊 FULL ANALYTICS DATA FOR ANALYSIS:');
-                console.log('='.repeat(50));
-                console.log('Total Notes:', reportData.fullNotesData?.length || 0);
-                console.log('Full Data:', reportData.fullNotesData);
-                console.log('='.repeat(50));
-                console.log(`💾 Full data also saved to localStorage key: ${fullDataKey}`);
                 
                 // Show notification
                 showNotification(`💾 Full analytics data saved locally (${reportData.fullNotesData?.length || 0} notes)`, 'info', 5000);
@@ -4683,13 +4639,6 @@ ${subIssueNumbers.map((num, index) =>
                 }
                 
                 console.log('📤 Sending usage report...');
-                
-                // Debug: Show current tracking state
-                console.log('📊 Current tracking state:');
-                console.log('- Session start:', new Date(AppState.usageTracking.sessionStart));
-                console.log('- Button clicks:', Object.keys(AppState.usageTracking.buttonClicks).length, 'tracked');
-                console.log('- Note patterns:', AppState.usageTracking.notePatterns.length, 'patterns');
-                console.log('- User hash:', AppState.usageTracking.userHash);
                 
                 // Add some button clicks if none exist
                 if (Object.keys(AppState.usageTracking.buttonClicks).length === 0) {
@@ -4748,12 +4697,6 @@ ${subIssueNumbers.map((num, index) =>
                 console.log('🧪 Sending test usage report...');
                 
                 // Debug: Show current tracking state
-                console.log('📊 Current tracking state:');
-                console.log('- Session start:', new Date(AppState.usageTracking.sessionStart));
-                console.log('- Button clicks:', Object.keys(AppState.usageTracking.buttonClicks).length, 'tracked');
-                console.log('- Note patterns:', AppState.usageTracking.notePatterns.length, 'patterns');
-                console.log('- User hash:', AppState.usageTracking.userHash);
-                
                 // Add some test button clicks if none exist
                 if (Object.keys(AppState.usageTracking.buttonClicks).length === 0) {
                     console.log('🔧 No button clicks found, adding test data...');
@@ -8124,7 +8067,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 loadChecklistState();
                 loadAgentName();
                 
-                console.log('Frostbyte QA Checklist App initialized successfully');
+                console.log('Frostbyte(Digital Assets) App initialized successfully');
                 
             } catch (error) {
                 console.error('Initialization failed:', error);
