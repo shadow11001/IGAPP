@@ -5521,7 +5521,8 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             // Email type patterns based on content analysis
             emailTypes: {
                 'Defrost Request': {
-                    patterns: [/defrost/gi, /emergency\s+defrost/gi, /forced\s+defrost/gi],
+                    patterns: [/(?:force|perform|request|run|need|start|initiate)\s+(?:a\s+)?defrost/gi, /emergency\s+defrost/gi, /forced\s+defrost/gi],
+                    antiPatterns: [/check.*defrost/gi, /verify.*defrost/gi, /any.*defrost.*overlap/gi],
                     template: 'defrost'
                 },
                 'MasterMind': {
@@ -5537,7 +5538,8 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                     template: 'general'
                 },
                 'Lighting': {
-                    patterns: [/light/gi, /lighting/gi, /lamp/gi],
+                    patterns: [/\blight(?:s|ing)?\b/gi, /\blamp/gi, /forced.*light/gi, /light.*forced/gi],
+                    antiPatterns: [/daylight/gi],
                     template: 'general'
                 },
                 'PDR Request': {
@@ -5554,6 +5556,10 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                 },
                 'Status Update': {
                     patterns: [/status/gi, /update/gi, /progress/gi, /completed/gi],
+                    template: 'general'
+                },
+                'Status Check': {
+                    patterns: [/check.*for/gi, /verify/gi, /confirm/gi, /please\s+check/gi, /could\s+you.*check/gi],
                     template: 'general'
                 },
                 'General Inquiry': {
@@ -5589,31 +5595,54 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
 
             // Extract store number (1-4 digits, context-aware)
             extractStoreNumber(text) {
-                // Look for store number patterns
+                // Look for store number patterns with prioritization
                 const storePatterns = [
-                    /(?:store|site)[#:\s]*(\d{1,4})\b/gi,
-                    /subject:\s*(\d{1,4})\b/gi, // Store number in subject line
-                    /(?:^|\s)(\d{1,4})(?:\s|$)/gm // Standalone numbers in subject/beginning
+                    /(?:store|site|club)[#:\s]*(\d{1,4})\b/gi,  // Highest priority: explicit store/site/club
+                    /subject:[^\n]*?(?:store|site|club)[#:\s]*(\d{1,4})\b/gi, // Store in subject line
+                    /subject:[^\n]*?\b(\d{4})\b/gi // 4-digit number in subject (common store pattern)
                 ];
                 
+                // Try patterns in order of priority
                 for (const pattern of storePatterns) {
                     const matches = [...text.matchAll(pattern)];
                     if (matches.length > 0) {
                         for (const match of matches) {
-                            const fullMatch = match[0];
-                            const numberMatch = fullMatch.match(/(\d{1,4})/);
-                            if (numberMatch) {
-                                const num = parseInt(numberMatch[1]);
-                                // Store numbers are typically 1-4 digits, not 9 (work orders)
-                                if (num >= 1 && num <= 9999 && numberMatch[1].length <= 4) {
-                                    console.log('Store number found:', numberMatch[1]);
-                                    return numberMatch[1];
-                                }
+                            const numberMatch = match[1];
+                            const num = parseInt(numberMatch);
+                            // Store numbers are typically 1-4 digits, not 9 (work orders)
+                            // Exclude years (e.g., 2025) by checking if the number appears in a date context
+                            const isInDate = new RegExp(`(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|\\d{1,2}[/\\-]\\d{1,2}[/\\-]|sent:|date:)[^\\n]*?${numberMatch}`, 'gi').test(text);
+                            if (num >= 1 && num <= 9999 && numberMatch.length <= 4 && !isInDate) {
+                                console.log('Store number found:', numberMatch);
+                                return numberMatch;
                             }
                         }
                     }
                 }
                 return null;
+            },
+            
+            // Extract ALL store numbers (1-4 digits, context-aware)
+            extractAllStoreNumbers(text) {
+                const storeNumbers = new Set();
+                const storePatterns = [
+                    /(?:store|site|club)[#:\s]*(\d{1,4})\b/gi,
+                    /subject:[^\n]*?(?:store|site|club)[#:\s]*(\d{1,4})\b/gi,
+                    /subject:[^\n]*?\b(\d{4})\b/gi
+                ];
+                
+                for (const pattern of storePatterns) {
+                    const matches = [...text.matchAll(pattern)];
+                    for (const match of matches) {
+                        const numberMatch = match[1];
+                        const num = parseInt(numberMatch);
+                        const isInDate = new RegExp(`(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|\\d{1,2}[/\\-]\\d{1,2}[/\\-]|sent:|date:)[^\\n]*?${numberMatch}`, 'gi').test(text);
+                        if (num >= 1 && num <= 9999 && numberMatch.length <= 4 && !isInDate) {
+                            storeNumbers.add(numberMatch);
+                        }
+                    }
+                }
+                return Array.from(storeNumbers);
             },
 
             // Extract case number (like A2, B1, C3, etc.)
@@ -5633,6 +5662,24 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                     }
                 }
                 return null;
+            },
+            
+            // Extract ALL case numbers (like A2, B1, C3, etc.)
+            extractAllCaseNumbers(text) {
+                const caseNumbers = new Set();
+                const casePattern = /\b([A-Z]\d+)\b/g;
+                
+                const matches = [...text.matchAll(casePattern)];
+                for (const match of matches) {
+                    const caseNum = match[1];
+                    // Only add if it looks like a valid case identifier (single letter + digits)
+                    if (caseNum.length >= 2 && caseNum.length <= 4) {
+                        caseNumbers.add(caseNum);
+                    }
+                }
+                
+                console.log('All case numbers found:', Array.from(caseNumbers));
+                return Array.from(caseNumbers);
             },
 
             // Extract technician name from email signature or content
@@ -5662,6 +5709,24 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                 
                 for (const [type, config] of Object.entries(this.emailTypes)) {
                     let matches = 0;
+                    
+                    // Check for anti-patterns first (patterns that exclude this type)
+                    if (config.antiPatterns) {
+                        let hasAntiPattern = false;
+                        for (const antiPattern of config.antiPatterns) {
+                            const found = lowerText.match(antiPattern);
+                            if (found) {
+                                hasAntiPattern = true;
+                                break;
+                            }
+                        }
+                        // Skip this type if anti-pattern is found
+                        if (hasAntiPattern) {
+                            continue;
+                        }
+                    }
+                    
+                    // Count pattern matches
                     for (const pattern of config.patterns) {
                         const found = lowerText.match(pattern);
                         if (found) {
@@ -5912,9 +5977,9 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                     workOrder: EMAIL_PROCESSOR.extractWorkOrder(emailContent),
                     workOrders: EMAIL_PROCESSOR.extractWorkOrder(emailContent) ? [EMAIL_PROCESSOR.extractWorkOrder(emailContent)] : [],
                     storeNumber: EMAIL_PROCESSOR.extractStoreNumber(emailContent),
-                    storeNumbers: EMAIL_PROCESSOR.extractStoreNumber(emailContent) ? [EMAIL_PROCESSOR.extractStoreNumber(emailContent)] : [],
+                    storeNumbers: EMAIL_PROCESSOR.extractAllStoreNumbers(emailContent),
                     caseNumber: EMAIL_PROCESSOR.extractCaseNumber(emailContent),
-                    caseNumbers: EMAIL_PROCESSOR.extractCaseNumber(emailContent) ? [EMAIL_PROCESSOR.extractCaseNumber(emailContent)] : [],
+                    caseNumbers: EMAIL_PROCESSOR.extractAllCaseNumbers(emailContent),
                     techName: EMAIL_PROCESSOR.extractTechName(emailContent),
                     techNames: EMAIL_PROCESSOR.extractTechName(emailContent) ? [EMAIL_PROCESSOR.extractTechName(emailContent)] : [],
                     emailType: EMAIL_PROCESSOR.classifyEmail(emailContent),
