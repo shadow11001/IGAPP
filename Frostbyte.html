@@ -1736,6 +1736,7 @@
             border: 1px solid;
             border-radius: 6px;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         body.light-mode .tag-recommendations {
@@ -2687,6 +2688,76 @@
                     <small>Tags will appear here based on your notes content...</small>
                 </div>
             </div>
+            
+            <!-- Frostbyte Logo - Bottom Right of Form Container -->
+            <div style="display: flex; justify-content: flex-end; margin-top: 30px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <!-- Original Frostbyte Snowflake Design -->
+                    <svg width="48" height="48" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Main snowflake structure with exact original styling -->
+                        <g fill="none" stroke="#00bcd4" stroke-width="3" stroke-linecap="round">
+                            <!-- Main cross lines -->
+                            <line x1="50" y1="8" x2="50" y2="92"/>
+                            <line x1="8" y1="50" x2="92" y2="50"/>
+                            
+                            <!-- Diagonal lines -->
+                            <line x1="21" y1="21" x2="79" y2="79"/>
+                            <line x1="79" y1="21" x2="21" y2="79"/>
+                            
+                            <!-- Top decorative branches -->
+                            <line x1="50" y1="8" x2="42" y2="20"/>
+                            <line x1="50" y1="8" x2="58" y2="20"/>
+                            
+                            <!-- Bottom decorative branches -->
+                            <line x1="50" y1="92" x2="42" y2="80"/>
+                            <line x1="50" y1="92" x2="58" y2="80"/>
+                            
+                            <!-- Left decorative branches -->
+                            <line x1="8" y1="50" x2="20" y2="42"/>
+                            <line x1="8" y1="50" x2="20" y2="58"/>
+                            
+                            <!-- Right decorative branches -->
+                            <line x1="92" y1="50" x2="80" y2="42"/>
+                            <line x1="92" y1="50" x2="80" y2="58"/>
+                            
+                            <!-- Top-left diagonal branches -->
+                            <line x1="21" y1="21" x2="29" y2="27"/>
+                            <line x1="21" y1="21" x2="27" y2="29"/>
+                            
+                            <!-- Top-right diagonal branches -->
+                            <line x1="79" y1="21" x2="71" y2="27"/>
+                            <line x1="79" y1="21" x2="73" y2="29"/>
+                            
+                            <!-- Bottom-left diagonal branches -->
+                            <line x1="21" y1="79" x2="29" y2="73"/>
+                            <line x1="21" y1="79" x2="27" y2="71"/>
+                            
+                            <!-- Bottom-right diagonal branches -->
+                            <line x1="79" y1="79" x2="71" y2="73"/>
+                            <line x1="79" y1="79" x2="73" y2="71"/>
+                        </g>
+                        
+                        <!-- Binary code elements exactly like original -->
+                        <text x="34" y="42" fill="#00bcd4" font-family="Consolas, Monaco, monospace" font-size="8" font-weight="bold">01</text>
+                        <text x="58" y="42" fill="#00bcd4" font-family="Consolas, Monaco, monospace" font-size="8" font-weight="bold">01</text>
+                        <text x="34" y="64" fill="#00bcd4" font-family="Consolas, Monaco, monospace" font-size="8" font-weight="bold">10</text>
+                        <text x="58" y="64" fill="#00bcd4" font-family="Consolas, Monaco, monospace" font-size="8" font-weight="bold">01</text>
+                    </svg>
+                    
+                    <!-- Typography matching original exactly -->
+                    <div style="text-align: left;">
+                        <div style="font-size: 28px; font-weight: 300; color: #9e9e9e; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; line-height: 0.85; letter-spacing: -0.5px;">
+                            Frostbyte
+                        </div>
+                        <div style="font-size: 9px; color: #9e9e9e; font-weight: 400; margin: 0; letter-spacing: 1.8px; text-transform: uppercase; margin-top: 4px; line-height: 1.2;">
+                            KEEPING DIGITAL ASSETS
+                        </div>
+                        <div style="font-size: 9px; color: #9e9e9e; font-weight: 400; margin: 0; letter-spacing: 1.8px; text-transform: uppercase; line-height: 1.2;">
+                            IN PERFECT SYNC
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2715,8 +2786,8 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.1.1', // Update this when you make changes
-            githubRepo: 'shadow11001/IGAPP',
+            currentVersion: '1.1.2', // Update this when you make changes
+            githubRepo: 'shadow11001/Frostbyte',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
             // Masked GitHub token (Base64 + simple XOR obfuscation)
@@ -3317,7 +3388,7 @@
                 showNotification('Checking for updates...', 'info');
                 
                 // Try multiple possible file names (case sensitivity) for current branch
-                const fileName = 'IGAPP.html';
+                const fileName = 'Frostbyte.html';
                 const branch = AppState.currentBranch;
                 
                 // Construct API URL for specific branch
@@ -3334,7 +3405,7 @@
                     // Headers for API request - Updated to latest GitHub API standards
                     const headers = {
                         'Accept': 'application/vnd.github+json',
-                        'User-Agent': 'IGAPP-AutoUpdater',
+                        'User-Agent': 'Frostbyte-AutoUpdater',
                         'X-GitHub-Api-Version': '2022-11-28'
                     };
                     
@@ -3515,7 +3586,7 @@ METHOD 1 - Direct Replacement:
 6. Refresh this page (F5)
 
 METHOD 2 - Alternative:
-1. Create a new file named "IGAPP_new.html"
+1. Create a new file named "Frostbyte_new.html"
 2. Paste the copied code into it
 3. Save as UTF-8 encoding
 4. Replace your current file with the new one
@@ -3551,7 +3622,7 @@ This method preserves all icons and emojis correctly.
                 }
                 
                 // Try different possible localStorage keys
-                const possibleKeys = ['savedNotes', 'notes', 'history', 'formData', 'IGAPP_notes', 'notesHistory'];
+                const possibleKeys = ['savedNotes', 'notes', 'history', 'formData', 'frostbyte_notes', 'notesHistory'];
                 const foundData = {};
                 
                 possibleKeys.forEach(key => {
@@ -3600,7 +3671,7 @@ This method preserves all icons and emojis correctly.
 
                 // Create formatted export with all actual notes content
                 let exportText = `
-=== IGAPP NOTES DATA EXPORT ===
+=== FROSTBYTE NOTES DATA EXPORT ===
 Export Date: ${exportData.timestamp}
 App Version: ${exportData.currentVersion}
 
@@ -3675,7 +3746,7 @@ ${JSON.stringify(exportData, null, 2)}
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
-                    link.download = `IGAPP_Debug_Export_${new Date().toISOString().split('T')[0]}.txt`;
+                    link.download = `Frostbyte_Debug_Export_${new Date().toISOString().split('T')[0]}.txt`;
                     link.click();
                     URL.revokeObjectURL(url);
                     showNotification(`📊 Debug data downloaded as file!`, 'success', 5000);
@@ -3870,6 +3941,51 @@ ${JSON.stringify(exportData, null, 2)}
             }
         }
         
+        // Anonymization helper functions for usage analytics
+        function hashString(str) {
+            if (!str || str.length === 0) return '';
+            
+            // Simple hash function to create consistent anonymous identifiers
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+            
+            // Return a shortened hash with prefix to indicate type
+            return 'anon_' + Math.abs(hash).toString(36).substring(0, 8);
+        }
+        
+        function anonymizeContent(content) {
+            if (!content || content.length === 0) return '';
+            
+            let anonymized = content;
+            
+            // Remove common personal identifiers while preserving technical content
+            // Replace names that look like people (capital letter followed by lowercase, space, repeat)
+            anonymized = anonymized.replace(/\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/g, '[TECH_NAME]');
+            
+            // Replace phone numbers
+            anonymized = anonymized.replace(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g, '[PHONE]');
+            
+            // Replace email addresses
+            anonymized = anonymized.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, '[EMAIL]');
+            
+            // Replace employee IDs that look like empXXXXX or similar patterns
+            anonymized = anonymized.replace(/\bemp\d+\b/gi, '[EMP_ID]');
+            anonymized = anonymized.replace(/\b[A-Z]{2,3}\d{4,6}\b/g, '[ID]');
+            
+            // Replace specific work order patterns (keep structure but anonymize)
+            anonymized = anonymized.replace(/\bWO\d+\b/gi, '[WO_REF]');
+            anonymized = anonymized.replace(/\b\d{8,12}\b/g, '[TICKET_NUM]');
+            
+            // Keep technical terms, system names, and troubleshooting steps
+            // These are valuable for analytics but not personally identifying
+            
+            return anonymized;
+        }
+        
         function generateUsageReportData() {
             // Debug: Check all localStorage like the export function does
             const allLocalStorageKeys = [];
@@ -3893,7 +4009,7 @@ ${JSON.stringify(exportData, null, 2)}
             }
             
             // Try multiple possible keys for notes data
-            const possibleNotesKeys = ['savedNotes', 'notes', 'history', 'formData', 'IGAPP_notes', 'notesHistory', 'notesData'];
+            const possibleNotesKeys = ['savedNotes', 'notes', 'history', 'formData', 'frostbyte_notes', 'notesHistory', 'notesData'];
             let savedNotes = [];
             let notesDataSource = 'none';
             
@@ -4010,12 +4126,13 @@ ${JSON.stringify(exportData, null, 2)}
                     hasStoreNumber: !!(note.storeNumber && note.storeNumber.length > 0),
                     hasWorkOrder: !!(note.workOrder && note.workOrder.length > 0),
                     tags: note.tags || [],
-                    // Include truncated note content to avoid size limits
-                    notesPreview: note.notes ? note.notes.substring(0, 150) + (note.notes.length > 150 ? '...' : '') : '',
-                    daePreview: note.dae ? note.dae.substring(0, 100) + (note.dae.length > 100 ? '...' : '') : '',
-                    techName: note.techName || '',
-                    storeNumber: note.storeNumber || '',
-                    workOrder: note.workOrder || ''
+                    // Anonymize note content - remove personal info but keep patterns
+                    notesPreview: note.notes ? anonymizeContent(note.notes.substring(0, 150)) + (note.notes.length > 150 ? '...' : '') : '',
+                    daePreview: note.dae ? anonymizeContent(note.dae.substring(0, 100)) + (note.dae.length > 100 ? '...' : '') : '',
+                    // Anonymize personal identifiers
+                    techNameHash: note.techName ? hashString(note.techName) : '',
+                    storeNumber: note.storeNumber || '', // Store numbers are OK to keep
+                    workOrderHash: note.workOrder ? hashString(note.workOrder) : ''
                 })),
                 // Summary of raw data
                 rawDataSummary: {
@@ -4035,7 +4152,7 @@ ${JSON.stringify(exportData, null, 2)}
                 }
             };
             
-            // Add full notes data for sub-issue creation
+            // Add full notes data for sub-issue creation (anonymized)
             reportData.fullNotesData = savedNotes.map((note, index) => ({
                 id: `note_${index + 1}`,
                 date: note.date || 'unknown',
@@ -4046,12 +4163,12 @@ ${JSON.stringify(exportData, null, 2)}
                 hasStoreNumber: !!(note.storeNumber && note.storeNumber.length > 0),
                 hasWorkOrder: !!(note.workOrder && note.workOrder.length > 0),
                 tags: note.tags || [],
-                // Include full note content for sub-issues
-                fullContent: note.notes || '',
-                fullDAE: note.dae || '',
-                techName: note.techName || '',
-                storeNumber: note.storeNumber || '',
-                workOrder: note.workOrder || ''
+                // Anonymize full content for analytics while preserving useful patterns
+                fullContent: note.notes ? anonymizeContent(note.notes) : '',
+                fullDAE: note.dae ? anonymizeContent(note.dae) : '',
+                techNameHash: note.techName ? hashString(note.techName) : '',
+                storeNumber: note.storeNumber || '', // Store numbers are OK for analysis
+                workOrderHash: note.workOrder ? hashString(note.workOrder) : ''
             }));
             
             console.log('📊 Generated report data:', reportData);
@@ -4229,7 +4346,7 @@ The complete untruncated dataset with all ${reportData.rawDataSummary?.totalNote
                     'Authorization': `Bearer ${AppState.githubToken}`,
                     'Accept': 'application/vnd.github+json',
                     'Content-Type': 'application/json',
-                    'User-Agent': 'IGAPP-Analytics'
+                    'User-Agent': 'Frostbyte-Analytics'
                 },
                 body: JSON.stringify({
                     title: issueTitle,
@@ -4364,7 +4481,7 @@ ${note.fullDAE || 'No DAE content'}
                         'Authorization': `Bearer ${AppState.githubToken}`,
                         'Accept': 'application/vnd.github+json',
                         'Content-Type': 'application/json',
-                        'User-Agent': 'IGAPP-Analytics'
+                        'User-Agent': 'Frostbyte-Analytics'
                     },
                     body: JSON.stringify({
                         title: subIssueTitle,
@@ -4431,7 +4548,7 @@ ${subIssueNumbers.map((num, index) =>
                     'Authorization': `Bearer ${AppState.githubToken}`,
                     'Accept': 'application/vnd.github+json',
                     'Content-Type': 'application/json',
-                    'User-Agent': 'IGAPP-Analytics'
+                    'User-Agent': 'Frostbyte-Analytics'
                 },
                 body: JSON.stringify({
                     body: linksSummary
@@ -4518,8 +4635,8 @@ ${subIssueNumbers.map((num, index) =>
                 // Add some button clicks if none exist
                 if (Object.keys(AppState.usageTracking.buttonClicks).length === 0) {
                     console.log('🔧 No button clicks found, adding usage data...');
-                    trackButtonClick('Send Usage Report');
-                    trackButtonClick('Settings Menu');
+                    trackButtonClick('Send Usage Report', 'settings');
+                    trackButtonClick('Settings Menu', 'settings');
                 }
                 
                 showNotification('📤 Generating usage report...', 'info', 2000);
@@ -4581,9 +4698,9 @@ ${subIssueNumbers.map((num, index) =>
                 // Add some test button clicks if none exist
                 if (Object.keys(AppState.usageTracking.buttonClicks).length === 0) {
                     console.log('🔧 No button clicks found, adding test data...');
-                    trackButtonClick('Test Button');
-                    trackButtonClick('Settings Menu');
-                    trackButtonClick('Test Usage Report');
+                    trackButtonClick('Test Button', 'settings');
+                    trackButtonClick('Settings Menu', 'settings');
+                    trackButtonClick('Test Usage Report', 'settings');
                 }
                 
                 showNotification('🧪 Generating test usage report...', 'info', 2000);
@@ -4836,7 +4953,7 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
 </details>
 
 ---
-*This feedback was submitted directly through the IGAPP suggestion system and includes comprehensive technical context for debugging and feature development.*
+*This feedback was submitted directly through the Frostbyte suggestion system and includes comprehensive technical context for debugging and feature development.*
             `;
 
             // Create GitHub issue
@@ -4846,7 +4963,7 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                     'Authorization': `Bearer ${AppState.githubToken}`,
                     'Accept': 'application/vnd.github+json',
                     'Content-Type': 'application/json',
-                    'User-Agent': 'IGAPP-Feedback'
+                    'User-Agent': 'Frostbyte-Feedback'
                 },
                 body: JSON.stringify({
                     title: issueTitle,
@@ -5068,11 +5185,11 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             
             // Update GitHub repo reference based on branch
             if (branch === 'main') {
-                AppState.githubRepo = 'shadow11001/IGAPP';
+                AppState.githubRepo = 'shadow11001/Frostbyte';
             } else if (branch === 'beta') {
-                AppState.githubRepo = 'shadow11001/IGAPP'; // Same repo, beta branch
+                AppState.githubRepo = 'shadow11001/Frostbyte'; // Same repo, beta branch
             } else if (branch === 'dev') {
-                AppState.githubRepo = 'shadow11001/IGAPP'; // Same repo, dev branch
+                AppState.githubRepo = 'shadow11001/Frostbyte'; // Same repo, dev branch
             }
             
             // Control dev-only features visibility
@@ -5144,7 +5261,7 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             
             try {
                 // Get the current file name
-                const currentFileName = window.location.pathname.split('/').pop() || 'IGAPP.html';
+                const currentFileName = window.location.pathname.split('/').pop() || 'Frostbyte.html';
                 
                 // Add UTF-8 BOM and create blob with explicit UTF-8 encoding
                 const utf8BOM = '\uFEFF';
@@ -5818,6 +5935,9 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                 return;
             }
             
+            // Track email processing usage
+            trackButtonClick('Process Email', 'email-processing');
+            
             showNotification('🔍 Processing email...', 'info', 2000);
             
             // Extract information
@@ -5971,6 +6091,9 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
 
         // Dev-only email analysis function
         async function submitEmailForAnalysis() {
+            // Track developer email analysis usage
+            trackButtonClick('Email Analysis (Dev)', 'email-processing');
+            
             const emailContent = document.getElementById('email-input').value.trim();
             const analysisBtn = document.getElementById('dev-email-analysis-btn');
             
@@ -6100,7 +6223,7 @@ ${analysisData.originalEmail}
                     'Authorization': `Bearer ${AppState.githubToken}`,
                     'Accept': 'application/vnd.github+json',
                     'Content-Type': 'application/json',
-                    'User-Agent': 'IGAPP-Email-Analysis'
+                    'User-Agent': 'Frostbyte-Email-Analysis'
                 },
                 body: JSON.stringify({
                     title: issueTitle,
@@ -6267,6 +6390,9 @@ verified in {SYSTEM}
 
         // War Room Functions
         function toggleWarRoom() {
+            // Track war room toggle
+            trackButtonClick('Toggle War Room', 'war-room');
+            
             WAR_ROOM_SYSTEM.state.isEnabled = !WAR_ROOM_SYSTEM.state.isEnabled;
             localStorage.setItem('warRoomEnabled', WAR_ROOM_SYSTEM.state.isEnabled.toString());
             
@@ -6411,6 +6537,9 @@ verified in {SYSTEM}
         }
         
         function startWarRoomCheck() {
+            // Track war room check start
+            trackButtonClick('Start War Room Check', 'war-room');
+            
             const storesText = document.getElementById('assigned-stores').value.trim();
             if (!storesText) {
                 showNotification('❌ Please enter store numbers first', 'error', 3000);
@@ -6626,6 +6755,9 @@ verified in {SYSTEM}
         }
         
         function completeWarRoomCheck() {
+            // Track war room completion
+            trackButtonClick('Complete War Room Check', 'war-room');
+            
             // Hide progress and checker
             document.getElementById('war-room-progress').style.display = 'none';
             document.getElementById('store-checker').style.display = 'none';
@@ -6665,6 +6797,9 @@ verified in {SYSTEM}
         }
         
         function copyWarRoomResults() {
+            // Track war room copy action
+            trackButtonClick('Copy War Room Results', 'war-room');
+            
             // Get the HTML content and convert <br> tags back to newlines
             let resultsText = document.getElementById('results-content').innerHTML;
             resultsText = resultsText.replace(/<br>/g, '\n');
@@ -7930,7 +8065,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 loadChecklistState();
                 loadAgentName();
                 
-                console.log('QA Checklist App initialized successfully');
+                console.log('Frostbyte QA Checklist App initialized successfully');
                 
             } catch (error) {
                 console.error('Initialization failed:', error);
