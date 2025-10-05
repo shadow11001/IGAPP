@@ -2837,6 +2837,7 @@
         // Global state management
         const AppState = {
             autoSaveTimer: null,
+            currentNoteId: null, // Track the current note being edited
             lastSavedData: null,
             deadAirTimer: null,
             deadAirSeconds: 0,
@@ -3685,8 +3686,15 @@ This method preserves all icons and emojis correctly.
                     }
                 });
                 
-                // Collect all notes data
-                const savedNotesData = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+                // Collect all notes data - check both possible locations
+                let savedNotesData = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+                const notesHistoryData = JSON.parse(localStorage.getItem('notesHistory') || '[]');
+                
+                // Use notesHistory if savedNotes is empty but notesHistory has data
+                if (savedNotesData.length === 0 && notesHistoryData.length > 0) {
+                    savedNotesData = notesHistoryData;
+                }
+                
                 const exportData = {
                     timestamp: new Date().toISOString(),
                     currentVersion: AppState.currentVersion,
@@ -3706,12 +3714,12 @@ This method preserves all icons and emojis correctly.
                     
                     // Usage statistics
                     notesHistory: savedNotesData.map(note => ({
-                        date: note.date,
+                        date: note.date || new Date(note.timestamp).toLocaleDateString(),
                         length: note.notes ? note.notes.length : 0,
-                        hasDAE: note.dae ? note.dae.length > 0 : false,
-                        techName: note.techName ? 'present' : 'empty',
-                        storeNumber: note.storeNumber ? 'present' : 'empty',
-                        workOrder: note.workOrder ? 'present' : 'empty'
+                        hasDAE: (note.dae && note.dae.length > 0) || (note.notes && note.notes.toLowerCase().includes('dae')),
+                        techName: (note.techName && note.techName.trim().length > 0) ? 'present' : 'empty',
+                        storeNumber: (note.storeNumber && note.storeNumber.trim().length > 0) ? 'present' : 'empty',
+                        workOrder: (note.workOrder && note.workOrder.trim().length > 0) ? 'present' : 'empty'
                     })),
                     
                     // Most common words/phrases analysis
@@ -3750,19 +3758,21 @@ Selected Tags: ${exportData.selectedTags.join(', ') || 'None'}
 
                 // Add each saved note with full content
                 savedNotesData.forEach((note, index) => {
+                    const noteDate = note.date || new Date(note.timestamp).toLocaleString();
                     exportText += `
---- Note ${index + 1} (${note.date}) ---
+--- Note ${index + 1} (${noteDate}) ---
 Tech Name: ${note.techName || '(not provided)'}
 Store Number: ${note.storeNumber || '(not provided)'}
 Work Order: ${note.workOrder || '(not provided)'}
 
 DAE Content:
-${note.dae || '(no DAE content)'}
+${note.dae || (note.notes && note.notes.toLowerCase().includes('dae') ? 'DAE referenced in notes' : '(no DAE content)')}
 
 Notes Content:
 ${note.notes || '(no notes content)'}
 
 Tags: ${note.tags ? note.tags.join(', ') : '(no tags)'}
+ID: ${note.id || '(no ID)'}
 ---------------------------------
 `;
                 });
@@ -4072,20 +4082,54 @@ ${JSON.stringify(exportData, null, 2)}
             let savedNotes = [];
             let notesDataSource = 'none';
             
-            for (const key of possibleNotesKeys) {
+            // First try savedNotes
+            try {
+                const savedNotesData = localStorage.getItem('savedNotes');
+                if (savedNotesData) {
+                    const parsed = JSON.parse(savedNotesData);
+                    if (Array.isArray(parsed)) {
+                        savedNotes = parsed;
+                        notesDataSource = 'savedNotes';
+                    }
+                }
+            } catch (e) {
+                // Skip invalid JSON
+            }
+            
+            // If savedNotes is empty, try notesHistory
+            if (savedNotes.length === 0) {
                 try {
-                    const data = localStorage.getItem(key);
-                    if (data) {
-                        const parsed = JSON.parse(data);
+                    const notesHistoryData = localStorage.getItem('notesHistory');
+                    if (notesHistoryData) {
+                        const parsed = JSON.parse(notesHistoryData);
                         if (Array.isArray(parsed) && parsed.length > 0) {
                             savedNotes = parsed;
-                            notesDataSource = key;
-                            console.log(`📋 Found notes data in localStorage key: ${key} (${parsed.length} items)`);
-                            break;
+                            notesDataSource = 'notesHistory';
+                            console.log(`📋 Using notesHistory data: ${parsed.length} items`);
                         }
                     }
                 } catch (e) {
                     // Skip invalid JSON
+                }
+            }
+            
+            // If still no data, try other possible keys
+            if (savedNotes.length === 0) {
+                for (const key of possibleNotesKeys.filter(k => k !== 'savedNotes' && k !== 'notesHistory')) {
+                    try {
+                        const data = localStorage.getItem(key);
+                        if (data) {
+                            const parsed = JSON.parse(data);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                savedNotes = parsed;
+                                notesDataSource = key;
+                                console.log(`📋 Found notes data in localStorage key: ${key} (${parsed.length} items)`);
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        // Skip invalid JSON
+                    }
                 }
             }
             
@@ -4149,8 +4193,11 @@ ${JSON.stringify(exportData, null, 2)}
                     Math.round(savedNotes.filter(note => note.notes && /\d/.test(note.notes)).length / savedNotes.length * 100) : 0,
                 totalNotesSaved: savedNotes.length,
                 sessionNotesAnalyzed: notePatternCount,
-                notesWithDAE: savedNotes.filter(note => note.dae && note.dae.length > 0).length,
-                notesWithTechName: savedNotes.filter(note => note.techName && note.techName.length > 0).length
+                notesWithDAE: savedNotes.filter(note => 
+                    (note.dae && note.dae.length > 0) || 
+                    (note.notes && note.notes.toLowerCase().includes('dae'))
+                ).length,
+                notesWithTechName: savedNotes.filter(note => note.techName && note.techName.trim().length > 0).length
             };
             
             // Analyze saved notes for common patterns (anonymized)
@@ -4159,7 +4206,12 @@ ${JSON.stringify(exportData, null, 2)}
             // Calculate session duration - use persisted sessionStart if available
             const savedSessionStart = localStorage.getItem('sessionStartTime');
             const sessionStartTime = savedSessionStart ? parseInt(savedSessionStart) : AppState.usageTracking.sessionStart;
-            const sessionDuration = Math.round((Date.now() - sessionStartTime) / 1000 / 60); // minutes
+            let sessionDuration = Math.round((Date.now() - sessionStartTime) / 1000 / 60); // minutes
+            
+            // Validate session duration - if unrealistic, use a fallback
+            if (sessionDuration < 0 || sessionDuration > 1440) { // negative or more than 24 hours
+                sessionDuration = Math.round((Date.now() - AppState.usageTracking.sessionStart) / 1000 / 60);
+            }
             
             console.log('📊 Session duration calculation:', {
                 sessionStartTime: new Date(sessionStartTime).toLocaleString(),
@@ -4188,13 +4240,13 @@ ${JSON.stringify(exportData, null, 2)}
                 // Include condensed notes data for analysis (to avoid GitHub 422 errors)
                 rawNotesData: savedNotes.slice(0, 20).map((note, index) => ({
                     id: `note_${index + 1}`,
-                    date: note.date || 'unknown',
+                    date: note.date || (note.timestamp ? new Date(note.timestamp).toLocaleDateString() : 'unknown'),
                     noteLength: note.notes ? note.notes.length : 0,
                     wordCount: note.notes ? note.notes.split(' ').length : 0,
-                    hasDAE: !!(note.dae && note.dae.length > 0),
-                    hasTechName: !!(note.techName && note.techName.length > 0),
-                    hasStoreNumber: !!(note.storeNumber && note.storeNumber.length > 0),
-                    hasWorkOrder: !!(note.workOrder && note.workOrder.length > 0),
+                    hasDAE: !!(note.dae && note.dae.length > 0) || !!(note.notes && note.notes.toLowerCase().includes('dae')),
+                    hasTechName: !!(note.techName && note.techName.trim().length > 0),
+                    hasStoreNumber: !!(note.storeNumber && note.storeNumber.trim().length > 0),
+                    hasWorkOrder: !!(note.workOrder && note.workOrder.trim().length > 0),
                     tags: note.tags || [],
                     // Anonymize note content - remove personal info but keep patterns
                     notesPreview: note.notes ? anonymizeContent(note.notes.substring(0, 150)) + (note.notes.length > 150 ? '...' : '') : '',
@@ -4210,14 +4262,21 @@ ${JSON.stringify(exportData, null, 2)}
                     totalCharacters: savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.length : 0), 0),
                     totalWords: savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.split(' ').length : 0), 0),
                     notesWithContent: savedNotes.filter(note => note.notes && note.notes.trim().length > 0).length,
-                    notesWithDAE: savedNotes.filter(note => note.dae && note.dae.length > 0).length,
+                    notesWithDAE: savedNotes.filter(note => 
+                        (note.dae && note.dae.length > 0) || 
+                        (note.notes && note.notes.toLowerCase().includes('dae'))
+                    ).length,
                     dateRange: {
-                        earliest: savedNotes.length > 0 ? savedNotes.reduce((earliest, note) => 
-                            note.date && note.date < earliest ? note.date : earliest, 
-                            savedNotes[0]?.date || 'unknown') : 'none',
-                        latest: savedNotes.length > 0 ? savedNotes.reduce((latest, note) => 
-                            note.date && note.date > latest ? note.date : latest, 
-                            savedNotes[0]?.date || 'unknown') : 'none'
+                        earliest: savedNotes.length > 0 ? 
+                            savedNotes.reduce((earliest, note) => {
+                                const noteDate = note.date || (note.timestamp ? new Date(note.timestamp).toLocaleDateString() : 'unknown');
+                                return noteDate && noteDate < earliest ? noteDate : earliest;
+                            }, savedNotes[0]?.date || (savedNotes[0]?.timestamp ? new Date(savedNotes[0].timestamp).toLocaleDateString() : 'unknown')) : 'none',
+                        latest: savedNotes.length > 0 ? 
+                            savedNotes.reduce((latest, note) => {
+                                const noteDate = note.date || (note.timestamp ? new Date(note.timestamp).toLocaleDateString() : 'unknown');
+                                return noteDate && noteDate > latest ? noteDate : latest;
+                            }, savedNotes[0]?.date || (savedNotes[0]?.timestamp ? new Date(savedNotes[0].timestamp).toLocaleDateString() : 'unknown')) : 'none'
                     }
                 }
             };
@@ -4225,13 +4284,13 @@ ${JSON.stringify(exportData, null, 2)}
             // Add full notes data for sub-issue creation (anonymized)
             reportData.fullNotesData = savedNotes.map((note, index) => ({
                 id: `note_${index + 1}`,
-                date: note.date || 'unknown',
+                date: note.date || (note.timestamp ? new Date(note.timestamp).toLocaleDateString() : 'unknown'),
                 noteLength: note.notes ? note.notes.length : 0,
                 wordCount: note.notes ? note.notes.split(' ').length : 0,
-                hasDAE: !!(note.dae && note.dae.length > 0),
-                hasTechName: !!(note.techName && note.techName.length > 0),
-                hasStoreNumber: !!(note.storeNumber && note.storeNumber.length > 0),
-                hasWorkOrder: !!(note.workOrder && note.workOrder.length > 0),
+                hasDAE: !!(note.dae && note.dae.length > 0) || !!(note.notes && note.notes.toLowerCase().includes('dae')),
+                hasTechName: !!(note.techName && note.techName.trim().length > 0),
+                hasStoreNumber: !!(note.storeNumber && note.storeNumber.trim().length > 0),
+                hasWorkOrder: !!(note.workOrder && note.workOrder.trim().length > 0),
                 tags: note.tags || [],
                 // Anonymize full content for analytics while preserving useful patterns
                 fullContent: note.notes ? anonymizeContent(note.notes) : '',
@@ -4498,7 +4557,7 @@ The complete untruncated dataset with all ${reportData.rawDataSummary?.totalNote
 
 ${chunk.map((note, index) => {
     const noteNumber = startNote + index;
-    return `## Note ${noteNumber} - ${note.date || 'Unknown Date'}
+    return `## Note ${noteNumber} - ${note.date || (note.timestamp ? new Date(note.timestamp).toLocaleDateString() : 'Unknown Date')}
 
 **📍 Store:** ${note.storeNumber || 'N/A'}  
 **🎫 Work Order:** ${note.workOrder || 'N/A'}  
@@ -4639,14 +4698,16 @@ ${subIssueNumbers.map((num, index) =>
         async function sendUsageReport() {
             const sendBtn = document.getElementById('send-report-btn');
             
-            // Check for 24-hour cooldown
-            const lastSent = localStorage.getItem('lastUsageReportSent');
-            const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
-            
-            if (lastSent && parseInt(lastSent) > twentyFourHoursAgo) {
-                const hoursLeft = Math.ceil((parseInt(lastSent) + (24 * 60 * 60 * 1000) - Date.now()) / (60 * 60 * 1000));
-                showNotification(`⏰ Usage report already sent today. Try again in ${hoursLeft} hours.`, 'error', 5000);
-                return;
+            // Check for 24-hour cooldown (skip on dev branch)
+            if (AppState.currentBranch !== 'dev') {
+                const lastSent = localStorage.getItem('lastUsageReportSent');
+                const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+                
+                if (lastSent && parseInt(lastSent) > twentyFourHoursAgo) {
+                    const hoursLeft = Math.ceil((parseInt(lastSent) + (24 * 60 * 60 * 1000) - Date.now()) / (60 * 60 * 1000));
+                    showNotification(`⏰ Usage report already sent today. Try again in ${hoursLeft} hours.`, 'error', 5000);
+                    return;
+                }
             }
             
             // Disable button during send
@@ -7133,7 +7194,7 @@ verified in {SYSTEM}
         }
 
         // Enhanced history management with better error handling
-        function saveNotesHistory() {
+        function saveNotesHistory(forceNew = false) {
             try {
                 const formData = getFormData();
                 
@@ -7141,28 +7202,53 @@ verified in {SYSTEM}
                     return false;
                 }
 
+                let history = getNotesHistory();
+                history = cleanOldEntries(history);
+                
+                // If we have a current note ID and not forcing new, update existing note
+                if (AppState.currentNoteId && !forceNew) {
+                    const existingIndex = history.findIndex(entry => entry.id === AppState.currentNoteId);
+                    if (existingIndex !== -1) {
+                        // Update existing note
+                        history[existingIndex] = {
+                            ...history[existingIndex],
+                            ...formData,
+                            timestamp: Date.now() // Update timestamp to show latest edit
+                        };
+                        localStorage.setItem('notesHistory', JSON.stringify(history));
+                        updateHistoryDropdown();
+                        return true;
+                    }
+                }
+                
+                // Create new note
                 const noteEntry = {
                     ...formData,
                     timestamp: Date.now(),
                     id: generateId()
                 };
-
-                let history = getNotesHistory();
-                history = cleanOldEntries(history);
                 
-                // Prevent duplicate entries
-                const isDuplicate = history.some(entry => 
-                    entry.techName === formData.techName &&
-                    entry.storeNumber === formData.storeNumber &&
-                    entry.workOrder === formData.workOrder &&
-                    Math.abs(entry.timestamp - noteEntry.timestamp) < 60000 // Within 1 minute
-                );
+                // Set this as the current note being edited
+                AppState.currentNoteId = noteEntry.id;
                 
-                if (!isDuplicate) {
-                    history.push(noteEntry);
-                    localStorage.setItem('notesHistory', JSON.stringify(history));
-                    updateHistoryDropdown();
+                // Prevent duplicate entries (only check if forcing new)
+                if (forceNew) {
+                    const isDuplicate = history.some(entry => 
+                        entry.techName === formData.techName &&
+                        entry.storeNumber === formData.storeNumber &&
+                        entry.workOrder === formData.workOrder &&
+                        Math.abs(entry.timestamp - noteEntry.timestamp) < 60000 // Within 1 minute
+                    );
+                    
+                    if (isDuplicate) {
+                        return false;
+                    }
                 }
+                
+                history.push(noteEntry);
+                localStorage.setItem('notesHistory', JSON.stringify(history));
+                updateHistoryDropdown();
+                updateNoteStatus();
                 
                 return true;
             } catch (error) {
@@ -7810,7 +7896,20 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 
                 button.disabled = true;
                 button.classList.add('loading');
-                const success = saveNotesHistory();
+                
+                // If we have a current note, this finalizes it and prepares for a new one
+                if (AppState.currentNoteId) {
+                    // Update the current note one final time
+                    saveNotesHistory(false);
+                    // Clear current note ID so next save creates a new note
+                    AppState.currentNoteId = null;
+                } else {
+                    // No current note, create new one and finalize it
+                    saveNotesHistory(true);
+                    AppState.currentNoteId = null;
+                }
+                
+                const success = true; // saveNotesHistory already called above
                 
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     await navigator.clipboard.writeText(copiedText.join('\n'));
@@ -7898,7 +7997,8 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             AppState.autoSaveTimer = setTimeout(() => {
                 const currentData = JSON.stringify(getFormData());
                 if (currentData !== AppState.lastSavedData && hasValidData(getFormData())) {
-                    saveNotesHistory();
+                    // Auto-save should update current note, not create new ones
+                    saveNotesHistory(false); // false = update existing note if available
                     AppState.lastSavedData = currentData;
                 }
             }, 30000); // Auto-save after 30 seconds of inactivity
@@ -7907,6 +8007,30 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         function clearAutoSave() {
             clearTimeout(AppState.autoSaveTimer);
             AppState.lastSavedData = null;
+            // Don't clear currentNoteId here - let Copy Notes handle note finalization
+        }
+        
+        // Function to start a new note (useful for new calls)
+        function startNewNote() {
+            AppState.currentNoteId = null;
+            AppState.lastSavedData = null;
+            clearForm();
+            updateNoteStatus();
+            showNotification('Started new note - changes will auto-save to this note', 'info', 3000);
+        }
+        
+        // Update UI to show current note status
+        function updateNoteStatus() {
+            const statusElement = document.querySelector('.note-status');
+            if (statusElement) {
+                if (AppState.currentNoteId) {
+                    statusElement.textContent = '✏️ Editing note (auto-saving)';
+                    statusElement.className = 'note-status editing';
+                } else {
+                    statusElement.textContent = '📝 New note ready';
+                    statusElement.className = 'note-status new';
+                }
+            }
         }
 
         // Enhanced input validation
