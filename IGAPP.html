@@ -5538,7 +5538,8 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                     template: 'general'
                 },
                 'Lighting': {
-                    patterns: [/light/gi, /lighting/gi, /lamp/gi],
+                    patterns: [/\blight(?:s|ing)?\b/gi, /\blamp/gi, /forced.*light/gi, /light.*forced/gi],
+                    antiPatterns: [/daylight/gi],
                     template: 'general'
                 },
                 'PDR Request': {
@@ -5555,6 +5556,10 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                 },
                 'Status Update': {
                     patterns: [/status/gi, /update/gi, /progress/gi, /completed/gi],
+                    template: 'general'
+                },
+                'Status Check': {
+                    patterns: [/check.*for/gi, /verify/gi, /confirm/gi, /please\s+check/gi, /could\s+you.*check/gi],
                     template: 'general'
                 },
                 'General Inquiry': {
