@@ -1186,6 +1186,19 @@
             background-color: #218838 !important;
         }
 
+        .warning-button {
+            background-color: #ffc107 !important;
+            color: #212529 !important;
+            border: 1px solid #ffc107 !important;
+        }
+
+        .warning-button:hover {
+            background-color: #e0a800 !important;
+            border-color: #d39e00 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+        }
+
         .dev-analysis-button {
             background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%) !important;
             color: #ffffff !important;
@@ -2517,6 +2530,7 @@
                                 <div class="war-room-controls">
                                     <button onclick="startWarRoomCheck()" class="primary-button">🚀 Start War Room Check</button>
                                     <button onclick="showTemplateConfig()" class="success-button">⚙️ Configure Template</button>
+                                    <button onclick="verifyWarRoomReport()" class="warning-button">🔍 Verify Report</button>
                                     <button onclick="generateWarRoomTemplate()" class="secondary-button">📋 Generate Report</button>
                                 </div>
                             </div>
@@ -6203,8 +6217,9 @@ verified in {SYSTEM}
             generateVerificationCode() {
                 const factors = [
                     localStorage.getItem('agentName') || 'unknown',
-                    new Date().getTime(),
-                    Math.random().toString(36).substring(7),
+                    this.state.sessionStartTime || Date.now(),
+                    this.state.sessionId || 'no-session',
+                    this.state.storeResults.length.toString(),
                     navigator.userAgent.slice(-10)
                 ];
                 return btoa(factors.join('')).slice(0, 12);
@@ -6704,6 +6719,135 @@ verified in {SYSTEM}
                 
                 showNotification('🔄 Ready for new War Room check', 'info', 3000);
             }
+        }
+
+        // War Room Verification System (Level 1 - Basic Validation)
+        function verifyWarRoomReport() {
+            const sessionId = prompt('Enter Session ID to verify:');
+            if (!sessionId) return;
+            
+            const verificationCode = prompt('Enter Verification Code:');
+            if (!verificationCode) return;
+            
+            const result = validateWarRoomReport(sessionId, verificationCode);
+            
+            if (result.valid) {
+                let message = `✅ Valid War Room Report\n\n`;
+                message += `📊 Session Details:\n`;
+                message += `Session Date: ${result.sessionDate}\n`;
+                message += `Agent Prefix: ${result.agentPrefix}\n`;
+                message += `Session Age: ${result.sessionAge}\n`;
+                message += `Random ID: ${result.randomId}\n\n`;
+                message += `🔍 Verification Level: Basic Format Validation\n`;
+                message += `Status: Session ID format and timing verified\n`;
+                message += `Verification Code: Structure validated`;
+                
+                alert(message);
+                showNotification('✅ War Room report verified successfully', 'success', 5000);
+            } else {
+                alert(`❌ Verification Failed\n\nReason: ${result.reason}\n\nPlease check the Session ID and Verification Code and try again.`);
+                showNotification('❌ War Room report verification failed', 'error', 5000);
+            }
+        }
+
+        function validateWarRoomReport(sessionId, verificationCode) {
+            // Validate Session ID format: WR_AgentPrefix_Timestamp_RandomString
+            const sessionPattern = /^WR_([^_]+)_(\d+)_([a-z0-9]+)$/;
+            const sessionMatch = sessionId.match(sessionPattern);
+            
+            if (!sessionMatch) {
+                return { 
+                    valid: false, 
+                    reason: 'Invalid session ID format. Expected format: WR_AgentPrefix_Timestamp_RandomString' 
+                };
+            }
+            
+            const [, agentPrefix, timestamp, randomString] = sessionMatch;
+            
+            // Validate timestamp is reasonable (not from future, not too old)
+            const sessionTime = parseInt(timestamp);
+            const now = Date.now();
+            const oneMonthAgo = now - (30 * 24 * 60 * 60 * 1000); // 30 days
+            
+            if (isNaN(sessionTime)) {
+                return { 
+                    valid: false, 
+                    reason: 'Invalid timestamp in session ID' 
+                };
+            }
+            
+            if (sessionTime > now) {
+                return { 
+                    valid: false, 
+                    reason: 'Session timestamp is from the future' 
+                };
+            }
+            
+            if (sessionTime < oneMonthAgo) {
+                return { 
+                    valid: false, 
+                    reason: 'Session is older than 30 days and may no longer be valid' 
+                };
+            }
+            
+            // Validate agent prefix
+            if (agentPrefix.length < 2 || agentPrefix.length > 20) {
+                return { 
+                    valid: false, 
+                    reason: 'Invalid agent prefix length in session ID' 
+                };
+            }
+            
+            // Validate random string
+            if (randomString.length < 10 || !/^[a-z0-9]+$/.test(randomString)) {
+                return { 
+                    valid: false, 
+                    reason: 'Invalid random identifier in session ID' 
+                };
+            }
+            
+            // Validate verification code format
+            try {
+                const decoded = atob(verificationCode);
+                
+                // Basic validation - should contain reasonable data
+                if (decoded.length < 8) {
+                    return { 
+                        valid: false, 
+                        reason: 'Verification code appears to be too short' 
+                    };
+                }
+                
+                // Check if it contains printable characters (basic sanity check)
+                if (!/^[\x20-\x7E]*$/.test(decoded)) {
+                    return { 
+                        valid: false, 
+                        reason: 'Verification code contains invalid characters' 
+                    };
+                }
+                
+            } catch (e) {
+                return { 
+                    valid: false, 
+                    reason: 'Verification code is not valid Base64 encoding' 
+                };
+            }
+            
+            // Calculate session age
+            const ageHours = Math.round((now - sessionTime) / (1000 * 60 * 60));
+            const ageDays = Math.floor(ageHours / 24);
+            const ageString = ageDays > 0 ? 
+                `${ageDays} day${ageDays > 1 ? 's' : ''} ago` : 
+                `${ageHours} hour${ageHours > 1 ? 's' : ''} ago`;
+            
+            return {
+                valid: true,
+                sessionDate: new Date(sessionTime).toLocaleString(),
+                agentPrefix: agentPrefix,
+                randomId: randomString,
+                sessionAge: ageString,
+                timestamp: sessionTime
+            };
         }
 
         // Enhanced Quick Notes to auto-reset timer
