@@ -6900,7 +6900,15 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                     template: 'general'
                 },
                 'PDR Request': {
-                    patterns: [/parameter/gi, /deviation/gi, /pdr/gi, /outside.*parameter/gi],
+                    patterns: [
+                        /parameter/gi, 
+                        /deviation/gi, 
+                        /pdr/gi, 
+                        /outside.*parameter/gi,
+                        /(?:change|adjust|modify|increase|decrease).*defrost.*(?:duration|time|setting|cycle)/gi,
+                        /defrost.*(?:duration|time|setting).*(?:change|adjust|modify|increase|decrease)/gi,
+                        /(?:45|forty[- ]?five).*minute.*defrost/gi  // Specific duration changes
+                    ],
                     template: 'pdr'
                 },
                 'PCR Request': {
@@ -7108,6 +7116,59 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 return null;
             },
 
+            // Extract phone number from email signature or content
+            extractPhone(text) {
+                // Phone number patterns - US format with various separators
+                const phonePatterns = [
+                    /\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, // (479)856-8378, 479-856-8378, 479.856.8378, 4798568378
+                    /\d{3}[-.\s]?\d{4}/g, // 856-8378 (7 digit)
+                ];
+                
+                for (const pattern of phonePatterns) {
+                    const matches = [...text.matchAll(pattern)];
+                    if (matches.length > 0) {
+                        // Return the first phone number found, cleaned up
+                        const phone = matches[0][0].replace(/[^\d]/g, ''); // Remove non-digits
+                        // Format as (XXX)XXXXXXX for 10 digits or leave as-is for 7 digits
+                        if (phone.length === 10) {
+                            const formatted = `(${phone.substring(0, 3)})${phone.substring(3)}`;
+                            console.log('Phone number found:', formatted);
+                            return formatted;
+                        } else if (phone.length === 7) {
+                            console.log('Phone number found:', phone);
+                            return phone;
+                        }
+                    }
+                }
+                return null;
+            },
+
+            // Extract email address from content
+            extractEmail(text) {
+                // Email pattern - standard email format
+                const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+                
+                const matches = [...text.matchAll(emailPattern)];
+                if (matches.length > 0) {
+                    // Filter out automated system emails and return first user email
+                    for (const match of matches) {
+                        const email = match[0].toLowerCase();
+                        // Skip system emails
+                        if (!email.includes('customercare.walmart.com') && 
+                            !email.includes('incontactemail.com') &&
+                            !email.includes('noreply') &&
+                            !email.includes('no-reply')) {
+                            console.log('Email address found:', email);
+                            return email;
+                        }
+                    }
+                    // If all emails are system emails, return the first one anyway
+                    console.log('Email address found:', matches[0][0].toLowerCase());
+                    return matches[0][0].toLowerCase();
+                }
+                return null;
+            },
+
             // Classify email type based on content
             classifyEmail(text) {
                 const lowerText = text.toLowerCase();
@@ -7221,6 +7282,8 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 storeNumber: EMAIL_PROCESSOR.extractStoreNumber(emailText),
                 caseNumber: EMAIL_PROCESSOR.extractCaseNumber(emailText),
                 techName: EMAIL_PROCESSOR.extractTechName(emailText),
+                techPhone: EMAIL_PROCESSOR.extractPhone(emailText),
+                techEmail: EMAIL_PROCESSOR.extractEmail(emailText),
                 emailType: EMAIL_PROCESSOR.classifyEmail(emailText),
                 rawContent: emailText
             };
@@ -7270,6 +7333,20 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 infoHTML += `<div class="info-item">
                     <span class="info-label">Tech Name:</span>
                     <span class="info-value">${emailData.techName}</span>
+                </div>`;
+            }
+            
+            if (emailData.techPhone) {
+                infoHTML += `<div class="info-item">
+                    <span class="info-label">Tech Phone:</span>
+                    <span class="info-value highlight">${emailData.techPhone}</span>
+                </div>`;
+            }
+            
+            if (emailData.techEmail) {
+                infoHTML += `<div class="info-item">
+                    <span class="info-label">Tech Email:</span>
+                    <span class="info-value highlight">${emailData.techEmail}</span>
                 </div>`;
             }
             
@@ -7394,6 +7471,8 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                     caseNumbers: EMAIL_PROCESSOR.extractAllCaseNumbers(emailContent),
                     techName: EMAIL_PROCESSOR.extractTechName(emailContent),
                     techNames: EMAIL_PROCESSOR.extractTechName(emailContent) ? [EMAIL_PROCESSOR.extractTechName(emailContent)] : [],
+                    techPhone: EMAIL_PROCESSOR.extractPhone(emailContent),
+                    techEmail: EMAIL_PROCESSOR.extractEmail(emailContent),
                     emailType: EMAIL_PROCESSOR.classifyEmail(emailContent),
                     rawContent: emailContent
                 };
