@@ -5613,6 +5613,21 @@ ${subIssueNumbers.map((num, index) =>
                     warRoomToggle.classList.remove('active');
                 }
             }
+            
+            // Update SQLite toggle
+            const sqliteToggle = document.getElementById('sqlite-toggle');
+            if (sqliteToggle) {
+                const isEnabled = localStorage.getItem('sqliteEnabled') === 'true';
+                const isSupported = SQLITE_STORAGE.checkSupport();
+                if (isEnabled && isSupported) {
+                    sqliteToggle.classList.add('active');
+                } else {
+                    sqliteToggle.classList.remove('active');
+                }
+            }
+            
+            // Update SQLite UI
+            updateSQLiteUI();
         }
         
         function toggleAutoUpdateFromSettings() {
@@ -6049,6 +6064,233 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             }
             
             console.log(`⚠️ Visual dead air warnings ${status}`);
+        }
+
+        // ============= SQLite Management Functions =============
+        
+        // Toggle SQLite storage on/off
+        async function toggleSQLiteStorage() {
+            try {
+                const currentlyEnabled = localStorage.getItem('sqliteEnabled') === 'true';
+                const newState = !currentlyEnabled;
+                
+                if (newState) {
+                    // Enabling SQLite
+                    if (!SQLITE_STORAGE.checkSupport()) {
+                        showNotification('❌ SQLite storage not supported in this browser', 'error', 5000);
+                        return;
+                    }
+                    
+                    const success = await SQLITE_STORAGE.init();
+                    if (!success) {
+                        showNotification('❌ Failed to initialize SQLite storage', 'error', 5000);
+                        return;
+                    }
+                    
+                    localStorage.setItem('sqliteEnabled', 'true');
+                    showNotification('💾 SQLite storage enabled', 'success', 3000);
+                } else {
+                    // Disabling SQLite
+                    SQLITE_STORAGE.isEnabled = false;
+                    localStorage.setItem('sqliteEnabled', 'false');
+                    showNotification('💾 SQLite storage disabled', 'success', 3000);
+                }
+                
+                updateSQLiteUI();
+                updateSettingsToggles();
+                
+            } catch (error) {
+                console.error('Failed to toggle SQLite storage:', error);
+                showNotification('❌ Error toggling SQLite storage', 'error', 5000);
+            }
+        }
+        
+        // Create new SQLite database
+        async function createSQLiteDatabase() {
+            try {
+                showNotification('📁 Creating new database...', 'info', 2000);
+                
+                const success = await SQLITE_STORAGE.createDatabase();
+                if (success) {
+                    showNotification('✅ New database created successfully', 'success', 3000);
+                    updateSQLiteUI();
+                } else {
+                    showNotification('❌ Failed to create database', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to create database:', error);
+                showNotification('❌ Error creating database', 'error', 5000);
+            }
+        }
+        
+        // Load existing SQLite database
+        async function loadSQLiteDatabase() {
+            try {
+                showNotification('📂 Loading database...', 'info', 2000);
+                
+                const success = await SQLITE_STORAGE.loadDatabase();
+                if (success) {
+                    showNotification('✅ Database loaded successfully', 'success', 3000);
+                    updateSQLiteUI();
+                } else {
+                    showNotification('❌ Failed to load database', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to load database:', error);
+                showNotification('❌ Error loading database', 'error', 5000);
+            }
+        }
+        
+        // Backup SQLite database
+        async function backupSQLiteDatabase() {
+            try {
+                if (!SQLITE_STORAGE.isEnabled) {
+                    showNotification('❌ SQLite storage not enabled', 'error', 3000);
+                    return;
+                }
+                
+                showNotification('💾 Creating backup...', 'info', 2000);
+                
+                const success = await SQLITE_STORAGE.backupDatabase();
+                if (success) {
+                    showNotification('✅ Database backup created', 'success', 3000);
+                } else {
+                    showNotification('❌ Failed to create backup', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to backup database:', error);
+                showNotification('❌ Error creating backup', 'error', 5000);
+            }
+        }
+        
+        // Sync localStorage to SQLite
+        async function syncToSQLite() {
+            try {
+                if (!SQLITE_STORAGE.isEnabled) {
+                    showNotification('❌ SQLite storage not enabled', 'error', 3000);
+                    return;
+                }
+                
+                showNotification('🔄 Syncing to SQLite...', 'info', 2000);
+                
+                const success = await SQLITE_STORAGE.syncToSQLite();
+                if (success) {
+                    showNotification('✅ Data synced to SQLite', 'success', 3000);
+                } else {
+                    showNotification('❌ Failed to sync to SQLite', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to sync to SQLite:', error);
+                showNotification('❌ Error syncing to SQLite', 'error', 5000);
+            }
+        }
+        
+        // Sync SQLite to localStorage
+        async function syncFromSQLite() {
+            try {
+                if (!SQLITE_STORAGE.isEnabled) {
+                    showNotification('❌ SQLite storage not enabled', 'error', 3000);
+                    return;
+                }
+                
+                showNotification('📥 Syncing from SQLite...', 'info', 2000);
+                
+                const success = await SQLITE_STORAGE.syncFromSQLite();
+                if (success) {
+                    showNotification('✅ Data synced from SQLite', 'success', 3000);
+                    updateHistoryDropdown(); // Refresh the UI with new data
+                } else {
+                    showNotification('❌ Failed to sync from SQLite', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to sync from SQLite:', error);
+                showNotification('❌ Error syncing from SQLite', 'error', 5000);
+            }
+        }
+        
+        // Show SQLite database statistics
+        async function showSQLiteStats() {
+            try {
+                if (!SQLITE_STORAGE.isEnabled) {
+                    showNotification('❌ SQLite storage not enabled', 'error', 3000);
+                    return;
+                }
+                
+                const stats = await SQLITE_STORAGE.getStats();
+                if (stats) {
+                    const statsMessage = `📈 Database Statistics:
+                    
+Notes: ${stats.notesCount}
+Settings: ${stats.settingsCount}
+Analytics: ${stats.analyticsCount}
+Sync Logs: ${stats.syncLogCount}
+Database Size: ${(stats.databaseSize / 1024).toFixed(2)} KB`;
+                    
+                    alert(statsMessage);
+                } else {
+                    showNotification('❌ Failed to get database stats', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to get SQLite stats:', error);
+                showNotification('❌ Error getting database stats', 'error', 5000);
+            }
+        }
+        
+        // Update SQLite UI elements
+        function updateSQLiteUI() {
+            const sqliteToggle = document.getElementById('sqlite-toggle');
+            const sqliteControls = document.getElementById('sqlite-controls');
+            const sqliteStatusDot = document.getElementById('sqlite-status-dot');
+            const sqliteStatusText = document.getElementById('sqlite-status-text');
+            
+            const isEnabled = localStorage.getItem('sqliteEnabled') === 'true';
+            const isSupported = SQLITE_STORAGE.checkSupport();
+            
+            // Update toggle state
+            if (sqliteToggle) {
+                if (isEnabled && isSupported) {
+                    sqliteToggle.classList.add('active');
+                } else {
+                    sqliteToggle.classList.remove('active');
+                }
+            }
+            
+            // Show/hide controls
+            if (sqliteControls) {
+                sqliteControls.style.display = isEnabled ? 'block' : 'none';
+            }
+            
+            // Update status indicator
+            if (sqliteStatusDot && sqliteStatusText) {
+                if (!isSupported) {
+                    sqliteStatusDot.style.backgroundColor = '#ff6b6b';
+                    sqliteStatusText.textContent = 'SQLite: Not Supported';
+                } else if (isEnabled && SQLITE_STORAGE.isEnabled) {
+                    sqliteStatusDot.style.backgroundColor = '#51cf66';
+                    sqliteStatusText.textContent = 'SQLite: Active';
+                } else if (isEnabled) {
+                    sqliteStatusDot.style.backgroundColor = '#ffd43b';
+                    sqliteStatusText.textContent = 'SQLite: Initializing...';
+                } else {
+                    sqliteStatusDot.style.backgroundColor = '#868e96';
+                    sqliteStatusText.textContent = 'SQLite: Disabled';
+                }
+            }
+        }
+        
+        // Initialize SQLite on app startup
+        async function initializeSQLiteOnStartup() {
+            try {
+                const enabled = localStorage.getItem('sqliteEnabled') === 'true';
+                if (enabled && SQLITE_STORAGE.checkSupport()) {
+                    console.log('Initializing SQLite storage...');
+                    await SQLITE_STORAGE.init();
+                }
+                updateSQLiteUI();
+            } catch (error) {
+                console.error('Failed to initialize SQLite on startup:', error);
+                updateSQLiteUI();
+            }
         }
 
         function applyUpdate(newContent, newVersion) {
@@ -7930,6 +8172,7 @@ verified in {SYSTEM}
                             timestamp: Date.now() // Update timestamp to show latest edit
                         };
                         localStorage.setItem('notesHistory', JSON.stringify(history));
+                        ENHANCED_STORAGE.setItem('notesHistory', JSON.stringify(history)); // Enhanced storage
                         updateHistoryDropdown();
                         return true;
                     }
@@ -7962,6 +8205,7 @@ verified in {SYSTEM}
                 
                 history.push(noteEntry);
                 localStorage.setItem('notesHistory', JSON.stringify(history));
+                ENHANCED_STORAGE.setItem('notesHistory', JSON.stringify(history)); // Enhanced storage
                 updateHistoryDropdown();
                 updateNoteStatus();
                 
@@ -8997,6 +9241,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             
             // Initialize War Room system
             initializeWarRoom();
+            
+            // Initialize SQLite storage system
+            initializeSQLiteOnStartup();
             
             // Initialize dev-only features
             initializeDevFeatures();
