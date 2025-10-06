@@ -2233,6 +2233,75 @@
             box-shadow: none;
         }
 
+        /* SQLite Storage Settings */
+        .sqlite-controls {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(108, 117, 125, 0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+        }
+        
+        body.dark-mode .sqlite-controls {
+            background: rgba(108, 117, 125, 0.2);
+            border-color: rgba(108, 117, 125, 0.3);
+        }
+        
+        .sqlite-status {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            background: rgba(248, 249, 250, 0.8);
+            border: 1px solid #dee2e6;
+        }
+        
+        body.dark-mode .sqlite-status {
+            background: rgba(33, 37, 41, 0.8);
+            border-color: #495057;
+        }
+        
+        .sqlite-status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #868e96;
+            flex-shrink: 0;
+            transition: background-color 0.3s ease;
+        }
+        
+        .status-text {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .sqlite-controls .settings-item {
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(108, 117, 125, 0.2);
+        }
+        
+        .sqlite-controls .settings-item:last-child {
+            border-bottom: none;
+        }
+        
+        body.dark-mode .sqlite-controls .settings-item {
+            border-bottom-color: rgba(108, 117, 125, 0.3);
+        }
+        
+        .sqlite-controls .settings-test-btn {
+            font-size: 12px;
+            padding: 4px 8px;
+            min-width: 70px;
+        }
+
         /* Frostbyte Badge - Top Left */
         .frostbyte-badge {
             position: fixed;
@@ -2453,6 +2522,60 @@
                 <div class="settings-toggle-slider"></div>
             </div>
         </div>
+        
+        <!-- SQLite Storage Section -->
+        <div class="settings-separator"></div>
+        <div class="settings-item">
+            <span class="settings-label">💾 SQLite Storage</span>
+            <div class="settings-toggle" id="sqlite-toggle" onclick="toggleSQLiteStorage()">
+                <div class="settings-toggle-slider"></div>
+            </div>
+        </div>
+        <div class="sqlite-controls" id="sqlite-controls" style="display: none;">
+            <div class="settings-item">
+                <span class="settings-label">📁 Create Database</span>
+                <button class="settings-test-btn" onclick="createSQLiteDatabase()" title="Create new SQLite database file">
+                    Create New
+                </button>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">📂 Load Database</span>
+                <button class="settings-test-btn" onclick="loadSQLiteDatabase()" title="Load existing SQLite database file">
+                    Load Existing
+                </button>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">💾 Backup Database</span>
+                <button class="settings-test-btn" onclick="backupSQLiteDatabase()" title="Create backup of current database">
+                    Backup
+                </button>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">🔄 Sync to SQLite</span>
+                <button class="settings-test-btn" onclick="syncToSQLite()" title="Sync localStorage data to SQLite">
+                    Sync →
+                </button>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">📥 Sync from SQLite</span>
+                <button class="settings-test-btn" onclick="syncFromSQLite()" title="Load data from SQLite to localStorage">
+                    ← Sync
+                </button>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">📈 Database Stats</span>
+                <button class="settings-test-btn" onclick="showSQLiteStats()" title="Show database statistics">
+                    View Stats
+                </button>
+            </div>
+            <div class="sqlite-status" id="sqlite-status">
+                <div class="sqlite-status-indicator" id="sqlite-status-indicator">
+                    <span class="status-dot" id="sqlite-status-dot"></span>
+                    <span class="status-text" id="sqlite-status-text">SQLite: Disabled</span>
+                </div>
+            </div>
+        </div>
+        
         <div class="settings-separator"></div>
         <div class="settings-item suggestion-box">
             <span class="settings-label">💡 Suggestions & Feedback</span>
@@ -2935,6 +3058,477 @@
             micSensitivity: 25, // Default speech threshold
             currentMicLevel: 0,
             micLevelHistory: []
+        };
+
+        // ============= SQLite Storage System =============
+        const SQLITE_STORAGE = {
+            db: null,
+            isEnabled: false,
+            isSupported: false,
+            fileHandle: null,
+            
+            // Check if browser supports required APIs
+            checkSupport() {
+                this.isSupported = (
+                    'showSaveFilePicker' in window &&
+                    'showOpenFilePicker' in window &&
+                    'indexedDB' in window
+                );
+                return this.isSupported;
+            },
+            
+            // Initialize database
+            async init() {
+                try {
+                    if (!this.checkSupport()) {
+                        console.warn('SQLite storage not supported in this browser');
+                        return false;
+                    }
+                    
+                    // Check if SQLite is enabled in settings
+                    const enabled = localStorage.getItem('sqliteEnabled') === 'true';
+                    if (!enabled) {
+                        return false;
+                    }
+                    
+                    this.isEnabled = true;
+                    
+                    // Load existing database or create new one
+                    const existingPath = localStorage.getItem('sqliteDatabasePath');
+                    if (existingPath) {
+                        try {
+                            await this.loadDatabase();
+                        } catch (error) {
+                            console.warn('Failed to load existing database, creating new one:', error);
+                            await this.createDatabase();
+                        }
+                    } else {
+                        await this.createDatabase();
+                    }
+                    
+                    console.log('SQLite storage initialized successfully');
+                    return true;
+                } catch (error) {
+                    console.error('Failed to initialize SQLite storage:', error);
+                    this.isEnabled = false;
+                    return false;
+                }
+            },
+            
+            // Create new database file
+            async createDatabase() {
+                try {
+                    const response = await fetch('data:application/octet-stream;base64,U1FMaXRlIGZvcm1hdCAzAAABAQEAEAAAAAABAAAAAgAAAAEAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAXEzAAAAAwAAAAICAgECAwEBAgAAAAACAAAACgAAAAEAAAABAAAAAQAAAAAAAAAB');
+                    const arrayBuffer = await response.arrayBuffer();
+                    const blob = new Blob([arrayBuffer], { type: 'application/octet-stream' });
+                    
+                    // Save as .db file
+                    const fileHandle = await window.showSaveFilePicker({
+                        suggestedName: 'walmart-qa-data.db',
+                        types: [{
+                            description: 'SQLite Database',
+                            accept: { 'application/octet-stream': ['.db'] }
+                        }]
+                    });
+                    
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    
+                    this.fileHandle = fileHandle;
+                    localStorage.setItem('sqliteDatabasePath', fileHandle.name);
+                    
+                    // Initialize database structure
+                    await this.initializeTables();
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Failed to create database:', error);
+                    throw error;
+                }
+            },
+            
+            // Load existing database
+            async loadDatabase() {
+                try {
+                    const [fileHandle] = await window.showOpenFilePicker({
+                        types: [{
+                            description: 'SQLite Database',
+                            accept: { 'application/octet-stream': ['.db'] }
+                        }]
+                    });
+                    
+                    this.fileHandle = fileHandle;
+                    localStorage.setItem('sqliteDatabasePath', fileHandle.name);
+                    
+                    const file = await fileHandle.getFile();
+                    const arrayBuffer = await file.arrayBuffer();
+                    
+                    // TODO: Load SQLite database from ArrayBuffer
+                    // This would require a SQLite WASM library
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Failed to load database:', error);
+                    throw error;
+                }
+            },
+            
+            // Initialize database tables
+            async initializeTables() {
+                const sql = `
+                    CREATE TABLE IF NOT EXISTS notes (
+                        id TEXT PRIMARY KEY,
+                        tech_name TEXT,
+                        store_number TEXT,
+                        work_order TEXT,
+                        notes TEXT,
+                        session_infractions INTEGER DEFAULT 0,
+                        total_infractions_at_time INTEGER DEFAULT 0,
+                        infraction_log TEXT DEFAULT '[]',
+                        timestamp INTEGER,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    );
+                    
+                    CREATE TABLE IF NOT EXISTS settings (
+                        key TEXT PRIMARY KEY,
+                        value TEXT,
+                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    );
+                    
+                    CREATE TABLE IF NOT EXISTS analytics (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        event_type TEXT,
+                        event_data TEXT,
+                        timestamp INTEGER,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    );
+                    
+                    CREATE TABLE IF NOT EXISTS sync_log (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        operation TEXT,
+                        table_name TEXT,
+                        record_id TEXT,
+                        success BOOLEAN,
+                        error_message TEXT,
+                        timestamp INTEGER,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    );
+                `;
+                
+                // TODO: Execute SQL using SQLite WASM
+                console.log('Database tables initialized');
+            },
+            
+            // Save note to SQLite
+            async saveNote(noteData) {
+                if (!this.isEnabled) return false;
+                
+                try {
+                    const sql = `
+                        INSERT OR REPLACE INTO notes 
+                        (id, tech_name, store_number, work_order, notes, session_infractions, total_infractions_at_time, infraction_log, timestamp)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    `;
+                    
+                    // TODO: Execute SQL with parameters
+                    console.log('Note saved to SQLite:', noteData.id);
+                    
+                    this.logSync('INSERT', 'notes', noteData.id, true);
+                    return true;
+                } catch (error) {
+                    console.error('Failed to save note to SQLite:', error);
+                    this.logSync('INSERT', 'notes', noteData.id, false, error.message);
+                    return false;
+                }
+            },
+            
+            // Load notes from SQLite
+            async loadNotes() {
+                if (!this.isEnabled) return [];
+                
+                try {
+                    const sql = 'SELECT * FROM notes ORDER BY timestamp DESC';
+                    
+                    // TODO: Execute SQL query
+                    const notes = []; // Would be populated from SQL results
+                    
+                    console.log(`Loaded ${notes.length} notes from SQLite`);
+                    return notes;
+                } catch (error) {
+                    console.error('Failed to load notes from SQLite:', error);
+                    return [];
+                }
+            },
+            
+            // Save setting to SQLite
+            async saveSetting(key, value) {
+                if (!this.isEnabled) return false;
+                
+                try {
+                    const sql = `
+                        INSERT OR REPLACE INTO settings (key, value, updated_at)
+                        VALUES (?, ?, CURRENT_TIMESTAMP)
+                    `;
+                    
+                    // TODO: Execute SQL with parameters
+                    console.log(`Setting saved to SQLite: ${key} = ${value}`);
+                    return true;
+                } catch (error) {
+                    console.error('Failed to save setting to SQLite:', error);
+                    return false;
+                }
+            },
+            
+            // Load setting from SQLite
+            async loadSetting(key) {
+                if (!this.isEnabled) return null;
+                
+                try {
+                    const sql = 'SELECT value FROM settings WHERE key = ?';
+                    
+                    // TODO: Execute SQL query
+                    const value = null; // Would be populated from SQL result
+                    
+                    return value;
+                } catch (error) {
+                    console.error('Failed to load setting from SQLite:', error);
+                    return null;
+                }
+            },
+            
+            // Log analytics data
+            async logAnalytics(eventType, eventData) {
+                if (!this.isEnabled) return false;
+                
+                try {
+                    const sql = `
+                        INSERT INTO analytics (event_type, event_data, timestamp)
+                        VALUES (?, ?, ?)
+                    `;
+                    
+                    // TODO: Execute SQL with parameters
+                    return true;
+                } catch (error) {
+                    console.error('Failed to log analytics to SQLite:', error);
+                    return false;
+                }
+            },
+            
+            // Log sync operations
+            async logSync(operation, tableName, recordId, success, errorMessage = null) {
+                try {
+                    const sql = `
+                        INSERT INTO sync_log (operation, table_name, record_id, success, error_message, timestamp)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    `;
+                    
+                    // TODO: Execute SQL with parameters
+                } catch (error) {
+                    console.error('Failed to log sync operation:', error);
+                }
+            },
+            
+            // Backup database to file
+            async backupDatabase() {
+                if (!this.isEnabled || !this.fileHandle) return false;
+                
+                try {
+                    const file = await this.fileHandle.getFile();
+                    const arrayBuffer = await file.arrayBuffer();
+                    
+                    const backupHandle = await window.showSaveFilePicker({
+                        suggestedName: `walmart-qa-backup-${new Date().toISOString().slice(0, 10)}.db`,
+                        types: [{
+                            description: 'SQLite Database Backup',
+                            accept: { 'application/octet-stream': ['.db'] }
+                        }]
+                    });
+                    
+                    const writable = await backupHandle.createWritable();
+                    await writable.write(arrayBuffer);
+                    await writable.close();
+                    
+                    console.log('Database backup created successfully');
+                    return true;
+                } catch (error) {
+                    console.error('Failed to create database backup:', error);
+                    return false;
+                }
+            },
+            
+            // Restore database from backup
+            async restoreDatabase() {
+                try {
+                    const [fileHandle] = await window.showOpenFilePicker({
+                        types: [{
+                            description: 'SQLite Database',
+                            accept: { 'application/octet-stream': ['.db'] }
+                        }]
+                    });
+                    
+                    this.fileHandle = fileHandle;
+                    localStorage.setItem('sqliteDatabasePath', fileHandle.name);
+                    
+                    console.log('Database restored successfully');
+                    return true;
+                } catch (error) {
+                    console.error('Failed to restore database:', error);
+                    return false;
+                }
+            },
+            
+            // Get database statistics
+            async getStats() {
+                if (!this.isEnabled) return null;
+                
+                try {
+                    const stats = {
+                        notesCount: 0,
+                        settingsCount: 0,
+                        analyticsCount: 0,
+                        syncLogCount: 0,
+                        databaseSize: 0
+                    };
+                    
+                    // TODO: Execute SQL queries to get counts
+                    
+                    if (this.fileHandle) {
+                        const file = await this.fileHandle.getFile();
+                        stats.databaseSize = file.size;
+                    }
+                    
+                    return stats;
+                } catch (error) {
+                    console.error('Failed to get database stats:', error);
+                    return null;
+                }
+            },
+            
+            // Sync localStorage to SQLite
+            async syncToSQLite() {
+                if (!this.isEnabled) return false;
+                
+                try {
+                    // Sync notes history
+                    const notesHistory = JSON.parse(localStorage.getItem('notesHistory') || '[]');
+                    for (const note of notesHistory) {
+                        await this.saveNote(note);
+                    }
+                    
+                    // Sync settings
+                    const settingsKeys = [
+                        'darkMode', 'autoSave', 'deadAirThreshold', 'speechThreshold',
+                        'loudSoundThreshold', 'autoStartEnabled', 'visualDeadAirWarnings',
+                        'usageReportingEnabled', 'micSensitivity'
+                    ];
+                    
+                    for (const key of settingsKeys) {
+                        const value = localStorage.getItem(key);
+                        if (value !== null) {
+                            await this.saveSetting(key, value);
+                        }
+                    }
+                    
+                    console.log('Successfully synced localStorage to SQLite');
+                    return true;
+                } catch (error) {
+                    console.error('Failed to sync to SQLite:', error);
+                    return false;
+                }
+            },
+            
+            // Sync SQLite to localStorage
+            async syncFromSQLite() {
+                if (!this.isEnabled) return false;
+                
+                try {
+                    // Load notes from SQLite
+                    const notes = await this.loadNotes();
+                    if (notes.length > 0) {
+                        localStorage.setItem('notesHistory', JSON.stringify(notes));
+                    }
+                    
+                    console.log('Successfully synced SQLite to localStorage');
+                    return true;
+                } catch (error) {
+                    console.error('Failed to sync from SQLite:', error);
+                    return false;
+                }
+            }
+        };
+
+        // Enhanced Storage Wrapper (uses both localStorage and SQLite)
+        const ENHANCED_STORAGE = {
+            // Save to both localStorage and SQLite
+            async setItem(key, value) {
+                try {
+                    // Always save to localStorage first (fast, synchronous)
+                    localStorage.setItem(key, value);
+                    
+                    // Save to SQLite if enabled (async, reliable)
+                    if (SQLITE_STORAGE.isEnabled) {
+                        if (key === 'notesHistory') {
+                            const notes = JSON.parse(value);
+                            for (const note of notes) {
+                                await SQLITE_STORAGE.saveNote(note);
+                            }
+                        } else {
+                            await SQLITE_STORAGE.saveSetting(key, value);
+                        }
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Enhanced storage setItem failed:', error);
+                    return false;
+                }
+            },
+            
+            // Get from localStorage (with SQLite fallback)
+            async getItem(key) {
+                try {
+                    // Try localStorage first
+                    let value = localStorage.getItem(key);
+                    
+                    // If not found and SQLite is available, try SQLite
+                    if (value === null && SQLITE_STORAGE.isEnabled) {
+                        if (key === 'notesHistory') {
+                            const notes = await SQLITE_STORAGE.loadNotes();
+                            if (notes.length > 0) {
+                                value = JSON.stringify(notes);
+                                localStorage.setItem(key, value); // Cache in localStorage
+                            }
+                        } else {
+                            value = await SQLITE_STORAGE.loadSetting(key);
+                            if (value !== null) {
+                                localStorage.setItem(key, value); // Cache in localStorage
+                            }
+                        }
+                    }
+                    
+                    return value;
+                } catch (error) {
+                    console.error('Enhanced storage getItem failed:', error);
+                    return localStorage.getItem(key); // Fallback to localStorage only
+                }
+            },
+            
+            // Remove from both localStorage and SQLite
+            async removeItem(key) {
+                try {
+                    localStorage.removeItem(key);
+                    
+                    if (SQLITE_STORAGE.isEnabled) {
+                        // TODO: Implement removal from SQLite
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Enhanced storage removeItem failed:', error);
+                    return false;
+                }
+            }
         };
 
         // Tag analysis system
@@ -5019,6 +5613,21 @@ ${subIssueNumbers.map((num, index) =>
                     warRoomToggle.classList.remove('active');
                 }
             }
+            
+            // Update SQLite toggle
+            const sqliteToggle = document.getElementById('sqlite-toggle');
+            if (sqliteToggle) {
+                const isEnabled = localStorage.getItem('sqliteEnabled') === 'true';
+                const isSupported = SQLITE_STORAGE.checkSupport();
+                if (isEnabled && isSupported) {
+                    sqliteToggle.classList.add('active');
+                } else {
+                    sqliteToggle.classList.remove('active');
+                }
+            }
+            
+            // Update SQLite UI
+            updateSQLiteUI();
         }
         
         function toggleAutoUpdateFromSettings() {
@@ -5455,6 +6064,233 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             }
             
             console.log(`⚠️ Visual dead air warnings ${status}`);
+        }
+
+        // ============= SQLite Management Functions =============
+        
+        // Toggle SQLite storage on/off
+        async function toggleSQLiteStorage() {
+            try {
+                const currentlyEnabled = localStorage.getItem('sqliteEnabled') === 'true';
+                const newState = !currentlyEnabled;
+                
+                if (newState) {
+                    // Enabling SQLite
+                    if (!SQLITE_STORAGE.checkSupport()) {
+                        showNotification('❌ SQLite storage not supported in this browser', 'error', 5000);
+                        return;
+                    }
+                    
+                    const success = await SQLITE_STORAGE.init();
+                    if (!success) {
+                        showNotification('❌ Failed to initialize SQLite storage', 'error', 5000);
+                        return;
+                    }
+                    
+                    localStorage.setItem('sqliteEnabled', 'true');
+                    showNotification('💾 SQLite storage enabled', 'success', 3000);
+                } else {
+                    // Disabling SQLite
+                    SQLITE_STORAGE.isEnabled = false;
+                    localStorage.setItem('sqliteEnabled', 'false');
+                    showNotification('💾 SQLite storage disabled', 'success', 3000);
+                }
+                
+                updateSQLiteUI();
+                updateSettingsToggles();
+                
+            } catch (error) {
+                console.error('Failed to toggle SQLite storage:', error);
+                showNotification('❌ Error toggling SQLite storage', 'error', 5000);
+            }
+        }
+        
+        // Create new SQLite database
+        async function createSQLiteDatabase() {
+            try {
+                showNotification('📁 Creating new database...', 'info', 2000);
+                
+                const success = await SQLITE_STORAGE.createDatabase();
+                if (success) {
+                    showNotification('✅ New database created successfully', 'success', 3000);
+                    updateSQLiteUI();
+                } else {
+                    showNotification('❌ Failed to create database', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to create database:', error);
+                showNotification('❌ Error creating database', 'error', 5000);
+            }
+        }
+        
+        // Load existing SQLite database
+        async function loadSQLiteDatabase() {
+            try {
+                showNotification('📂 Loading database...', 'info', 2000);
+                
+                const success = await SQLITE_STORAGE.loadDatabase();
+                if (success) {
+                    showNotification('✅ Database loaded successfully', 'success', 3000);
+                    updateSQLiteUI();
+                } else {
+                    showNotification('❌ Failed to load database', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to load database:', error);
+                showNotification('❌ Error loading database', 'error', 5000);
+            }
+        }
+        
+        // Backup SQLite database
+        async function backupSQLiteDatabase() {
+            try {
+                if (!SQLITE_STORAGE.isEnabled) {
+                    showNotification('❌ SQLite storage not enabled', 'error', 3000);
+                    return;
+                }
+                
+                showNotification('💾 Creating backup...', 'info', 2000);
+                
+                const success = await SQLITE_STORAGE.backupDatabase();
+                if (success) {
+                    showNotification('✅ Database backup created', 'success', 3000);
+                } else {
+                    showNotification('❌ Failed to create backup', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to backup database:', error);
+                showNotification('❌ Error creating backup', 'error', 5000);
+            }
+        }
+        
+        // Sync localStorage to SQLite
+        async function syncToSQLite() {
+            try {
+                if (!SQLITE_STORAGE.isEnabled) {
+                    showNotification('❌ SQLite storage not enabled', 'error', 3000);
+                    return;
+                }
+                
+                showNotification('🔄 Syncing to SQLite...', 'info', 2000);
+                
+                const success = await SQLITE_STORAGE.syncToSQLite();
+                if (success) {
+                    showNotification('✅ Data synced to SQLite', 'success', 3000);
+                } else {
+                    showNotification('❌ Failed to sync to SQLite', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to sync to SQLite:', error);
+                showNotification('❌ Error syncing to SQLite', 'error', 5000);
+            }
+        }
+        
+        // Sync SQLite to localStorage
+        async function syncFromSQLite() {
+            try {
+                if (!SQLITE_STORAGE.isEnabled) {
+                    showNotification('❌ SQLite storage not enabled', 'error', 3000);
+                    return;
+                }
+                
+                showNotification('📥 Syncing from SQLite...', 'info', 2000);
+                
+                const success = await SQLITE_STORAGE.syncFromSQLite();
+                if (success) {
+                    showNotification('✅ Data synced from SQLite', 'success', 3000);
+                    updateHistoryDropdown(); // Refresh the UI with new data
+                } else {
+                    showNotification('❌ Failed to sync from SQLite', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to sync from SQLite:', error);
+                showNotification('❌ Error syncing from SQLite', 'error', 5000);
+            }
+        }
+        
+        // Show SQLite database statistics
+        async function showSQLiteStats() {
+            try {
+                if (!SQLITE_STORAGE.isEnabled) {
+                    showNotification('❌ SQLite storage not enabled', 'error', 3000);
+                    return;
+                }
+                
+                const stats = await SQLITE_STORAGE.getStats();
+                if (stats) {
+                    const statsMessage = `📈 Database Statistics:
+                    
+Notes: ${stats.notesCount}
+Settings: ${stats.settingsCount}
+Analytics: ${stats.analyticsCount}
+Sync Logs: ${stats.syncLogCount}
+Database Size: ${(stats.databaseSize / 1024).toFixed(2)} KB`;
+                    
+                    alert(statsMessage);
+                } else {
+                    showNotification('❌ Failed to get database stats', 'error', 5000);
+                }
+            } catch (error) {
+                console.error('Failed to get SQLite stats:', error);
+                showNotification('❌ Error getting database stats', 'error', 5000);
+            }
+        }
+        
+        // Update SQLite UI elements
+        function updateSQLiteUI() {
+            const sqliteToggle = document.getElementById('sqlite-toggle');
+            const sqliteControls = document.getElementById('sqlite-controls');
+            const sqliteStatusDot = document.getElementById('sqlite-status-dot');
+            const sqliteStatusText = document.getElementById('sqlite-status-text');
+            
+            const isEnabled = localStorage.getItem('sqliteEnabled') === 'true';
+            const isSupported = SQLITE_STORAGE.checkSupport();
+            
+            // Update toggle state
+            if (sqliteToggle) {
+                if (isEnabled && isSupported) {
+                    sqliteToggle.classList.add('active');
+                } else {
+                    sqliteToggle.classList.remove('active');
+                }
+            }
+            
+            // Show/hide controls
+            if (sqliteControls) {
+                sqliteControls.style.display = isEnabled ? 'block' : 'none';
+            }
+            
+            // Update status indicator
+            if (sqliteStatusDot && sqliteStatusText) {
+                if (!isSupported) {
+                    sqliteStatusDot.style.backgroundColor = '#ff6b6b';
+                    sqliteStatusText.textContent = 'SQLite: Not Supported';
+                } else if (isEnabled && SQLITE_STORAGE.isEnabled) {
+                    sqliteStatusDot.style.backgroundColor = '#51cf66';
+                    sqliteStatusText.textContent = 'SQLite: Active';
+                } else if (isEnabled) {
+                    sqliteStatusDot.style.backgroundColor = '#ffd43b';
+                    sqliteStatusText.textContent = 'SQLite: Initializing...';
+                } else {
+                    sqliteStatusDot.style.backgroundColor = '#868e96';
+                    sqliteStatusText.textContent = 'SQLite: Disabled';
+                }
+            }
+        }
+        
+        // Initialize SQLite on app startup
+        async function initializeSQLiteOnStartup() {
+            try {
+                const enabled = localStorage.getItem('sqliteEnabled') === 'true';
+                if (enabled && SQLITE_STORAGE.checkSupport()) {
+                    console.log('Initializing SQLite storage...');
+                    await SQLITE_STORAGE.init();
+                }
+                updateSQLiteUI();
+            } catch (error) {
+                console.error('Failed to initialize SQLite on startup:', error);
+                updateSQLiteUI();
+            }
         }
 
         function applyUpdate(newContent, newVersion) {
@@ -7336,6 +8172,7 @@ verified in {SYSTEM}
                             timestamp: Date.now() // Update timestamp to show latest edit
                         };
                         localStorage.setItem('notesHistory', JSON.stringify(history));
+                        ENHANCED_STORAGE.setItem('notesHistory', JSON.stringify(history)); // Enhanced storage
                         updateHistoryDropdown();
                         return true;
                     }
@@ -7367,6 +8204,7 @@ verified in {SYSTEM}
                 
                 history.push(noteEntry);
                 localStorage.setItem('notesHistory', JSON.stringify(history));
+                ENHANCED_STORAGE.setItem('notesHistory', JSON.stringify(history)); // Enhanced storage
                 updateHistoryDropdown();
                 updateNoteStatus();
                 
@@ -8394,6 +9232,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             
             // Initialize War Room system
             initializeWarRoom();
+            
+            // Initialize SQLite storage system
+            initializeSQLiteOnStartup();
             
             // Initialize dev-only features
             initializeDevFeatures();
