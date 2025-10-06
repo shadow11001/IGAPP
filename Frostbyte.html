@@ -6900,7 +6900,18 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                     template: 'general'
                 },
                 'PDR Request': {
-                    patterns: [/parameter/gi, /deviation/gi, /pdr/gi, /outside.*parameter/gi],
+                    patterns: [
+                        /parameter/gi, 
+                        /deviation/gi, 
+                        /pdr/gi, 
+                        /outside.*parameter/gi,
+                        /change.*defrost.*duration/gi,
+                        /defrost.*duration.*change/gi,
+                        /(?:add|remove|change).*defrost.*cycle/gi,
+                        /defrost.*(?:minutes|time|setting)/gi,
+                        /parameter.*sheet/gi,
+                        /spec.*sheet/gi
+                    ],
                     template: 'pdr'
                 },
                 'PCR Request': {
@@ -7108,6 +7119,52 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 return null;
             },
 
+            // Extract technician phone number from email
+            extractTechPhone(text) {
+                // Common phone number patterns
+                const phonePatterns = [
+                    /(?:phone|tel|cell|mobile)[:\s]*\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/gi,
+                    /\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, // General phone pattern
+                    /\d{3}[-.\s]?\d{7}/g // Phone without area code separators
+                ];
+                
+                for (const pattern of phonePatterns) {
+                    const matches = [...text.matchAll(pattern)];
+                    if (matches.length > 0) {
+                        const phone = matches[0][0].trim();
+                        console.log('Tech phone found:', phone);
+                        return phone;
+                    }
+                }
+                return null;
+            },
+
+            // Extract technician email from email content
+            extractTechEmail(text) {
+                // Email pattern - prioritize walmart.com emails
+                const emailPatterns = [
+                    /\b([a-zA-Z0-9._+-]+@walmart\.com)\b/gi, // Walmart emails first
+                    /\b([a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/g // General email pattern
+                ];
+                
+                for (const pattern of emailPatterns) {
+                    const matches = [...text.matchAll(pattern)];
+                    if (matches.length > 0) {
+                        // Filter out common system emails
+                        const systemEmails = ['customercare.walmart.com', 'incontactemail.com', 'no-reply', 'noreply'];
+                        for (const match of matches) {
+                            const email = match[1].toLowerCase();
+                            const isSystemEmail = systemEmails.some(sys => email.includes(sys));
+                            if (!isSystemEmail) {
+                                console.log('Tech email found:', email);
+                                return email;
+                            }
+                        }
+                    }
+                }
+                return null;
+            },
+
             // Classify email type based on content
             classifyEmail(text) {
                 const lowerText = text.toLowerCase();
@@ -7221,6 +7278,8 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 storeNumber: EMAIL_PROCESSOR.extractStoreNumber(emailText),
                 caseNumber: EMAIL_PROCESSOR.extractCaseNumber(emailText),
                 techName: EMAIL_PROCESSOR.extractTechName(emailText),
+                techPhone: EMAIL_PROCESSOR.extractTechPhone(emailText),
+                techEmail: EMAIL_PROCESSOR.extractTechEmail(emailText),
                 emailType: EMAIL_PROCESSOR.classifyEmail(emailText),
                 rawContent: emailText
             };
@@ -7270,6 +7329,20 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 infoHTML += `<div class="info-item">
                     <span class="info-label">Tech Name:</span>
                     <span class="info-value">${emailData.techName}</span>
+                </div>`;
+            }
+            
+            if (emailData.techPhone) {
+                infoHTML += `<div class="info-item">
+                    <span class="info-label">Tech Phone:</span>
+                    <span class="info-value">${emailData.techPhone}</span>
+                </div>`;
+            }
+            
+            if (emailData.techEmail) {
+                infoHTML += `<div class="info-item">
+                    <span class="info-label">Tech Email:</span>
+                    <span class="info-value">${emailData.techEmail}</span>
                 </div>`;
             }
             
@@ -7394,6 +7467,10 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                     caseNumbers: EMAIL_PROCESSOR.extractAllCaseNumbers(emailContent),
                     techName: EMAIL_PROCESSOR.extractTechName(emailContent),
                     techNames: EMAIL_PROCESSOR.extractTechName(emailContent) ? [EMAIL_PROCESSOR.extractTechName(emailContent)] : [],
+                    techPhone: EMAIL_PROCESSOR.extractTechPhone(emailContent),
+                    techPhones: EMAIL_PROCESSOR.extractTechPhone(emailContent) ? [EMAIL_PROCESSOR.extractTechPhone(emailContent)] : [],
+                    techEmail: EMAIL_PROCESSOR.extractTechEmail(emailContent),
+                    techEmails: EMAIL_PROCESSOR.extractTechEmail(emailContent) ? [EMAIL_PROCESSOR.extractTechEmail(emailContent)] : [],
                     emailType: EMAIL_PROCESSOR.classifyEmail(emailContent),
                     rawContent: emailContent
                 };
@@ -7417,6 +7494,8 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                         storeNumbersFound: emailData.storeNumbers?.length || 0,
                         caseNumbersFound: emailData.caseNumbers?.length || 0,
                         techNamesFound: emailData.techNames?.length || 0,
+                        techPhonesFound: emailData.techPhones?.length || 0,
+                        techEmailsFound: emailData.techEmails?.length || 0,
                         emailType: emailData.emailType || 'unknown'
                     }
                 };
