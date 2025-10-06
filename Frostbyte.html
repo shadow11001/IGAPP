@@ -1770,6 +1770,48 @@
         body.dark-mode .tag-recommendations h4 {
             color: #ccc;
         }
+        
+        /* Note Infractions Display */
+        .note-infractions {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: 1px solid #dc3545;
+        }
+        
+        .infraction-info h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .infraction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .infraction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .infraction-number {
+            font-weight: bold;
+            color: #fff3cd;
+        }
+        
+        .infraction-time {
+            font-size: 11px;
+            opacity: 0.9;
+        }
 
         .tag-list {
             display: flex;
@@ -2828,6 +2870,10 @@
                     <small>Tags will appear here based on your notes content...</small>
                 </div>
             </div>
+            
+            <div id="current-note-infractions" class="note-infractions" style="display: none;">
+                <!-- Infraction information will be displayed here -->
+            </div>
         </div>
     </div>
 
@@ -3295,6 +3341,10 @@
             
             // Clear session infractions at end of call
             AppState.sessionInfractions = 0;
+            
+            // Reset current note infraction tracking for new calls
+            AppState.currentNoteInfractions = [];
+            
             updateInfractionDisplay();
             
             updateTimerDisplay();
@@ -3307,17 +3357,50 @@
             AppState.sessionInfractions++;
             AppState.totalInfractions++;
             
+            // Create infraction log entry
+            const infractionEntry = {
+                timestamp: Date.now(),
+                sessionNumber: AppState.sessionInfractions,
+                totalNumber: AppState.totalInfractions,
+                timeOfDay: new Date().toLocaleTimeString(),
+                date: new Date().toLocaleDateString()
+            };
+            
+            // Add to current note's infraction log
+            if (!AppState.currentNoteInfractions) {
+                AppState.currentNoteInfractions = [];
+            }
+            AppState.currentNoteInfractions.push(infractionEntry);
+            
+            // If we have a current note, update it with the infraction
+            if (AppState.currentNoteId) {
+                updateCurrentNoteWithInfraction(infractionEntry);
+            }
+            
+            // Update current note display
+            displayInfractionInfo({ infractionLog: AppState.currentNoteInfractions });
+            
             // Save total to localStorage
             localStorage.setItem('totalInfractions', AppState.totalInfractions.toString());
             
             updateInfractionDisplay();
-            showNotification('⚠️ Dead air infraction recorded (30+ seconds)', 'error', 3000);
+            showNotification(`⚠️ Dead air infraction #${AppState.sessionInfractions} recorded (30+ seconds)`, 'error', 3000);
         }
 
         function clearLastInfraction() {
             if (AppState.sessionInfractions > 0) {
                 AppState.sessionInfractions--;
                 AppState.totalInfractions--;
+                
+                // Remove the last infraction from current note log
+                if (AppState.currentNoteInfractions && AppState.currentNoteInfractions.length > 0) {
+                    AppState.currentNoteInfractions.pop();
+                    
+                    // Update the note in localStorage if it exists
+                    if (AppState.currentNoteId) {
+                        updateCurrentNoteWithInfraction(null, true); // true = remove last
+                    }
+                }
                 
                 // Update localStorage
                 localStorage.setItem('totalInfractions', AppState.totalInfractions.toString());
@@ -3326,6 +3409,35 @@
                 showNotification('✅ Last infraction cleared', 'success', 2000);
             } else {
                 showNotification('❌ No infractions to clear', 'error', 2000);
+            }
+        }
+        
+        // Helper function to update current note with infraction data
+        function updateCurrentNoteWithInfraction(infractionEntry, removeLast = false) {
+            try {
+                const history = getNotesHistory();
+                const existingIndex = history.findIndex(entry => entry.id === AppState.currentNoteId);
+                
+                if (existingIndex !== -1) {
+                    if (!history[existingIndex].infractionLog) {
+                        history[existingIndex].infractionLog = [];
+                    }
+                    
+                    if (removeLast) {
+                        history[existingIndex].infractionLog.pop();
+                    } else if (infractionEntry) {
+                        history[existingIndex].infractionLog.push(infractionEntry);
+                    }
+                    
+                    // Update session infractions count
+                    history[existingIndex].sessionInfractions = AppState.sessionInfractions;
+                    history[existingIndex].totalInfractionsAtTime = AppState.totalInfractions;
+                    
+                    localStorage.setItem('notesHistory', JSON.stringify(history));
+                    updateHistoryDropdown();
+                }
+            } catch (error) {
+                console.error('Failed to update note with infraction:', error);
             }
         }
 
@@ -7273,7 +7385,12 @@ verified in {SYSTEM}
                 techName: document.getElementById('tech-name').value.trim(),
                 storeNumber: document.getElementById('store-number').value.trim(),
                 workOrder: document.getElementById('work-order').value.trim(),
-                notes: document.getElementById('notes').value.trim()
+                notes: document.getElementById('notes').value.trim(),
+                
+                // Infraction tracking
+                sessionInfractions: AppState.sessionInfractions || 0,
+                totalInfractionsAtTime: AppState.totalInfractions || 0,
+                infractionLog: AppState.currentNoteInfractions || []
             };
         }
 
@@ -7318,10 +7435,22 @@ verified in {SYSTEM}
                     let storeNumber = entry.storeNumber || 'N/A';
                     if (techName.length > 18) techName = techName.substring(0, 15) + '...';
                     if (storeNumber.length > 10) storeNumber = storeNumber.substring(0, 10) + '...';
-                    const label = `${date} - ${techName} (Store: ${storeNumber})`;
+                    
+                    // Add infraction indicator
+                    const infractionCount = (entry.infractionLog && entry.infractionLog.length) || 0;
+                    const infractionIndicator = infractionCount > 0 ? ` ⚠️${infractionCount}` : '';
+                    
+                    const label = `${date} - ${techName} (Store: ${storeNumber})${infractionIndicator}`;
                     const option = document.createElement('option');
                     option.value = entry.id;
                     option.textContent = label;
+                    
+                    // Add visual styling for notes with infractions
+                    if (infractionCount > 0) {
+                        option.style.color = '#dc3545';
+                        option.style.fontWeight = 'bold';
+                    }
+                    
                     historySelect.appendChild(option);
                 });
             } catch (error) {
@@ -7344,15 +7473,23 @@ verified in {SYSTEM}
                     document.getElementById('work-order').value = entry.workOrder || '';
                     document.getElementById('notes').value = entry.notes || '';
                     
+                    // Restore infraction data
+                    AppState.currentNoteInfractions = entry.infractionLog || [];
+                    
                     // Set this as the current note being edited
                     AppState.currentNoteId = selectedId;
                     AppState.lastSavedData = JSON.stringify(getFormData());
                     updateNoteStatus();
                     
+                    // Show infraction info if present
+                    displayInfractionInfo(entry);
+                    
                     showNotification('Notes restored successfully', 'success', 2000);
                     
                     // Auto-save after restore (this will now update the existing note)
                     scheduleAutoSave();
+                } else {
+                    showNotification('Failed to find selected notes', 'error', 2000);
                 }
             } catch (error) {
                 console.error('Failed to restore notes:', error);
@@ -8036,9 +8173,55 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         function startNewNote() {
             AppState.currentNoteId = null;
             AppState.lastSavedData = null;
+            AppState.currentNoteInfractions = []; // Clear infraction tracking for new note
             clearForm();
             updateNoteStatus();
+            clearInfractionDisplay();
             showNotification('Started new note - changes will auto-save to this note', 'info', 3000);
+        }
+        
+        // Function to display infraction information for a note
+        function displayInfractionInfo(entry) {
+            const infractionContainer = document.getElementById('current-note-infractions');
+            if (!infractionContainer) return;
+            
+            const infractionCount = (entry.infractionLog && entry.infractionLog.length) || 0;
+            
+            if (infractionCount > 0) {
+                let infractionHTML = `
+                    <div class="infraction-info">
+                        <h4>⚠️ Note Infractions (${infractionCount})</h4>
+                        <div class="infraction-list">
+                `;
+                
+                entry.infractionLog.forEach((infraction, index) => {
+                    infractionHTML += `
+                        <div class="infraction-item">
+                            <span class="infraction-number">#${infraction.sessionNumber}</span>
+                            <span class="infraction-time">${infraction.timeOfDay} on ${infraction.date}</span>
+                        </div>
+                    `;
+                });
+                
+                infractionHTML += `
+                        </div>
+                    </div>
+                `;
+                
+                infractionContainer.innerHTML = infractionHTML;
+                infractionContainer.style.display = 'block';
+            } else {
+                clearInfractionDisplay();
+            }
+        }
+        
+        // Function to clear infraction display
+        function clearInfractionDisplay() {
+            const infractionContainer = document.getElementById('current-note-infractions');
+            if (infractionContainer) {
+                infractionContainer.innerHTML = '';
+                infractionContainer.style.display = 'none';
+            }
         }
         
         // Update UI to show current note status
