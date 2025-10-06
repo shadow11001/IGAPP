@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frostbyte Usage Analytics Dashboard v2.0</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    
+    <!-- External Dependencies -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Application CSS -->
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        /* Minimal fallback styles in case CSS doesn't load */
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .loading { text-align: center; padding: 2rem; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <!-- Frostbyte Snowflake Icon -->
+                <svg width="24" height="24" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.5rem;">
+                    <g fill="none" stroke="#667eea" stroke-width="4" stroke-linecap="round">
+                        <line x1="50" y1="15" x2="50" y2="85"/>
+                        <line x1="15" y1="50" x2="85" y2="50"/>
+                        <line x1="25" y1="25" x2="75" y2="75"/>
+                        <line x1="75" y1="25" x2="25" y2="75"/>
+                        <line x1="50" y1="15" x2="42" y2="25"/>
+                        <line x1="50" y1="15" x2="58" y2="25"/>
+                        <line x1="50" y1="85" x2="42" y2="75"/>
+                        <line x1="50" y1="85" x2="58" y2="75"/>
+                        <line x1="15" y1="50" x2="25" y2="42"/>
+                        <line x1="15" y1="50" x2="25" y2="58"/>
+                        <line x1="85" y1="50" x2="75" y2="42"/>
+                        <line x1="85" y1="50" x2="75" y2="58"/>
+                    </g>
+                    <text x="36" y="42" fill="#667eea" font-family="monospace" font-size="6" font-weight="bold">01</text>
+                    <text x="56" y="42" fill="#667eea" font-family="monospace" font-size="6" font-weight="bold">01</text>
+                    <text x="36" y="62" fill="#667eea" font-family="monospace" font-size="6" font-weight="bold">10</text>
+                    <text x="56" y="62" fill="#667eea" font-family="monospace" font-size="6" font-weight="bold">01</text>
+                </svg>
+                <span>Frostbyte Analytics Dashboard</span>
+                <span class="version">v2.0</span>
+            </div>
+            <div class="header-controls">
+                <div id="config-status" class="status-indicator">
+                    <i class="fas fa-circle"></i>
+                    <span>Loading...</span>
+                </div>
+                <button id="settings-btn" class="btn btn-secondary">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </button>
+                <button id="refresh-btn" class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh
+                </button>
+                <div class="last-update" id="last-update">
+                    Last updated: --
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Settings Panel -->
+        <div class="settings-panel hidden" id="settings-panel">
+            <div class="settings-header">
+                <div class="card-icon primary">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="card-title">GitHub Configuration</div>
+            </div>
+            
+            <div class="settings-grid">
+                <div class="form-group">
+                    <label class="form-label" for="github-token">GitHub Personal Access Token *</label>
+                    <input type="password" class="form-input" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="new-password">
+                    <small class="form-hint">Required permissions: repo (read issues). <a href="https://github.com/settings/tokens" target="_blank">Generate new token</a></small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="github-owner">Repository Owner *</label>
+                    <input type="text" class="form-input" id="github-owner" placeholder="username">
+                    <small class="form-hint">GitHub username or organization</small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="github-repo">Repository Name *</label>
+                    <input type="text" class="form-input" id="github-repo" placeholder="repository-name">
+                    <small class="form-hint">Repository containing usage analytics issues</small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="auto-refresh" class="checkbox-input">
+                        <span class="checkbox-text">Enable auto-refresh (5 minutes)</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="theme-select">Dashboard Theme</label>
+                    <select class="form-input" id="theme-select">
+                        <option value="auto">Auto (System)</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="settings-actions">
+                <button id="save-settings-btn" class="btn btn-success">
+                    <i class="fas fa-save"></i>
+                    Save Settings
+                </button>
+                <button id="clear-cache-btn" class="btn btn-warning">
+                    <i class="fas fa-trash"></i>
+                    Clear Cache
+                </button>
+                <button id="advanced-settings-btn" class="btn btn-secondary">
+                    <i class="fas fa-cogs"></i>
+                    Advanced Settings
+                </button>
+                <button id="export-btn" class="btn btn-info">
+                    <i class="fas fa-download"></i>
+                    Export Data
+                </button>
+            </div>
+            
+            <div class="status-indicator hidden" id="status-indicator">
+                <i class="fas fa-info-circle"></i>
+                <span id="status-text">Status message</span>
+            </div>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon primary">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="card-title">Total Reports</div>
+                </div>
+                <div class="stat-value" id="total-reports">--</div>
+                <div class="stat-label">Usage reports submitted</div>
+                <div class="trend" id="reports-trend">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>--% from last week</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon success">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="card-title">Active Users</div>
+                </div>
+                <div class="stat-value" id="active-users">--</div>
+                <div class="stat-label">Unique users this month</div>
+                <div class="trend" id="users-trend">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>--% from last month</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon warning">
+                        <i class="fas fa-mouse-pointer"></i>
+                    </div>
+                    <div class="card-title">Button Clicks</div>
+                </div>
+                <div class="stat-value" id="total-clicks">--</div>
+                <div class="stat-label">Total button interactions</div>
+                <div class="trend" id="clicks-trend">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>--% from last week</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon info">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <div class="card-title">Notes Created</div>
+                </div>
+                <div class="stat-value" id="total-notes">--</div>
+                <div class="stat-label">Notes saved by users</div>
+                <div class="trend" id="notes-trend">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>--% from last week</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="dashboard-grid performance-metrics">
+            <div class="section-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Performance Analytics</h2>
+                <p>Advanced metrics for user engagement and platform performance</p>
+            </div>
+            
+            <!-- Performance Summary Cards -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon info">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="card-title">Session Duration</div>
+                </div>
+                <div class="stat-value" id="avg-session-duration">--</div>
+                <div class="stat-label">Average session length</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon warning">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="card-title">Bounce Rate</div>
+                </div>
+                <div class="stat-value" id="bounce-rate">--</div>
+                <div class="stat-label">Single-page sessions</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon success">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="card-title">Engagement Score</div>
+                </div>
+                <div class="stat-value" id="engagement-score">--</div>
+                <div class="stat-label">User interaction quality</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon primary">
+                        <i class="fas fa-redo"></i>
+                    </div>
+                    <div class="card-title">Weekly Retention</div>
+                </div>
+                <div class="stat-value" id="weekly-retention">--</div>
+                <div class="stat-label">Users returning weekly</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon info">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="card-title">Monthly Retention</div>
+                </div>
+                <div class="stat-value" id="monthly-retention">--</div>
+                <div class="stat-label">Users returning monthly</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon success">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="card-title">Feature Usage</div>
+                </div>
+                <div class="stat-value" id="active-feature-usage">--</div>
+                <div class="stat-label">Active feature adoption</div>
+            </div>
+        </div>
+
+        <!-- Performance Charts -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon primary">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="card-title">Session Metrics</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="session-metrics-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon success">
+                        <i class="fas fa-chart-doughnut"></i>
+                    </div>
+                    <div class="card-title">Engagement Distribution</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="engagement-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon warning">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="card-title">Retention Analysis</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="retention-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon info">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="card-title">Feature Adoption</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="feature-adoption-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Journey Analytics -->
+        <div class="dashboard-grid user-journey-section">
+            <div class="section-header">
+                <h2><i class="fas fa-route"></i> User Journey Analytics</h2>
+                <p>Understanding user behavior patterns, navigation flows, and conversion paths</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon primary">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="card-title">User Flow Patterns</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="user-flow-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon success">
+                        <i class="fas fa-funnel-dollar"></i>
+                    </div>
+                    <div class="card-title">Conversion Funnel</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="conversion-funnel-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon warning">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <div class="card-title">User Segments</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="user-segment-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="card-title">Drop-off Analysis</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="dropoff-analysis-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon primary">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="card-title">Usage Trends</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="usage-trend-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon success">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="card-title">Top Features</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="features-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Controls -->
+        <div class="controls enhanced-controls">
+            <div class="control-group">
+                <button id="advanced-filters-btn" class="btn btn-secondary modal-trigger" aria-label="Open advanced filters">
+                    <i class="fas fa-filter"></i>
+                    Advanced Filters
+                </button>
+                <button id="theme-toggle-btn" class="btn btn-secondary" aria-label="Toggle theme">
+                    <i class="fas fa-palette"></i>
+                    Theme
+                </button>
+                <button id="compact-mode-btn" class="btn btn-secondary" aria-label="Toggle compact mode">
+                    <i class="fas fa-compress"></i>
+                    Compact
+                </button>
+                <button id="help-btn" class="btn btn-secondary modal-trigger" aria-label="Show help and keyboard shortcuts">
+                    <i class="fas fa-question-circle"></i>
+                    Help
+                </button>
+            </div>
+            
+            <div class="view-mode-controls">
+                <button class="view-mode-btn active" data-mode="grid" aria-label="Grid view">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button class="view-mode-btn" data-mode="list" aria-label="List view">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button class="view-mode-btn" data-mode="compact" aria-label="Compact view">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label" for="date-filter">Date Range</label>
+                    <select class="filter-input" id="date-filter" aria-describedby="date-filter-hint">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="all">All time</option>
+                    </select>
+                    <small id="date-filter-hint" class="sr-only">Filter reports by date range</small>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="type-filter">Report Type</label>
+                    <select class="filter-input" id="type-filter" aria-describedby="type-filter-hint">
+                        <option value="all">All Reports</option>
+                        <option value="usage-analytics">Usage Analytics</option>
+                        <option value="feedback">User Feedback</option>
+                        <option value="email-analysis">Email Analysis</option>
+                    </select>
+                    <small id="type-filter-hint" class="sr-only">Filter reports by type</small>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="search-filter">Search</label>
+                    <div class="search-wrapper">
+                        <input type="text" class="filter-input" id="search-filter" 
+                               placeholder="Search reports..." 
+                               aria-describedby="search-filter-hint"
+                               autocomplete="off">
+                        <small id="search-filter-hint" class="sr-only">Search through report content, users, and features</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selection Actions (Initially Hidden) -->
+        <div class="selection-actions hidden" id="selection-actions">
+            <span class="selection-text">
+                <strong class="selection-count">0</strong> items selected
+            </span>
+            <div class="selection-buttons">
+                <button class="btn btn-primary btn-sm" onclick="window.dashboard.exportSelected()">
+                    <i class="fas fa-download"></i>
+                    Export Selected
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="window.dashboard.clearSelection()">
+                    <i class="fas fa-times"></i>
+                    Clear Selection
+                </button>
+            </div>
+        </div>
+
+        <!-- Reports Table -->
+        <div class="reports-table">
+            <div class="table-header">
+                <div class="table-header-content">
+                    <div class="table-title">
+                        <i class="fas fa-table"></i>
+                        Recent Usage Reports
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn-secondary" onclick="window.dashboard.selectAllRows()" aria-label="Select all rows">
+                            <i class="fas fa-check-square"></i>
+                            Select All
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="window.dashboard.exportData()" aria-label="Export table data">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="table-content" role="region" aria-label="Usage reports table" tabindex="0">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading usage reports...</p>
+                    <small class="text-muted">This may take a few moments...</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Screen Reader Status Updates -->
+        <div id="live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+    </div>
+
+    <!-- Application JavaScript Modules -->
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script src="js/data-processor.js"></script>
+    <script src="js/performance-analytics.js"></script>
+    <script src="js/user-journey.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

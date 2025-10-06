@@ -2857,7 +2857,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.1.3', // Update this when you make changes
+            currentVersion: '1.1.5', // Update this when you make changes
             githubRepo: 'shadow11001/Frostbyte',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -3672,7 +3672,7 @@ This method preserves all icons and emojis correctly.
                 }
                 
                 // Try different possible localStorage keys
-                const possibleKeys = ['savedNotes', 'notes', 'history', 'formData', 'frostbyte_notes', 'notesHistory'];
+                const possibleKeys = ['savedNotes', 'notes', 'history', 'formData', 'frostbyte_notes', 'notesHistory', 'dashboard_advanced_settings_tracking'];
                 const foundData = {};
                 
                 possibleKeys.forEach(key => {
@@ -3704,6 +3704,9 @@ This method preserves all icons and emojis correctly.
                     sessionInfractions: AppState.sessionInfractions,
                     totalInfractions: AppState.totalInfractions,
                     selectedTags: Array.from(AppState.selectedTags || []),
+                    
+                    // Advanced Settings usage tracking
+                    advancedSettingsUsage: JSON.parse(localStorage.getItem('dashboard_advanced_settings_tracking') || '{}'),
                     
                     // Debug info
                     debug: {
@@ -3787,6 +3790,11 @@ Notes with Store Number: ${exportData.notesHistory.filter(n => n.storeNumber ===
 Notes with Work Order: ${exportData.notesHistory.filter(n => n.workOrder === 'present').length}
 
 Average Notes Length: ${exportData.notesHistory.length > 0 ? Math.round(exportData.notesHistory.reduce((sum, n) => sum + n.length, 0) / exportData.notesHistory.length) : 0} characters
+
+=== ADVANCED SETTINGS USAGE ===
+${Object.keys(exportData.advancedSettingsUsage).length > 0 ? 
+    Object.entries(exportData.advancedSettingsUsage).map(([action, count]) => `${action}: ${count} times`).join('\n') : 
+    'No Advanced Settings usage tracked yet'}
 
 === COMMON PHRASES ===
 ${exportData.commonPhrases.join('\n')}
