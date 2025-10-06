@@ -8116,6 +8116,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 AppState.selectedTags.clear();
                 displayRecommendedTags([]);
                 
+                // Clear infraction display
+                clearInfractionDisplay();
+                
                 showNotification('Form cleared', 'success', 1500);
                 clearAutoSave();
                 
@@ -8134,6 +8137,10 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 clearFormFields();
                 localStorage.removeItem('notesHistory');
                 updateHistoryDropdown();
+                
+                // Clear infraction display
+                clearInfractionDisplay();
+                
                 showNotification('Everything cleared', 'success');
             } catch (error) {
                 console.error('Failed to clear everything:', error);
