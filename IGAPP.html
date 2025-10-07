@@ -7015,6 +7015,31 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
 
             // Extract case number (like A2, B1, C3, etc.)
             extractCaseNumber(text) {
+                // First, check for circuit/rack format (e.g., "circuit 5 rack B" -> "B5")
+                const circuitRackPatterns = [
+                    /circuit\s+(\d+)\s+rack\s+([A-Z])/gi,  // "circuit 5 rack B"
+                    /rack\s+([A-Z])\s+circuit\s+(\d+)/gi   // "rack B circuit 5"
+                ];
+                
+                for (const pattern of circuitRackPatterns) {
+                    const matches = [...text.matchAll(pattern)];
+                    if (matches.length > 0) {
+                        const match = matches[0];
+                        let caseNum;
+                        // Check which pattern matched and build the case number
+                        if (pattern.source.startsWith('circuit')) {
+                            // circuit X rack Y -> YX
+                            caseNum = match[2] + match[1];
+                        } else {
+                            // rack Y circuit X -> YX
+                            caseNum = match[1] + match[2];
+                        }
+                        console.log('Case number found from circuit/rack format:', caseNum);
+                        return caseNum;
+                    }
+                }
+                
+                // Standard patterns
                 const casePatterns = [
                     /\b([A-Z]\d+)\b/g, // Pattern like A2, B1, C3
                     /case\s*([A-Z]\d+)/gi,
@@ -7035,6 +7060,30 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             // Extract ALL case numbers (like A2, B1, C3, etc.)
             extractAllCaseNumbers(text) {
                 const caseNumbers = new Set();
+                
+                // Check for circuit/rack format (e.g., "circuit 5 rack B" -> "B5")
+                const circuitRackPatterns = [
+                    /circuit\s+(\d+)\s+rack\s+([A-Z])/gi,  // "circuit 5 rack B"
+                    /rack\s+([A-Z])\s+circuit\s+(\d+)/gi   // "rack B circuit 5"
+                ];
+                
+                for (const pattern of circuitRackPatterns) {
+                    const matches = [...text.matchAll(pattern)];
+                    for (const match of matches) {
+                        let caseNum;
+                        // Check which pattern matched and build the case number
+                        if (pattern.source.startsWith('circuit')) {
+                            // circuit X rack Y -> YX
+                            caseNum = match[2] + match[1];
+                        } else {
+                            // rack Y circuit X -> YX
+                            caseNum = match[1] + match[2];
+                        }
+                        caseNumbers.add(caseNum);
+                    }
+                }
+                
+                // Standard pattern
                 const casePattern = /\b([A-Z]\d+)\b/g;
                 
                 const matches = [...text.matchAll(casePattern)];
