@@ -4816,32 +4816,11 @@ ${JSON.stringify(exportData, null, 2)}
         }
         
         function anonymizeContent(content) {
+            // Per requirements: Only anonymize user identity, NOT tech names, work orders, etc.
+            // User anonymization is already handled via userHash system
+            // This function now returns content unchanged to preserve all technical details
             if (!content || content.length === 0) return '';
-            
-            let anonymized = content;
-            
-            // Remove common personal identifiers while preserving technical content
-            // Replace names that look like people (capital letter followed by lowercase, space, repeat)
-            anonymized = anonymized.replace(/\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/g, '[TECH_NAME]');
-            
-            // Replace phone numbers
-            anonymized = anonymized.replace(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g, '[PHONE]');
-            
-            // Replace email addresses
-            anonymized = anonymized.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, '[EMAIL]');
-            
-            // Replace employee IDs that look like empXXXXX or similar patterns
-            anonymized = anonymized.replace(/\bemp\d+\b/gi, '[EMP_ID]');
-            anonymized = anonymized.replace(/\b[A-Z]{2,3}\d{4,6}\b/g, '[ID]');
-            
-            // Replace specific work order patterns (keep structure but anonymize)
-            anonymized = anonymized.replace(/\bWO\d+\b/gi, '[WO_REF]');
-            anonymized = anonymized.replace(/\b\d{8,12}\b/g, '[TICKET_NUM]');
-            
-            // Keep technical terms, system names, and troubleshooting steps
-            // These are valuable for analytics but not personally identifying
-            
-            return anonymized;
+            return content;
         }
         
         function generateUsageReportData() {
@@ -5037,13 +5016,13 @@ ${JSON.stringify(exportData, null, 2)}
                     hasStoreNumber: !!(note.storeNumber && note.storeNumber.trim().length > 0),
                     hasWorkOrder: !!(note.workOrder && note.workOrder.trim().length > 0),
                     tags: note.tags || [],
-                    // Anonymize note content - remove personal info but keep patterns
-                    notesPreview: note.notes ? anonymizeContent(note.notes.substring(0, 150)) + (note.notes.length > 150 ? '...' : '') : '',
-                    daePreview: note.dae ? anonymizeContent(note.dae.substring(0, 100)) + (note.dae.length > 100 ? '...' : '') : '',
-                    // Anonymize personal identifiers
-                    techNameHash: note.techName ? hashString(note.techName) : '',
-                    storeNumber: note.storeNumber || '', // Store numbers are OK to keep
-                    workOrderHash: note.workOrder ? hashString(note.workOrder) : ''
+                    // Keep all technical details - only user identity is anonymized (via userHash)
+                    notesPreview: note.notes ? note.notes.substring(0, 150) + (note.notes.length > 150 ? '...' : '') : '',
+                    daePreview: note.dae ? note.dae.substring(0, 100) + (note.dae.length > 100 ? '...' : '') : '',
+                    // Include actual values for analysis
+                    techName: note.techName || '',
+                    storeNumber: note.storeNumber || '',
+                    workOrder: note.workOrder || ''
                 })),
                 // Summary of raw data
                 rawDataSummary: {
@@ -5081,12 +5060,12 @@ ${JSON.stringify(exportData, null, 2)}
                 hasStoreNumber: !!(note.storeNumber && note.storeNumber.trim().length > 0),
                 hasWorkOrder: !!(note.workOrder && note.workOrder.trim().length > 0),
                 tags: note.tags || [],
-                // Anonymize full content for analytics while preserving useful patterns
-                fullContent: note.notes ? anonymizeContent(note.notes) : '',
-                fullDAE: note.dae ? anonymizeContent(note.dae) : '',
-                techNameHash: note.techName ? hashString(note.techName) : '',
-                storeNumber: note.storeNumber || '', // Store numbers are OK for analysis
-                workOrderHash: note.workOrder ? hashString(note.workOrder) : ''
+                // Keep all technical details for analysis - only user identity is anonymized (via userHash)
+                fullContent: note.notes || '',
+                fullDAE: note.dae || '',
+                techName: note.techName || '',
+                storeNumber: note.storeNumber || '',
+                workOrder: note.workOrder || ''
             }));
             
             console.log('📊 Generated report data:', reportData);
