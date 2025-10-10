@@ -6964,6 +6964,17 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                     patterns: [/check.*for/gi, /verify/gi, /confirm/gi, /please\s+check/gi, /could\s+you.*check/gi],
                     template: 'general'
                 },
+                'Download Request': {
+                    patterns: [
+                        /download/gi, 
+                        /force.*download/gi, 
+                        /push.*download/gi,
+                        /request.*download/gi,
+                        /need.*download/gi,
+                        /version.*download/gi
+                    ],
+                    template: 'download'
+                },
                 'General Inquiry': {
                     patterns: [/question/gi, /inquiry/gi, /help/gi, /can\s+you/gi],
                     template: 'general'
@@ -7133,21 +7144,45 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 return Array.from(caseNumbers);
             },
 
+            // Extract rack name (LTA, LTB, MTC, MTD, DTB, RCU, etc.)
+            extractRackName(text) {
+                const rackPatterns = [
+                    /\brack\s*:?\s*([A-Z]{2,4})\b/gi,  // "rack: LTA" or "rack LTA"
+                    /\b(LTA|LTB|LTC|LTD|MTA|MTB|MTC|MTD|DTB|DTA|RCU|CKT)\b/g  // Common rack names
+                ];
+                
+                for (const pattern of rackPatterns) {
+                    const matches = [...text.matchAll(pattern)];
+                    if (matches.length > 0) {
+                        const rack = matches[0][1].toUpperCase();
+                        console.log('Rack name found:', rack);
+                        return rack;
+                    }
+                }
+                return null;
+            },
+
             // Extract technician name from email signature or content
             extractTechName(text) {
                 // Common patterns for tech names in signatures
                 const namePatterns = [
                     /(?:thanks|regards|sincerely)[,:\s]*\n?\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/gi,
+                    /^([A-Z][a-z]+\s+[A-Z][a-z]+)\s*$/gm, // Name at end/start of lines
                     /\n\s*([A-Z][a-z]+\s+[A-Z][a-z]+)\s*\n/g, // Name on its own line
-                    /^([A-Z][a-z]+\s+[A-Z][a-z]+)\s*$/gm // Name at end/start of lines
+                    /^([A-Z][a-z]+)\s*$/gm, // Single name (first name only) at start/end of line
+                    /(?:hi|hello|dear)\s+(?:team|there|all)[,\s]*\n*\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/gi // After greeting
                 ];
                 
                 for (const pattern of namePatterns) {
                     const matches = [...text.matchAll(pattern)];
                     if (matches.length > 0) {
                         const name = matches[0][1].trim();
-                        console.log('Tech name found:', name);
-                        return name;
+                        // Filter out common false positives
+                        const excludeWords = ['Store', 'Site', 'Rack', 'Case', 'Work', 'Order', 'Tech', 'Phone', 'Email', 'Team', 'There', 'All'];
+                        if (!excludeWords.some(word => name.toLowerCase().includes(word.toLowerCase()))) {
+                            console.log('Tech name found:', name);
+                            return name;
+                        }
                     }
                 }
                 return null;
@@ -7278,6 +7313,11 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                         response += `Master Mind Report Notes Show:\n\nPlease Email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site date and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri`;
                         break;
                         
+                    case 'download':
+                        const rackName = emailData.rackName || '[RACK]';
+                        response += `I see that you wanted a download pushed to the ${rackName} rack. I took a look and see that this is an Opus controller. Opus controllers download automatically but you can force a download by powering off for 15 minutes and then powering on and waiting 15 minutes. During the boot up, it will download if it is needed.`;
+                        break;
+                        
                     default:
                         if (emailData.workOrder) {
                             response += `I have received your request regarding store ${emailData.storeNumber || '[STORE NUMBER]'}. This has been logged under work order ${emailData.workOrder}. I will review your request and provide an update shortly.`;
@@ -7311,6 +7351,7 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 workOrder: EMAIL_PROCESSOR.extractWorkOrder(emailText),
                 storeNumber: EMAIL_PROCESSOR.extractStoreNumber(emailText),
                 caseNumber: EMAIL_PROCESSOR.extractCaseNumber(emailText),
+                rackName: EMAIL_PROCESSOR.extractRackName(emailText),
                 techName: EMAIL_PROCESSOR.extractTechName(emailText),
                 techPhone: EMAIL_PROCESSOR.extractTechPhone(emailText),
                 techEmail: EMAIL_PROCESSOR.extractTechEmail(emailText),
@@ -7356,6 +7397,13 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 infoHTML += `<div class="info-item">
                     <span class="info-label">Case:</span>
                     <span class="info-value highlight">${emailData.caseNumber}</span>
+                </div>`;
+            }
+            
+            if (emailData.rackName) {
+                infoHTML += `<div class="info-item">
+                    <span class="info-label">Rack:</span>
+                    <span class="info-value highlight">${emailData.rackName}</span>
                 </div>`;
             }
             
@@ -7499,6 +7547,8 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                     storeNumbers: EMAIL_PROCESSOR.extractAllStoreNumbers(emailContent),
                     caseNumber: EMAIL_PROCESSOR.extractCaseNumber(emailContent),
                     caseNumbers: EMAIL_PROCESSOR.extractAllCaseNumbers(emailContent),
+                    rackName: EMAIL_PROCESSOR.extractRackName(emailContent),
+                    rackNames: EMAIL_PROCESSOR.extractRackName(emailContent) ? [EMAIL_PROCESSOR.extractRackName(emailContent)] : [],
                     techName: EMAIL_PROCESSOR.extractTechName(emailContent),
                     techNames: EMAIL_PROCESSOR.extractTechName(emailContent) ? [EMAIL_PROCESSOR.extractTechName(emailContent)] : [],
                     techPhone: EMAIL_PROCESSOR.extractTechPhone(emailContent),
@@ -7527,6 +7577,7 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                         workOrdersFound: emailData.workOrders?.length || 0,
                         storeNumbersFound: emailData.storeNumbers?.length || 0,
                         caseNumbersFound: emailData.caseNumbers?.length || 0,
+                        rackNamesFound: emailData.rackNames?.length || 0,
                         techNamesFound: emailData.techNames?.length || 0,
                         techPhonesFound: emailData.techPhones?.length || 0,
                         techEmailsFound: emailData.techEmails?.length || 0,
@@ -7575,6 +7626,7 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
 - **Work Orders Found:** ${analysisData.analysisMetrics.workOrdersFound}
 - **Store Numbers Found:** ${analysisData.analysisMetrics.storeNumbersFound}
 - **Case Numbers Found:** ${analysisData.analysisMetrics.caseNumbersFound}
+- **Rack Names Found:** ${analysisData.analysisMetrics.rackNamesFound}
 - **Tech Names Found:** ${analysisData.analysisMetrics.techNamesFound}
 
 ### 📋 Extracted Data
