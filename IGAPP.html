@@ -2620,7 +2620,7 @@
                 <div id="quick-notes" class="tab-content active">
                     <h4>System Login</h4>
                     <div class="button-group">
-                        <button onclick="addQuickNote('Logged into Novar.')" class="quick-note-btn" title="Novar Login">Novar</button>
+                        <button onclick="addQuickNote('Logged into Novar.'); showDownloadsSection();" class="quick-note-btn" title="Novar Login">Novar</button>
                         <button onclick="addQuickNote('Logged into Opus Arch.')" class="quick-note-btn" title="Opus Arch Login">Opus Arch</button>
                         <button onclick="addQuickNote('Logged into Opus Mag.')" class="quick-note-btn" title="Opus Mag Login">Opus Mag</button>
                         <button onclick="addQuickNote('Logged into CPC.')" class="quick-note-btn" title="CPC Login">CPC</button>
@@ -2635,13 +2635,16 @@
                         <button onclick="addQuickNote('Checked temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
                         <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
                         <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn" title="Clock Check">Clocks</button>
+                        <button onclick="addCheckBreakersNote()" class="quick-note-btn" title="Check Breakers">Breakers</button>
+                        <button onclick="addQuickNote('Checked receiver level.')" class="quick-note-btn" title="Check Receiver Level">RECV LVL</button>
+                        <button onclick="addQuickNote('Checked Suction PSI.')" class="quick-note-btn" title="Check Suction Pressure">SUCT PSI</button>
+                        <button onclick="addQuickNote('Checked Discharge PSI.')" class="quick-note-btn" title="Check Discharge Pressure">DISC PSI</button>
                         <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn" title="Ping Test">Ping</button>
                         <button onclick="addQuickNote('Receiving good ping.')" class="quick-note-btn success-quick" title="Successful Ping">Good Ping</button>
                         <button onclick="addQuickNote('Ping timedout.')" class="quick-note-btn error-quick" title="Failed Ping">Ping Timeout</button>
-                        <button onclick="addCheckBreakersNote()" class="quick-note-btn" title="Check Breakers">Check Breakers</button>
                         <button onclick="addDefrostAlreadyRunningNote()" class="quick-note-btn" title="Defrost Already Active">Already Defrosting</button>
                         <button onclick="addQuickNote('Defrost already terminated.')" class="quick-note-btn" title="Defrost Already Ended">Already Terminated</button>
-                        <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Test</button>
+                        <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Tested</button>
                     </div>
 
             <h4>Actions</h4>
@@ -2657,13 +2660,15 @@
                 <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
             </div>
 
-            <h4>Downloads</h4>
-            <div class="button-group">
-                <button onclick="addQuickNote('Performed Version Download.')" class="quick-note-btn" title="Version Download">Version</button>
-                <button onclick="addQuickNote('Performed Load Change Download.')" class="quick-note-btn" title="Load Change Download">Load Change</button>
-                <button onclick="addQuickNote('Performed Comms and Load Change Download.')" class="quick-note-btn" title="Comms + Load Change">Comms+LC</button>
-                <button onclick="addQuickNote('Performed Main and Load Change Download.')" class="quick-note-btn" title="Main + Load Change">Main+LC</button>
-                <button onclick="addQuickNote('Performed Main, Comms, and Load Change Download.')" class="quick-note-btn" title="Full Download">Full DL</button>
+            <div id="downloads-section" style="display: none;">
+                <h4>Downloads</h4>
+                <div class="button-group">
+                    <button onclick="addQuickNote('Performed Version Download.')" class="quick-note-btn" title="Version Download">Version</button>
+                    <button onclick="addQuickNote('Performed Load Change Download.')" class="quick-note-btn" title="Load Change Download">Load Change</button>
+                    <button onclick="addQuickNote('Performed Comms and Load Change Download.')" class="quick-note-btn" title="Comms + Load Change">Comms+LC</button>
+                    <button onclick="addQuickNote('Performed Main and Load Change Download.')" class="quick-note-btn" title="Main + Load Change">Main+LC</button>
+                    <button onclick="addQuickNote('Performed Main, Comms, and Load Change Download.')" class="quick-note-btn" title="Full Download">Full DL</button>
+                </div>
             </div>
 
             <h4>Call Status</h4>
@@ -3042,7 +3047,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.1.7', // Update this when you make changes
+            currentVersion: '1.1.8', // Update this when you make changes
             githubRepo: 'shadow11001/Frostbyte',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -3073,7 +3078,12 @@
             // Microphone sensitivity and level tracking
             micSensitivity: 25, // Default speech threshold
             currentMicLevel: 0,
-            micLevelHistory: []
+            micLevelHistory: [],
+            
+            // Tab flashing for dead air warnings
+            originalTitle: document.title,
+            tabFlashInterval: null,
+            isTabFlashing: false
         };
 
         // ============= IndexedDB Storage System =============
@@ -3573,45 +3583,24 @@
             'Danfoss SVD': ['svd', 'storeview'],
             'Defrost': ['defrost', 'forced defrost', 'terminated defrost'],
             'Download': ['download', 'version download', 'load change download', 'main download', 'comms download', 'full dl', 'performed download'],
-            'Duplicate': ['duplicate', 'already called', 'repeat'],
-            'Electrician Request': ['electrician', 'electrical', 'power issue'],
-            'EMS': ['ems', 'system'],
-            'Equipment Request': ['equipment', 'replace', 'new'],
-            'Fuel Request': ['fuel', 'generator fuel'],
             'HVAC': ['hvac', 'air conditioning', 'heating', 'rtu'],
             'Lighting': ['lights', 'lighting', 'forced on lights'],
             'Manager Escalation': ['manager', 'escalation', 'supervisor'],
-            'Mobile Gen Staging': ['mobile gen', 'generator staging'],
-            'Monitoring (Mobile Gen)': ['monitor', 'mobile gen'],
-            'Monitoring (PMG)': ['monitor', 'pmg'],
             'New Module': ['new module', 'module'],
             'No Reply Needed': ['no reply', 'information only'],
             'Novar ESS': ['novar', 'ess'],
             'Opus Architect': ['opus arch', 'architect'],
             'Opus Magnum': ['opus mag', 'magnum'],
             'Other': ['other', 'misc', 'various'],
-            'PMG Request': ['pmg'],
             'Point Change': ['point change', 'board point', 'changing board'],
-            'Power Alerts Change Request': ['power alert', 'alert change'],
             'Power Cycle': ['power cycle', 'restart', 'reboot'],
-            'Power Restoral Emails': ['power restoral', 'power restored'],
-            'PPO': ['ppo'],
             'Project': ['project'],
-            'Queue Cap': ['queue cap', 'capacity'],
-            'Really Distant/Underwater': ['distant', 'underwater', 'poor connection', 'bad line'],
             'Refrigeration': ['refrigeration', 'rack', 'cooling', 'temps', 'temperature', 'defrost', 'forced defrost', 'terminated defrost'],
-            'Refrigeration Tech Request': ['refrigeration tech', 'ref tech'],
             'Remodel': ['remodel', 'renovation'],
-            'Reroute': ['reroute', 'redirect'],
-            'Set Points': ['setpoint', 'set point', 'temperature setting'],
-            'Site Emergency': ['emergency', 'urgent', 'critical'],
+            'Sams': ['sams', 'sam\'s club'],
             'Sporlan': ['sporlan'],
             'Static': ['static', 'noise', 'interference'],
-            'Suppression': ['suppression', 'nsrm'],
-            'Test': ['test', 'testing', 'tested'],
-            'Unplanned Power Outage': ['power outage', 'outage', 'power loss'],
-            'Utility Notification': ['utility', 'notification'],
-            'Sams': ['sams', 'sam\'s club']
+            'Suppression': ['suppression', 'nsrm']
         };
 
         function analyzeNotesForTags() {
@@ -3733,6 +3722,7 @@
                 clearInterval(AppState.deadAirTimer);
                 AppState.deadAirTimer = null;
             }
+            stopTabFlash(); // Stop flashing when paused
             showNotification('Timer paused', 'success', 1500);
         }
 
@@ -3740,6 +3730,7 @@
             AppState.deadAirSeconds = 0;
             updateTimerDisplay();
             updateTimerVisuals();
+            stopTabFlash(); // Stop flashing when reset
             showNotification('Timer reset - You spoke!', 'success', 1000);
         }
 
@@ -3777,21 +3768,55 @@
                 if (AppState.deadAirSeconds >= 30) {
                     timer.classList.add('critical');
                     warningOverlay.classList.add('critical');
+                    startTabFlash('🔴 DEAD AIR!');
                 } else if (AppState.deadAirSeconds >= 25) {
                     timer.classList.add('warning');
                     warningOverlay.classList.add('warning');
+                    startTabFlash('⚠️ Dead Air Warning');
+                } else {
+                    stopTabFlash();
                 }
             } else if (warningOverlay) {
                 // Remove all visual warnings if disabled
                 warningOverlay.classList.remove('warning', 'critical');
                 
-                // Still update timer colors
+                // Still update timer colors and tab flash
                 if (AppState.deadAirSeconds >= 30) {
                     timer.classList.add('critical');
+                    startTabFlash('🔴 DEAD AIR!');
                 } else if (AppState.deadAirSeconds >= 25) {
                     timer.classList.add('warning');
+                    startTabFlash('⚠️ Dead Air Warning');
+                } else {
+                    stopTabFlash();
                 }
             }
+        }
+        
+        // Tab flashing functions
+        function startTabFlash(alertMessage) {
+            if (AppState.isTabFlashing) return; // Already flashing
+            
+            AppState.isTabFlashing = true;
+            let showAlert = true;
+            
+            AppState.tabFlashInterval = setInterval(() => {
+                if (showAlert) {
+                    document.title = alertMessage;
+                } else {
+                    document.title = AppState.originalTitle;
+                }
+                showAlert = !showAlert;
+            }, 1000); // Flash every second
+        }
+        
+        function stopTabFlash() {
+            if (AppState.tabFlashInterval) {
+                clearInterval(AppState.tabFlashInterval);
+                AppState.tabFlashInterval = null;
+            }
+            AppState.isTabFlashing = false;
+            document.title = AppState.originalTitle; // Restore original title
         }
 
         // Microphone Detection (for voice detection only)
@@ -8417,7 +8442,7 @@ verified in {SYSTEM}
             };
         }
 
-        // Enhanced Quick Notes to auto-reset timer
+        // Enhanced Quick Notes
         function addQuickNote(noteText) {
             const notesTextarea = document.getElementById('notes');
             const currentNotes = notesTextarea.value.trim();
@@ -8431,11 +8456,6 @@ verified in {SYSTEM}
             // Track button usage for analytics
             trackButtonClick(noteText, 'quick-note');
             trackNotePattern(notesTextarea.value);
-            
-            // Auto-reset dead air timer (indicates speaking)
-            if (AppState.timerRunning) {
-                resetTimer();
-            }
             
             // Trigger auto-save
             scheduleAutoSave();
@@ -8875,40 +8895,6 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
 Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`
         };
         
-                // Quick Notes functionality
-        function addQuickNote(noteText) {
-            const notesTextarea = document.getElementById('notes');
-            const currentNotes = notesTextarea.value.trim();
-            
-            if (currentNotes) {
-                notesTextarea.value = currentNotes + ' ' + noteText;
-            } else {
-                notesTextarea.value = noteText;
-            }
-            
-            // Track button usage for analytics
-            trackButtonClick(noteText, 'quick-note');
-            trackNotePattern(notesTextarea.value);
-            
-            // Auto-reset dead air timer (indicates speaking)
-            if (AppState.timerRunning) {
-                resetTimer();
-            }
-            
-            // Trigger auto-save
-            scheduleAutoSave();
-            
-            // Update tag recommendations after adding note
-            analyzeNotesForTags();
-            
-            // Visual feedback
-            showNotification(`Added: ${noteText}`, 'success', 2000);
-            
-            // Scroll to end of textarea
-            notesTextarea.scrollTop = notesTextarea.scrollHeight;
-            notesTextarea.setSelectionRange(notesTextarea.value.length, notesTextarea.value.length);
-        }
-
         function addQuickNoteWithInput(prefix, prompt) {
             const userInput = window.prompt(prompt);
             if (userInput !== null && userInput.trim() !== '') {
@@ -9319,6 +9305,22 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             }
         }
 
+        // Show Downloads section (triggered by Novar button)
+        function showDownloadsSection() {
+            const downloadsSection = document.getElementById('downloads-section');
+            if (downloadsSection) {
+                downloadsSection.style.display = 'block';
+            }
+        }
+        
+        // Hide Downloads section (triggered by clearing form)
+        function hideDownloadsSection() {
+            const downloadsSection = document.getElementById('downloads-section');
+            if (downloadsSection) {
+                downloadsSection.style.display = 'none';
+            }
+        }
+
         // Enhanced form management
         function clearFormFields() {
             try {
@@ -9351,6 +9353,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 
                 // Clear infraction display
                 clearInfractionDisplay();
+                
+                // Hide Downloads section
+                hideDownloadsSection();
                 
                 showNotification('Form cleared', 'success', 1500);
                 clearAutoSave();
@@ -9685,5 +9690,13 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             notificationContainer.className = 'sr-only';
             notificationContainer.id = 'notification-announcer';
             document.body.appendChild(notificationContainer);
+        });
+        
+        // Stop tab flashing when user returns to the tab
+        window.addEventListener('focus', function() {
+            if (AppState.isTabFlashing && AppState.deadAirSeconds < 25) {
+                // Only stop flashing if we're no longer in warning state
+                stopTabFlash();
+            }
         });
     </script>
