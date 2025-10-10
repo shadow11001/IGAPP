@@ -5165,12 +5165,12 @@ ${JSON.stringify(exportData, null, 2)}
             const githubReportData = { ...reportData };
             delete githubReportData.fullNotesData; // Remove full data to reduce size
             
-            const issueTitle = `${reportData.isTestReport ? '[TEST] ' : ''}Usage Analytics - ${reportData.reportDate} - ${reportData.userHash.substring(0, 8)}`;
+            const issueTitle = `${reportData.isTestReport ? '[TEST] ' : ''}Usage Analytics - ${reportData.reportDate} - ${reportData.userHash}`;
             const issueBody = `
 ## 📊 ${reportData.isTestReport ? 'TEST ' : ''}Weekly Usage Analytics Report
 
 ${reportData.isTestReport ? '**⚠️ This is a test report for debugging purposes**\n\n' : ''}**Report Date:** ${reportData.reportDate}
-**User ID:** ${reportData.userHash.substring(0, 8)}...
+**User ID:** ${reportData.userHash}
 **Session Duration:** ${reportData.sessionDuration} minutes
 **App Version:** ${reportData.version}
 
@@ -5312,14 +5312,14 @@ The complete untruncated dataset with all ${reportData.rawDataSummary?.totalNote
                 const startNote = chunkIndex * NOTES_PER_ISSUE + 1;
                 const endNote = Math.min((chunkIndex + 1) * NOTES_PER_ISSUE, fullNotesData.length);
                 
-                const subIssueTitle = `[DATA] Analytics Notes ${startNote}-${endNote} | ${reportDate} | ${userHash.substring(0, 8)}`;
+                const subIssueTitle = `[DATA] Analytics Notes ${startNote}-${endNote} | ${reportDate} | ${userHash}`;
                 const subIssueBody = `
 ## 📝 Full Notes Data - Part ${chunkIndex + 1} of ${chunks.length}
 
 **Parent Issue:** #${parentIssueNumber}  
 **Notes Range:** ${startNote}-${endNote} of ${fullNotesData.length} total  
 **Report Date:** ${reportDate}  
-**User ID:** ${userHash.substring(0, 8)}...
+**User ID:** ${userHash}
 
 ---
 
