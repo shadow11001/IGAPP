@@ -7147,8 +7147,9 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             // Extract rack name (LTA, LTB, MTC, MTD, DTB, RCU, etc.)
             extractRackName(text) {
                 const rackPatterns = [
-                    /\brack\s*:?\s*([A-Z]{2,4})\b/gi,  // "rack: LTA" or "rack LTA"
-                    /\b(LTA|LTB|LTC|LTD|MTA|MTB|MTC|MTD|DTB|DTA|RCU|CKT)\b/g  // Common rack names
+                    /(?:rack|on the|to the)\s*:?\s*(LTA|LTB|LTC|LTD|MTA|MTB|MTC|MTD|DTB|DTA|RCU|CKT)\b/gi,  // "rack: LTA", "on the LTA", "to the LTA"
+                    /\b(LTA|LTB|LTC|LTD|MTA|MTB|MTC|MTD|DTB|DTA|RCU|CKT)\s+rack\b/gi,  // "LTA rack"
+                    /\b(LTA|LTB|LTC|LTD|MTA|MTB|MTC|MTD|DTB|DTA|RCU|CKT)\s*(?=\s*$|\s*\.|\s*,|\s+controller|\s+system)/gi  // Standalone rack names at word boundaries
                 ];
                 
                 for (const pattern of rackPatterns) {
@@ -7164,13 +7165,25 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
 
             // Extract technician name from email signature or content
             extractTechName(text) {
-                // Common patterns for tech names in signatures
+                // Common patterns for tech names - ordered by priority
                 const namePatterns = [
-                    /(?:thanks|regards|sincerely)[,:\s]*\n?\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/gi,
-                    /^([A-Z][a-z]+\s+[A-Z][a-z]+)\s*$/gm, // Name at end/start of lines
-                    /\n\s*([A-Z][a-z]+\s+[A-Z][a-z]+)\s*\n/g, // Name on its own line
-                    /^([A-Z][a-z]+)\s*$/gm, // Single name (first name only) at start/end of line
-                    /(?:hi|hello|dear)\s+(?:team|there|all)[,\s]*\n*\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/gi // After greeting
+                    // Pattern 1: "X here" (anywhere in first paragraph)
+                    /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+here/gi,
+                    
+                    // Pattern 2: "This is X" or "My name is X"
+                    /(?:this\s+is|my\s+name\s+is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/gi,
+                    
+                    // Pattern 3: Name after "Thanks," or "Regards," (signature)
+                    /(?:thanks|regards|sincerely)[,:\s]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s*$/gim,
+                    
+                    // Pattern 4: Single name (first name only) on its own line at start
+                    /^([A-Z][a-z]+)\s*\n/gm,
+                    
+                    // Pattern 5: Full name on its own line
+                    /^([A-Z][a-z]+\s+[A-Z][a-z]+)\s*$/gm,
+                    
+                    // Pattern 6: Name on its own line (middle of email)
+                    /\n\s*([A-Z][a-z]+\s+[A-Z][a-z]+)\s*\n/g
                 ];
                 
                 for (const pattern of namePatterns) {
@@ -7178,7 +7191,7 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                     if (matches.length > 0) {
                         const name = matches[0][1].trim();
                         // Filter out common false positives
-                        const excludeWords = ['Store', 'Site', 'Rack', 'Case', 'Work', 'Order', 'Tech', 'Phone', 'Email', 'Team', 'There', 'All'];
+                        const excludeWords = ['Store', 'Site', 'Rack', 'Case', 'Work', 'Order', 'Tech', 'Phone', 'Email', 'Team', 'There', 'All', 'Thanks', 'Good', 'Morning', 'Afternoon', 'Evening', 'Need', 'Want', 'Could', 'Would', 'Should'];
                         if (!excludeWords.some(word => name.toLowerCase().includes(word.toLowerCase()))) {
                             console.log('Tech name found:', name);
                             return name;
