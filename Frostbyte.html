@@ -387,11 +387,23 @@
             font-weight: 600;
             color: #495057;
             margin-bottom: 6px;
+            margin-top: 10px;
         }
         
-        .email-textarea, .response-textarea {
-            width: calc(100% - 20px);
-            max-width: 100%;
+        .email-input-section label:first-of-type {
+            margin-top: 0;
+        }
+        
+        .email-field-container {
+            position: relative;
+            display: flex;
+            gap: 6px;
+            align-items: flex-start;
+        }
+        
+        .email-field, .email-textarea, .response-textarea {
+            flex: 1;
+            width: 100%;
             padding: 10px;
             border: 1px solid #ced4da;
             border-radius: 6px;
@@ -404,7 +416,30 @@
             box-sizing: border-box;
         }
         
-        .email-textarea:focus, .response-textarea:focus {
+        .copy-field-btn {
+            flex-shrink: 0;
+            padding: 8px 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            height: fit-content;
+            align-self: flex-start;
+        }
+        
+        .copy-field-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+        
+        .copy-field-btn:active {
+            transform: translateY(0);
+        }
+        
+        .email-field:focus, .email-textarea:focus, .response-textarea:focus {
             outline: none;
             border-color: #007bff;
             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
@@ -487,6 +522,7 @@
             color: #bdc3c7;
         }
         
+        body.dark-mode .email-field,
         body.dark-mode .email-textarea, 
         body.dark-mode .response-textarea {
             background: #34495e;
@@ -494,6 +530,7 @@
             color: #ecf0f1;
         }
         
+        body.dark-mode .email-field:focus,
         body.dark-mode .email-textarea:focus, 
         body.dark-mode .response-textarea:focus {
             border-color: #3498db;
@@ -3034,8 +3071,17 @@
                         <h3>📧 Email Processor</h3>
                         
                         <div class="email-input-section">
-                            <label for="email-input">Paste Email Content:</label>
-                            <textarea id="email-input" class="email-textarea" placeholder="Paste the full email content here (subject and body)..." rows="8"></textarea>
+                            <label for="email-subject">Email Subject:</label>
+                            <div class="email-field-container">
+                                <textarea id="email-subject" class="email-field" placeholder="Paste email subject here..." rows="2"></textarea>
+                                <button onclick="copyEmailField('email-subject')" class="copy-field-btn" title="Copy Subject">📋</button>
+                            </div>
+                            
+                            <label for="email-body">Email Body:</label>
+                            <div class="email-field-container">
+                                <textarea id="email-body" class="email-field" placeholder="Paste email body here..." rows="8"></textarea>
+                                <button onclick="copyEmailField('email-body')" class="copy-field-btn" title="Copy Body">📋</button>
+                            </div>
                             
                             <div class="email-controls">
                                 <button onclick="processEmail()" class="primary-button">🔍 Process Email</button>
@@ -8359,10 +8405,10 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
 
         // Email processing functions
         function processEmail() {
-            const emailInput = document.getElementById('email-input');
-            const emailText = emailInput.value.trim();
+            const emailSubject = document.getElementById('email-subject').value.trim();
+            const emailBody = document.getElementById('email-body').value.trim();
             
-            if (!emailText) {
+            if (!emailSubject && !emailBody) {
                 showNotification('❌ Please paste email content first', 'error', 3000);
                 return;
             }
@@ -8372,8 +8418,13 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             
             showNotification('🔍 Processing email...', 'info', 2000);
             
+            // Combine subject and body for processing
+            const emailText = (emailSubject ? 'Subject: ' + emailSubject + '\n\n' : '') + emailBody;
+            
             // Extract information
             const emailData = {
+                subject: emailSubject,
+                body: emailBody,
                 workOrder: EMAIL_PROCESSOR.extractWorkOrder(emailText),
                 storeNumber: EMAIL_PROCESSOR.extractStoreNumber(emailText),
                 caseNumber: EMAIL_PROCESSOR.extractCaseNumber(emailText),
@@ -8511,6 +8562,24 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             }, 500);
         }
 
+        function copyEmailField(fieldId) {
+            const field = document.getElementById(fieldId);
+            const text = field.value.trim();
+            
+            if (!text) {
+                const fieldName = fieldId === 'email-subject' ? 'Subject' : 'Body';
+                showNotification(`❌ No ${fieldName} to copy`, 'error', 2000);
+                return;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const fieldName = fieldId === 'email-subject' ? 'Subject' : 'Body';
+                showNotification(`📋 ${fieldName} copied to clipboard!`, 'success', 2000);
+            }).catch(() => {
+                showNotification('❌ Failed to copy', 'error', 2000);
+            });
+        }
+
         function copyEmailResponse() {
             const responseTextarea = document.getElementById('generated-response');
             const responseText = responseTextarea.value;
@@ -8537,7 +8606,8 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
         }
 
         function clearEmailProcessor() {
-            document.getElementById('email-input').value = '';
+            document.getElementById('email-subject').value = '';
+            document.getElementById('email-body').value = '';
             document.getElementById('email-analysis').style.display = 'none';
             document.getElementById('generated-response').readOnly = true;
             document.getElementById('generated-response').style.backgroundColor = '';
@@ -8550,10 +8620,11 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             // Track developer email analysis usage
             trackButtonClick('Email Analysis (Dev)', 'email-processing');
             
-            const emailContent = document.getElementById('email-input').value.trim();
+            const emailSubject = document.getElementById('email-subject').value.trim();
+            const emailBody = document.getElementById('email-body').value.trim();
             const analysisBtn = document.getElementById('dev-email-analysis-btn');
             
-            if (!emailContent) {
+            if (!emailSubject && !emailBody) {
                 showNotification('📧 Please enter email content to analyze', 'error', 3000);
                 return;
             }
@@ -8565,8 +8636,13 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             try {
                 showNotification('📊 Processing email for analysis...', 'info', 2000);
                 
+                // Combine subject and body for processing
+                const emailContent = (emailSubject ? 'Subject: ' + emailSubject + '\n\n' : '') + emailBody;
+                
                 // Extract information using EMAIL_PROCESSOR methods
                 const emailData = {
+                    subject: emailSubject,
+                    body: emailBody,
                     workOrder: EMAIL_PROCESSOR.extractWorkOrder(emailContent),
                     workOrders: EMAIL_PROCESSOR.extractWorkOrder(emailContent) ? [EMAIL_PROCESSOR.extractWorkOrder(emailContent)] : [],
                     storeNumber: EMAIL_PROCESSOR.extractStoreNumber(emailContent),
@@ -8588,6 +8664,8 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 // Create comprehensive analysis report
                 const analysisReport = {
                     timestamp: new Date().toISOString(),
+                    emailSubject: emailSubject,
+                    emailBody: emailBody,
                     originalEmail: emailContent,
                     extractedData: emailData,
                     systemInfo: {
@@ -8665,11 +8743,18 @@ ${JSON.stringify(analysisData.extractedData, null, 2)}
 </details>
 
 ### 📧 Original Email Content
+
+**Subject:**
+\`\`\`
+${analysisData.emailSubject || 'No subject provided'}
+\`\`\`
+
+**Body:**
 <details>
-<summary>Click to expand original email</summary>
+<summary>Click to expand email body</summary>
 
 \`\`\`
-${analysisData.originalEmail}
+${analysisData.emailBody || 'No body provided'}
 \`\`\`
 </details>
 
