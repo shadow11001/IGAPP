@@ -2689,6 +2689,7 @@
                 <button onclick="addQuickNote('This is a Sams store.')" class="quick-note-btn" title="Sam's Club Store">Sams</button>
                 <button onclick="addQuickNote('Submitted PCR.')" class="quick-note-btn success-quick" title="Point Change Request Submitted">Submitted PCR</button>
                 <button onclick="addQuickNote('Submitted PDR.')" class="quick-note-btn success-quick" title="Parameter Deviation Request Submitted">Submitted PDR</button>
+                <button onclick="addQuickNote('Adv tech to restart the Sporlan case controllers and the Sporlan Gateway and adv tech that if it continues, they will need to contact Sporlan.')" class="quick-note-btn" title="Sporlan Controller Restart">Sporlan</button>
                 <button onclick="addAdvisoryNote()" class="quick-note-btn" title="Advise Tech of Issue">Advisory</button>
             </div>
 
@@ -3047,7 +3048,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.1.8', // Update this when you make changes
+            currentVersion: '1.1.9', // Update this when you make changes
             githubRepo: 'shadow11001/Frostbyte',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -3712,6 +3713,18 @@
                 
                 AppState.timerRunning = true;
                 AppState.deadAirTimer = setInterval(updateTimer, 1000);
+                
+                // Mark that we're on a call - this keeps focus tracking active even if window loses focus
+                AppState.usageTracking.onCall = true;
+                
+                // If not already tracking time, start now
+                if (!AppState.usageTracking.focusStart) {
+                    AppState.usageTracking.focusStart = Date.now();
+                    console.log('📊 Call started - beginning time tracking (acts as window focus)');
+                } else {
+                    console.log('📊 Call started - continuing existing time tracking');
+                }
+                
                 showNotification('Dead air timer started', 'success', 1500);
             }
         }
@@ -3722,6 +3735,21 @@
                 clearInterval(AppState.deadAirTimer);
                 AppState.deadAirTimer = null;
             }
+            
+            // Mark call as ended
+            AppState.usageTracking.onCall = false;
+            
+            // Save accumulated time if tracking and window is not focused
+            if (AppState.usageTracking.focusStart && !AppState.usageTracking.windowFocused) {
+                const focusedDuration = Date.now() - AppState.usageTracking.focusStart;
+                AppState.usageTracking.totalFocusTime += focusedDuration;
+                localStorage.setItem('totalFocusTime', AppState.usageTracking.totalFocusTime.toString());
+                console.log(`📊 Call ended (window not focused) - added ${Math.round(focusedDuration / 1000)}s to focus time`);
+                AppState.usageTracking.focusStart = null;
+            } else if (AppState.usageTracking.focusStart && AppState.usageTracking.windowFocused) {
+                console.log('📊 Call ended (window still focused) - continuing time tracking');
+            }
+            
             stopTabFlash(); // Stop flashing when paused
             showNotification('Timer paused', 'success', 1500);
         }
@@ -3793,18 +3821,24 @@
             }
         }
         
-        // Tab flashing functions
+        // Tab flashing functions with color
         function startTabFlash(alertMessage) {
             if (AppState.isTabFlashing) return; // Already flashing
             
             AppState.isTabFlashing = true;
             let showAlert = true;
             
+            // Determine color based on alert type
+            const isWarning = alertMessage.includes('⚠️');
+            const warningColor = isWarning ? '#ffc107' : '#dc3545'; // Yellow for warning, red for critical
+            
             AppState.tabFlashInterval = setInterval(() => {
                 if (showAlert) {
                     document.title = alertMessage;
+                    setFaviconColor(warningColor);
                 } else {
                     document.title = AppState.originalTitle;
+                    setFaviconColor('#0078d4'); // Default blue
                 }
                 showAlert = !showAlert;
             }, 1000); // Flash every second
@@ -3817,6 +3851,40 @@
             }
             AppState.isTabFlashing = false;
             document.title = AppState.originalTitle; // Restore original title
+            setFaviconColor('#0078d4'); // Restore default blue favicon
+        }
+        
+        // Helper function to dynamically set favicon color
+        function setFaviconColor(color) {
+            // Remove existing favicon
+            let link = document.querySelector("link[rel*='icon']");
+            if (link) {
+                document.head.removeChild(link);
+            }
+            
+            // Create new favicon with the specified color
+            const canvas = document.createElement('canvas');
+            canvas.width = 32;
+            canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            
+            // Draw colored circle
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(16, 16, 14, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Add white border
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Set as favicon
+            link = document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'icon';
+            link.href = canvas.toDataURL();
+            document.head.appendChild(link);
         }
 
         // Microphone Detection (for voice detection only)
@@ -4713,9 +4781,37 @@ ${JSON.stringify(exportData, null, 2)}
             }
             AppState.usageTracking.userHash = userHash;
             
-            // Initialize session start time for this session
-            AppState.usageTracking.sessionStart = Date.now();
-            localStorage.setItem('sessionStartTime', AppState.usageTracking.sessionStart.toString());
+            // Check if we need to reset session start (after a report was sent)
+            const lastReportTime = parseInt(localStorage.getItem('lastUsageReport') || '0');
+            const savedSessionStart = parseInt(localStorage.getItem('sessionStartTime') || '0');
+            const now = Date.now();
+            
+            // If last report was sent and session start is from before the report, reset it
+            if (lastReportTime > 0 && savedSessionStart < lastReportTime) {
+                console.log('📊 Resetting session start time (new reporting period)');
+                AppState.usageTracking.sessionStart = now;
+                localStorage.setItem('sessionStartTime', now.toString());
+            } else if (!savedSessionStart) {
+                // First time initialization
+                AppState.usageTracking.sessionStart = now;
+                localStorage.setItem('sessionStartTime', now.toString());
+            } else {
+                // Use existing session start
+                AppState.usageTracking.sessionStart = savedSessionStart;
+            }
+            
+            // Initialize focus tracking
+            AppState.usageTracking.totalFocusTime = parseInt(localStorage.getItem('totalFocusTime') || '0');
+            AppState.usageTracking.onCall = false;
+            AppState.usageTracking.windowFocused = !document.hidden;
+            
+            // Start tracking if window is already focused on load
+            if (AppState.usageTracking.windowFocused) {
+                AppState.usageTracking.focusStart = Date.now();
+                console.log('📊 Window already focused on load - starting time tracking');
+            } else {
+                AppState.usageTracking.focusStart = null;
+            }
             
             // Load existing button click data
             const savedClicks = localStorage.getItem('buttonClickAnalytics');
@@ -4723,14 +4819,28 @@ ${JSON.stringify(exportData, null, 2)}
                 try {
                     AppState.usageTracking.buttonClicks = JSON.parse(savedClicks);
                 } catch (e) {
+                    console.error('Failed to parse button click data:', e);
                     AppState.usageTracking.buttonClicks = {};
                 }
             }
             
+            // Load and merge note patterns from localStorage
+            const savedPatterns = localStorage.getItem('notePatterns');
+            if (savedPatterns) {
+                try {
+                    AppState.usageTracking.notePatterns = JSON.parse(savedPatterns);
+                    console.log(`📊 Loaded ${AppState.usageTracking.notePatterns.length} saved note patterns`);
+                } catch (e) {
+                    console.error('Failed to parse note patterns:', e);
+                    AppState.usageTracking.notePatterns = [];
+                }
+            } else {
+                AppState.usageTracking.notePatterns = [];
+            }
+            
             // Load last report time
-            const lastReport = localStorage.getItem('lastUsageReport');
-            if (lastReport) {
-                AppState.usageTracking.lastReport = parseInt(lastReport);
+            if (lastReportTime > 0) {
+                AppState.usageTracking.lastReport = lastReportTime;
             }
             
             // Load reporting preference
@@ -4739,26 +4849,91 @@ ${JSON.stringify(exportData, null, 2)}
                 AppState.usageTracking.reportingEnabled = reportingPref === 'true';
             }
             
+            // Setup focus/blur tracking to only count active usage time
+            window.addEventListener('focus', () => {
+                // Only start tracking if not already on a call
+                if (!AppState.usageTracking.onCall && !AppState.usageTracking.focusStart) {
+                    AppState.usageTracking.focusStart = Date.now();
+                    console.log('📊 Window focused - starting time tracking');
+                }
+                AppState.usageTracking.windowFocused = true;
+            });
+            
+            window.addEventListener('blur', () => {
+                AppState.usageTracking.windowFocused = false;
+                
+                // Only stop tracking if not on a call
+                // If on a call, keep tracking as if window is still focused
+                if (!AppState.usageTracking.onCall && AppState.usageTracking.focusStart) {
+                    const focusedDuration = Date.now() - AppState.usageTracking.focusStart;
+                    AppState.usageTracking.totalFocusTime += focusedDuration;
+                    localStorage.setItem('totalFocusTime', AppState.usageTracking.totalFocusTime.toString());
+                    console.log(`📊 Window blurred - added ${Math.round(focusedDuration / 1000)}s to focus time`);
+                    AppState.usageTracking.focusStart = null;
+                } else if (AppState.usageTracking.onCall) {
+                    console.log('📊 Window blurred but on call - continuing time tracking');
+                }
+            });
+            
+            // Track before unload to save any remaining focus time
+            window.addEventListener('beforeunload', () => {
+                if (AppState.usageTracking.focusStart) {
+                    const focusedDuration = Date.now() - AppState.usageTracking.focusStart;
+                    AppState.usageTracking.totalFocusTime += focusedDuration;
+                    localStorage.setItem('totalFocusTime', AppState.usageTracking.totalFocusTime.toString());
+                }
+                // Save note patterns before unload
+                if (AppState.usageTracking.notePatterns.length > 0) {
+                    localStorage.setItem('notePatterns', JSON.stringify(AppState.usageTracking.notePatterns));
+                }
+            });
+            
+            // Periodic save of tracking data (every 30 seconds) to prevent data loss
+            setInterval(() => {
+                // Save current focus time including active session
+                if (AppState.usageTracking.focusStart) {
+                    const focusedDuration = Date.now() - AppState.usageTracking.focusStart;
+                    const currentTotal = AppState.usageTracking.totalFocusTime + focusedDuration;
+                    localStorage.setItem('totalFocusTime', currentTotal.toString());
+                }
+                // Save note patterns
+                if (AppState.usageTracking.notePatterns.length > 0) {
+                    localStorage.setItem('notePatterns', JSON.stringify(AppState.usageTracking.notePatterns));
+                }
+            }, 30000); // Every 30 seconds
+            
             // Check if reporting should happen (weekly)
             if (shouldSendUsageReport()) {
                 setTimeout(generateAndSubmitUsageReport, 15000); // Delay 15 seconds after load
             }
             
-            console.log('📊 Usage analytics initialized for:', userHash.substring(0, 8) + '...');
-            console.log('📊 Session started at:', new Date(AppState.usageTracking.sessionStart).toLocaleString());
+            console.log('📊 Usage analytics initialized');
+            console.log('📊 User hash:', userHash.substring(0, 8) + '...');
+            console.log('📊 Session started:', new Date(AppState.usageTracking.sessionStart).toLocaleString());
+            console.log('📊 Total focus time:', Math.round(AppState.usageTracking.totalFocusTime / 1000 / 60), 'minutes');
+            console.log('📊 Note patterns:', AppState.usageTracking.notePatterns.length);
         }
         
         function trackButtonClick(buttonName, category = 'general') {
             if (!AppState.usageTracking.reportingEnabled) return;
+            
+            // Debounce duplicate clicks (within 100ms)
+            const now = Date.now();
+            const lastClickKey = `lastClick_${category}_${buttonName}`;
+            const lastClick = AppState.usageTracking[lastClickKey] || 0;
+            
+            if (now - lastClick < 100) {
+                console.log(`⚠️ Debounced duplicate click for ${category}:${buttonName}`);
+                return;
+            }
+            
+            AppState.usageTracking[lastClickKey] = now;
             
             const key = `${category}:${buttonName}`;
             AppState.usageTracking.buttonClicks[key] = (AppState.usageTracking.buttonClicks[key] || 0) + 1;
             
             // Save to localStorage immediately
             localStorage.setItem('buttonClickAnalytics', JSON.stringify(AppState.usageTracking.buttonClicks));
-            
-            // Update session start time to ensure accurate duration tracking
-            localStorage.setItem('sessionStartTime', AppState.usageTracking.sessionStart.toString());
             
             console.log('📊 Button tracked:', key, '- Total clicks:', AppState.usageTracking.buttonClicks[key]);
         }
@@ -4806,22 +4981,70 @@ ${JSON.stringify(exportData, null, 2)}
                     return;
                 }
                 
+                // Create backup before clearing data
+                const backupData = {
+                    buttonClicks: { ...AppState.usageTracking.buttonClicks },
+                    totalFocusTime: AppState.usageTracking.totalFocusTime,
+                    notePatterns: [...AppState.usageTracking.notePatterns],
+                    sessionStart: AppState.usageTracking.sessionStart,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('analyticsBackup', JSON.stringify(backupData));
+                console.log('📊 Created analytics backup before submission');
+                
                 await submitUsageReportToGitHub(reportData);
                 
-                // Update last report timestamp
-                AppState.usageTracking.lastReport = Date.now();
-                localStorage.setItem('lastUsageReport', AppState.usageTracking.lastReport.toString());
+                // Only clear data if submission was successful
+                console.log('✅ Report submitted successfully - clearing analytics data');
                 
-                // Clear session data after successful report
+                // Clear session data
+                localStorage.removeItem('buttonClickAnalytics');
+                localStorage.removeItem('totalFocusTime');
+                localStorage.removeItem('notePatterns');
+                AppState.usageTracking.buttonClicks = {};
+                AppState.usageTracking.totalFocusTime = 0;
                 AppState.usageTracking.notePatterns = [];
                 
+                // Update last report time
+                const reportTime = Date.now();
+                AppState.usageTracking.lastReport = reportTime;
+                localStorage.setItem('lastUsageReport', reportTime.toString());
+                
+                // Reset session start for new reporting period
+                AppState.usageTracking.sessionStart = reportTime;
+                localStorage.setItem('sessionStartTime', reportTime.toString());
+                
+                // Clear backup after successful submission
+                localStorage.removeItem('analyticsBackup');
+                
                 showNotification('📊 Anonymous usage data submitted - Thank you for helping improve the app!', 'success', 5000);
-                console.log('✅ Usage report submitted successfully');
+                console.log('✅ Usage report submitted and data cleared successfully');
                 
             } catch (error) {
-                console.log('📊 Usage report submission failed (this is normal):', error.message);
-                // Fail silently - don't bother users with analytics failures
+                console.error('❌ Usage report submission failed:', error.message);
+                showNotification('⚠️ Failed to submit usage report - data preserved for retry', 'warning', 3000);
+                // Don't clear data on failure - keep it for next attempt
             }
+        }
+        
+        // Helper function to restore backup if needed
+        function restoreAnalyticsBackup() {
+            const backup = localStorage.getItem('analyticsBackup');
+            if (backup) {
+                try {
+                    const data = JSON.parse(backup);
+                    localStorage.setItem('buttonClickAnalytics', JSON.stringify(data.buttonClicks));
+                    localStorage.setItem('totalFocusTime', data.totalFocusTime.toString());
+                    localStorage.setItem('notePatterns', JSON.stringify(data.notePatterns));
+                    localStorage.setItem('sessionStartTime', data.sessionStart.toString());
+                    console.log('📊 Restored analytics backup from:', new Date(data.timestamp).toLocaleString());
+                    return true;
+                } catch (e) {
+                    console.error('Failed to restore analytics backup:', e);
+                    return false;
+                }
+            }
+            return false;
         }
         
         // Anonymization helper functions for usage analytics
@@ -4996,19 +5219,34 @@ ${JSON.stringify(exportData, null, 2)}
             // Analyze saved notes for common patterns (anonymized)
             const commonPhrases = savedNotes.length > 0 ? analyzeCommonPhrasesForButtonSuggestions(savedNotes) : [];
             
-            // Calculate session duration - use persisted sessionStart if available
-            const savedSessionStart = localStorage.getItem('sessionStartTime');
-            const sessionStartTime = savedSessionStart ? parseInt(savedSessionStart) : AppState.usageTracking.sessionStart;
-            let sessionDuration = Math.round((Date.now() - sessionStartTime) / 1000 / 60); // minutes
+            // Calculate session duration using tracked focus time
+            // Get accumulated time from localStorage
+            const totalFocusTime = parseInt(localStorage.getItem('totalFocusTime') || '0');
+            
+            // Add current active focus time if currently tracking
+            // (either window is focused OR on a call)
+            let currentFocusTime = 0;
+            if (AppState.usageTracking.focusStart) {
+                currentFocusTime = Date.now() - AppState.usageTracking.focusStart;
+            }
+            
+            // Total active time in milliseconds
+            const totalActiveTime = totalFocusTime + currentFocusTime;
+            let sessionDuration = Math.round(totalActiveTime / 1000 / 60); // minutes
             
             // Validate session duration - if unrealistic, use a fallback
             if (sessionDuration < 0 || sessionDuration > 1440) { // negative or more than 24 hours
-                sessionDuration = Math.round((Date.now() - AppState.usageTracking.sessionStart) / 1000 / 60);
+                const savedSessionStart = localStorage.getItem('sessionStartTime');
+                const sessionStartTime = savedSessionStart ? parseInt(savedSessionStart) : AppState.usageTracking.sessionStart;
+                sessionDuration = Math.round((Date.now() - sessionStartTime) / 1000 / 60);
             }
             
             console.log('📊 Session duration calculation:', {
-                sessionStartTime: new Date(sessionStartTime).toLocaleString(),
-                currentTime: new Date().toLocaleString(),
+                totalFocusTime: Math.round(totalFocusTime / 1000 / 60) + ' minutes',
+                currentActiveTime: Math.round(currentFocusTime / 1000 / 60) + ' minutes',
+                totalActiveTime: Math.round(totalActiveTime / 1000 / 60) + ' minutes',
+                onCall: AppState.usageTracking.onCall,
+                windowFocused: AppState.usageTracking.windowFocused,
                 durationMinutes: sessionDuration
             });
             
@@ -5133,52 +5371,86 @@ ${JSON.stringify(exportData, null, 2)}
             try {
                 if (!savedNotesData || savedNotesData.length === 0) return [];
                 
-                // Analyze for common patterns that could become buttons
-                const allText = savedNotesData
-                    .map(note => note.notes || '')
-                    .join(' ')
-                    .toLowerCase();
+                const phraseCount = {};
+                const minOccurrences = 2;
                 
-                if (!allText.trim()) return [];
+                // Expanded stopwords list to filter out generic phrases
+                const stopWords = new Set([
+                    'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+                    'of', 'with', 'by', 'from', 'up', 'about', 'into', 'through', 'during',
+                    'before', 'after', 'above', 'below', 'between', 'under', 'again', 'further',
+                    'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'both',
+                    'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not',
+                    'only', 'own', 'same', 'so', 'than', 'too', 'very', 'can', 'will', 'just',
+                    'should', 'now', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'them', 'their',
+                    'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is',
+                    'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does',
+                    'did', 'doing', 'would', 'could', 'ought', 'im', 'ive', 'id', 'per', 'said'
+                ]);
                 
-                // Look for repeated action phrases
-                const actionPhrases = {};
-                
-                // Common action patterns
-                const actionPatterns = [
-                    /called\s+\w+/gi,
-                    /contacted\s+\w+/gi,
-                    /replaced\s+\w+/gi,
-                    /tested\s+\w+/gi,
-                    /checked\s+\w+/gi,
-                    /updated\s+\w+/gi,
-                    /reset\s+\w+/gi,
-                    /forced\s+\w+/gi,
-                    /performed\s+\w+/gi,
-                    /advised\s+\w+/gi
-                ];
-                
-                actionPatterns.forEach(pattern => {
-                    const matches = allText.match(pattern) || [];
-                    matches.forEach(match => {
-                        const cleanMatch = match.trim();
-                        if (cleanMatch.length > 5 && cleanMatch.length < 30) {
-                            actionPhrases[cleanMatch] = (actionPhrases[cleanMatch] || 0) + 1;
+                savedNotesData.forEach(noteObj => {
+                    const text = noteObj.notes || '';
+                    const words = text.toLowerCase()
+                        .replace(/[^\w\s]/g, ' ')
+                        .split(/\s+/)
+                        .filter(w => w.length > 2 && !stopWords.has(w));
+                    
+                    // Extract 2-5 word phrases (expanded from 2-4)
+                    for (let len = 2; len <= 5; len++) {
+                        for (let i = 0; i <= words.length - len; i++) {
+                            const phrase = words.slice(i, i + len).join(' ');
+                            
+                            // Skip if phrase is too short or too long
+                            if (phrase.length < 6 || phrase.length > 50) continue;
+                            
+                            // Normalize variations (e.g., "checking" -> "check")
+                            const normalized = normalizePhrase(phrase);
+                            
+                            if (!phraseCount[normalized]) {
+                                phraseCount[normalized] = {
+                                    count: 0,
+                                    originalPhrases: new Set()
+                                };
+                            }
+                            phraseCount[normalized].count++;
+                            phraseCount[normalized].originalPhrases.add(phrase);
                         }
-                    });
+                    }
                 });
                 
-                // Return phrases that appear multiple times and could be buttons
-                return Object.entries(actionPhrases)
-                    .filter(([phrase, count]) => count >= 2) // Used at least twice
-                    .sort(([,a], [,b]) => b - a)
-                    .slice(0, 15)
-                    .map(([phrase, count]) => ({ suggestion: phrase, frequency: count }));
+                // Convert to array and filter by minimum occurrences
+                const commonPhrases = Object.entries(phraseCount)
+                    .filter(([_, data]) => data.count >= minOccurrences)
+                    .map(([phrase, data]) => ({
+                        suggestion: getMostCommonVariant(data.originalPhrases),
+                        frequency: data.count,
+                        variants: Array.from(data.originalPhrases).length
+                    }))
+                    .sort((a, b) => b.frequency - a.frequency)
+                    .slice(0, 20); // Increased from 15 to 20
+                
+                return commonPhrases;
                     
             } catch (error) {
                 console.error('Button suggestion analysis failed:', error);
                 return [];
             }
+        }
+        
+        // Helper function to normalize phrase variations
+        function normalizePhrase(phrase) {
+            return phrase
+                .replace(/ing\b/g, '') // Remove -ing endings
+                .replace(/ed\b/g, '')  // Remove -ed endings
+                .replace(/s\b/g, '')   // Remove plural s
+                .replace(/\s+/g, ' ')  // Normalize spaces
+                .trim();
+        }
+        
+        // Helper function to get most common variant
+        function getMostCommonVariant(variants) {
+            // Return the shortest variant (usually the base form)
+            return Array.from(variants).sort((a, b) => a.length - b.length)[0];
         }
         
         async function submitUsageReportToGitHub(reportData) {
