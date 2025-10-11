@@ -2437,6 +2437,37 @@
             font-weight: 500;
             box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
             margin-left: 10px;
+            transition: background 0.3s ease;
+        }
+        
+        .war-room-status.flash-yellow {
+            animation: flash-yellow 1.5s ease-in-out infinite;
+        }
+        
+        .war-room-status.flash-red {
+            animation: flash-red 1s ease-in-out infinite;
+        }
+        
+        @keyframes flash-yellow {
+            0%, 100% {
+                background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+                box-shadow: 0 2px 12px rgba(255, 193, 7, 0.5);
+            }
+            50% {
+                background: linear-gradient(135deg, #ffeb3b 0%, #ffc107 100%);
+                box-shadow: 0 4px 20px rgba(255, 193, 7, 0.8);
+            }
+        }
+        
+        @keyframes flash-red {
+            0%, 100% {
+                background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+                box-shadow: 0 2px 12px rgba(220, 53, 69, 0.5);
+            }
+            50% {
+                background: linear-gradient(135deg, #ff4757 0%, #dc3545 100%);
+                box-shadow: 0 4px 20px rgba(220, 53, 69, 0.8);
+            }
         }
 
         .war-room-icon {
@@ -3347,7 +3378,8 @@
                 checkInterval: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
                 reminderTimeouts: [],
                 notificationShown: false,
-                currentCheckDue: null
+                currentCheckDue: null,
+                displayUpdateInterval: null
             },
             
             // Persistent Work Orders for War Room
@@ -6946,73 +6978,22 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             // Don't show if already dismissed for this check period
             if (AppState.warRoomSchedule.notificationShown) return;
             
-            // Don't show multiple notifications
-            if (document.getElementById('warRoomNotif')) return;
+            const statusDiv = document.getElementById('warRoomStatus');
+            if (!statusDiv) return;
             
-            const isBackup = AppState.warRoomSchedule.role === 'backup';
-            const checkTime = new Date();
-            checkTime.setHours(Math.floor(checkMinutes / 60), checkMinutes % 60, 0, 0);
-            const timeStr = checkTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            // Remove any existing flash classes
+            statusDiv.classList.remove('flash-yellow', 'flash-red');
             
-            let notification;
+            // Apply appropriate flash based on notification type
             if (type === 'can-start') {
-                notification = {
-                    title: '📋 War Room Check Available',
-                    message: `You can start your ${timeStr} War Room check now (20 minutes early). You'll have 20 minutes to complete it from when you start.`,
-                    urgent: false,
-                    buttons: [
-                        { text: 'Start Now', action: () => { dismissWarRoomNotification(); addQuickNote(`War Room Check - Started at ${new Date().toLocaleTimeString()}`); } },
-                        { text: 'Later', action: () => dismissWarRoomNotification() }
-                    ]
-                };
+                // Flash yellow - check can start early
+                statusDiv.classList.add('flash-yellow');
             } else if (type === 'due-now') {
-                notification = {
-                    title: '⚠️ War Room Check Due NOW',
-                    message: `Your War Room check is due at ${timeStr}! You have until ${calculateLatestStart(checkMinutes)} to start (20 minutes). Complete within 20 minutes of starting.`,
-                    urgent: true,
-                    buttons: [
-                        { text: 'Start Check', action: () => { dismissWarRoomNotification(); addQuickNote(`War Room Check - Starting`); } },
-                        { text: 'Dismiss', action: () => dismissWarRoomNotification() }
-                    ]
-                };
+                // Flash red - check is due now (urgent)
+                statusDiv.classList.add('flash-red');
             } else if (type === 'backup-check') {
-                notification = {
-                    title: '📋 Backup War Room Check',
-                    message: `Primary's ${timeStr} War Room check is 15 minutes overdue. Please verify the check has been completed or prepare to assist.`,
-                    urgent: false,
-                    buttons: [
-                        { text: 'Check Status', action: () => { dismissWarRoomNotification(); addQuickNote(`Backup checking War Room status for ${timeStr} check`); } },
-                        { text: 'Dismiss', action: () => dismissWarRoomNotification() }
-                    ]
-                };
-            }
-            
-            const notif = document.createElement('div');
-            notif.className = `war-room-notification ${notification.urgent ? 'urgent' : ''}`;
-            notif.id = 'warRoomNotif';
-            notif.innerHTML = `
-                <div class="notification-header">
-                    <span>${notification.title}</span>
-                </div>
-                <div class="notification-body">
-                    ${notification.message}
-                </div>
-                <div class="notification-actions">
-                    ${notification.buttons.map((btn, idx) => `
-                        <button class="${idx === 0 ? 'btn-primary' : 'btn-secondary'}" onclick="warRoomActions[${idx}]()">${btn.text}</button>
-                    `).join('')}
-                </div>
-            `;
-            
-            window.warRoomActions = notification.buttons.map(btn => btn.action);
-            document.body.appendChild(notif);
-            
-            // Play sound for urgent notifications
-            if (notification.urgent) {
-                try {
-                    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuFzvLZiTYIG2m98OScTgwOUKzn77ZiFwU7k9n0y4IuBSp+zO/glUQMFGS56+ibUBELTKXh8bllHgYuhND03YoxBSF1xe/mnUoODlSq5O+1YhgFOpPX88yDLgUpfsrv4JVEDBVku+rorVERC0um4PK8YyMGLITN8tyJNQcdaLvt455ODA5QrOTvsWIYBTuR1/PMgi4FK37L7+CVRAwVZLvr6qxREAtLpuDyvWMjBSyEzvLaijUHHWi77uScTgwOUKvj77JiFwY7k9nyzIIuBSl+yu/glUQMFWS76+usURQLS6bg8rxjIwUshdDy2Yk1Bx1nvu3knE4MDlCs5O+xYhgFPJPZ88yDLgYuf8vu3490EwwTYrfp6alTFApIo+DyvmQjBSuEzvHaizYHHGi77OOdTgwPUKvj7rJhGAU8kdnyzIItBSl+zO/glEQNFGO56+qrURQLSqXh8r1kJAUshdDy2Yk1Bx1nvu3jnE4MD1Cr4+2yYhgFPJPZ88yELgYpf8vu35BzEwwSYrjp6alTFApIpODyvmQjBSuFzvLaizUHHGi87OSfTgwOUavj7rNiGAU8kdnzzIMuBSl+y+/fkHQTDBJit+rpqlQUCkek4PK+ZSQFLIXu8dmJNQcNZ77t5JxODA9Qq+Pts2IYBTqT2/PMgy4FKX7L7t+QdBQNEmK46umqVBQLSKTg8r5lJAYrhc7y2ok1Bxxnu+zkn04OD1Gs4+yzYhgFPJHZ88yDLgUpfszv35B0EgwTYbjq6KpUFQpHpODzv2UkBSyF0PLZiTYIHGe77OSdTwwOUKzk7bNiGAU8ktnzzIMuBil/y+7fkHUTDBNht+rpqlUVC0ek4PK+ZSQFLYXu8dqJNggbZrvs5J1PDg5Rq+Pts2IaBjyR2vTMgy4FKX7L7t+QdRMLEmK36umpVRYKSKPg8r5lJAUshdDy2Yk2Bxxnuu3knE8MD1Cr4++zYhgFPJHZ88yELgUpf8vv35B1EwsUYrjq6alUFApIpODyvmUkBi2Fz/HZiTYIG2W77OSeUAwOT6vj7bNiGQY7ktn0y4MuBSl+y+7gkHQUCxFiu+vpq1QVCkik4PO+ZSQFLYXu8dqJNgcbZ7zt45xPDA9Qq+Pvs2IYBTyR2fPMgi4FKH7L7t+RdBQLFGK46+mrVBUKSKPg8r5lJAUthdDy2Yk1CBxnvO3jnU4MD1Cr4++zYhgFOpHa9MyCLgYpfsvv3490FAsUYrjr6atUFApIpODzvmUkBS2F0PLaiTUHHGe67eSdTwwPUKvj77NhGAU8ktn0zIMuBSl+y+7fkHQUCxNiuOvpq1QUEQ==');
-                    audio.play().catch(() => {});
-                } catch (e) {}
+                // Flash yellow for backup notification
+                statusDiv.classList.add('flash-yellow');
             }
         }
         
@@ -7024,10 +7005,10 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
         }
         
         function dismissWarRoomNotification() {
-            const notif = document.getElementById('warRoomNotif');
-            if (notif) {
-                notif.style.animation = 'slideOutRight 0.3s ease-in';
-                setTimeout(() => notif.remove(), 300);
+            // Stop any flashing on the War Room status display
+            const statusDiv = document.getElementById('warRoomStatus');
+            if (statusDiv) {
+                statusDiv.classList.remove('flash-yellow', 'flash-red');
             }
             
             // Mark notification as shown to prevent re-appearing
@@ -7085,9 +7066,20 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
         }
         
         function stopWarRoomSchedule() {
+            // Clear all reminder timeouts
             AppState.warRoomSchedule.reminderTimeouts.forEach(timeout => clearTimeout(timeout));
             AppState.warRoomSchedule.reminderTimeouts = [];
+            
+            // Clear display update interval
+            if (AppState.warRoomSchedule.displayUpdateInterval) {
+                clearInterval(AppState.warRoomSchedule.displayUpdateInterval);
+                AppState.warRoomSchedule.displayUpdateInterval = null;
+            }
+            
+            // Clear next check
             AppState.warRoomSchedule.nextCheck = null;
+            
+            // Dismiss any notifications
             dismissWarRoomNotification();
             
             const statusDiv = document.getElementById('warRoomStatus');
@@ -7097,6 +7089,12 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
         function updateWarRoomStatusDisplay() {
             const statusDiv = document.getElementById('warRoomStatus');
             const nextCheckSpan = document.getElementById('warRoomNextCheck');
+            
+            // Clear any existing display update interval
+            if (AppState.warRoomSchedule.displayUpdateInterval) {
+                clearInterval(AppState.warRoomSchedule.displayUpdateInterval);
+                AppState.warRoomSchedule.displayUpdateInterval = null;
+            }
             
             if (!AppState.warRoomSchedule.enabled || !AppState.warRoomSchedule.nextCheck) {
                 if (statusDiv) statusDiv.style.display = 'none';
@@ -7108,6 +7106,12 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             const updateDisplay = () => {
                 const now = new Date();
                 const next = AppState.warRoomSchedule.nextCheck;
+                
+                if (!next) {
+                    nextCheckSpan.textContent = 'No check scheduled';
+                    return;
+                }
+                
                 const diff = next - now;
                 
                 if (diff <= 0) {
@@ -7128,7 +7132,7 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             };
             
             updateDisplay();
-            setInterval(updateDisplay, 60000);
+            AppState.warRoomSchedule.displayUpdateInterval = setInterval(updateDisplay, 60000);
         }
         
         function loadWarRoomSchedule() {
@@ -9033,7 +9037,7 @@ verified in {SYSTEM}
             // Track war room check start
             trackButtonClick('Start War Room Check', 'war-room');
             
-            // Dismiss any active War Room notification
+            // Dismiss any active War Room notification and stop flashing
             dismissWarRoomNotification();
             
             const storesText = document.getElementById('assigned-stores').value.trim();
@@ -9288,9 +9292,13 @@ verified in {SYSTEM}
             
             showNotification('🎉 War Room check completed!', 'success', 5000);
             
-            // Reschedule next War Room check
+            // Clear the completion deadline timer and reschedule next War Room check
             if (AppState.warRoomSchedule.enabled) {
-                scheduleAllWarRoomChecks();
+                // Stop all existing timers
+                stopWarRoomSchedule();
+                
+                // Re-initialize the schedule to calculate and set next check
+                initializeWarRoomSchedule();
             }
         }
         
