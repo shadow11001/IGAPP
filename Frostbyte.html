@@ -3160,7 +3160,7 @@
                                 <div class="work-order-section">
                                     <h5>Work Orders:</h5>
                                     <div id="work-order-list" class="work-order-list">
-                                        <p>No work orders created for this store</p>
+                                        <p>No work orders monitored for this store</p>
                                     </div>
                                     <button onclick="addWorkOrder()" class="primary-button">📝 Add Work Order</button>
                                 </div>
@@ -3349,6 +3349,9 @@
                 notificationShown: false,
                 currentCheckDue: null
             },
+            
+            // Persistent Work Orders for War Room
+            persistentWorkOrders: [],
             
             // Selected system for button group visibility
             selectedSystem: null,
@@ -7164,6 +7167,18 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                     console.error('Failed to load War Room schedule:', e);
                 }
             }
+            
+            // Load persistent work orders
+            const savedWorkOrders = localStorage.getItem('persistentWorkOrders');
+            if (savedWorkOrders) {
+                try {
+                    AppState.persistentWorkOrders = JSON.parse(savedWorkOrders);
+                    console.log(`📝 Loaded ${AppState.persistentWorkOrders.length} persistent work orders`);
+                } catch (e) {
+                    console.error('Failed to load persistent work orders:', e);
+                    AppState.persistentWorkOrders = [];
+                }
+            }
         }
 
         // ============= Database Management Functions =============
@@ -9082,8 +9097,8 @@ verified in {SYSTEM}
                 document.getElementById('rack-list').innerHTML = '<p>Select a control system to see available racks/components</p>';
             }
             
-            // Reset work orders
-            document.getElementById('work-order-list').innerHTML = '<p>No work orders created for this store</p>';
+            // Load persistent work orders
+            renderWorkOrders();
         }
         
         function generateRackInterface(system) {
@@ -9151,19 +9166,39 @@ verified in {SYSTEM}
             
             const description = prompt('Enter work order description (optional):') || 'Standard work order';
             
-            const workOrderList = document.getElementById('work-order-list');
-            const workOrderHTML = `
-                <div class="work-order-item">
-                    <strong>${workOrderNumber}</strong> - ${description}
-                    <button onclick="this.parentElement.remove()" class="danger-button" style="float: right; padding: 2px 6px; font-size: 12px;">✕</button>
-                </div>
-            `;
+            // Add to persistent storage
+            const workOrder = {
+                number: workOrderNumber,
+                description: description,
+                addedDate: new Date().toISOString()
+            };
+            AppState.persistentWorkOrders.push(workOrder);
+            localStorage.setItem('persistentWorkOrders', JSON.stringify(AppState.persistentWorkOrders));
             
-            if (workOrderList.innerHTML.includes('No work orders')) {
-                workOrderList.innerHTML = workOrderHTML;
-            } else {
-                workOrderList.innerHTML += workOrderHTML;
+            // Update UI
+            renderWorkOrders();
+        }
+        
+        function renderWorkOrders() {
+            const workOrderList = document.getElementById('work-order-list');
+            
+            if (AppState.persistentWorkOrders.length === 0) {
+                workOrderList.innerHTML = '<p>No work orders monitored for this store</p>';
+                return;
             }
+            
+            workOrderList.innerHTML = AppState.persistentWorkOrders.map((wo, index) => `
+                <div class="work-order-item" data-index="${index}">
+                    <strong>${wo.number}</strong> - ${wo.description}
+                    <button onclick="removeWorkOrder(${index})" class="danger-button" style="float: right; padding: 2px 6px; font-size: 12px;">✕</button>
+                </div>
+            `).join('');
+        }
+        
+        function removeWorkOrder(index) {
+            AppState.persistentWorkOrders.splice(index, 1);
+            localStorage.setItem('persistentWorkOrders', JSON.stringify(AppState.persistentWorkOrders));
+            renderWorkOrders();
         }
         
         function saveStoreData() {
@@ -9191,15 +9226,8 @@ verified in {SYSTEM}
                 });
             });
             
-            // Collect work orders
-            const workOrders = [];
-            const workOrderItems = document.querySelectorAll('.work-order-item');
-            workOrderItems.forEach(item => {
-                const text = item.textContent.replace('✕', '').trim();
-                if (text && !text.includes('No work orders')) {
-                    workOrders.push(text);
-                }
-            });
+            // Use persistent work orders from AppState
+            const workOrders = AppState.persistentWorkOrders.map(wo => `${wo.number} - ${wo.description}`);
             
             // Store the data
             const storeData = {
@@ -9270,7 +9298,7 @@ verified in {SYSTEM}
             finalReport += `Agent: ${localStorage.getItem('agentName') || 'Unknown'}\\n`;
             finalReport += `Total Stores Checked: ${WAR_ROOM_SYSTEM.state.storeResults.length}\\n`;
             finalReport += `Stores with Alarms: ${WAR_ROOM_SYSTEM.state.storeResults.filter(s => s.hasAlarms).length}\\n`;
-            finalReport += `Work Orders Created: ${WAR_ROOM_SYSTEM.state.storeResults.reduce((total, s) => total + s.workOrders.length, 0)}\\n`;
+            finalReport += `Work Orders Monitored: ${WAR_ROOM_SYSTEM.state.storeResults.reduce((total, s) => total + s.workOrders.length, 0)}\\n`;
             finalReport += `Check Started: ${WAR_ROOM_SYSTEM.state.sessionStartTime.toLocaleString()}\\n`;
             finalReport += `Check Completed: ${new Date().toLocaleString()}\\n`;
             finalReport += `Verification Code: ${WAR_ROOM_SYSTEM.generateVerificationCode()}\\n`;
