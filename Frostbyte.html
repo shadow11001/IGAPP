@@ -6729,28 +6729,40 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             
             if (!shiftTimes[shift]) return null;
             
-            // Create a date in CST
+            // Create Date objects for today at the shift times in CST
+            // We'll create them as CST times and let JavaScript handle the conversion
             const now = new Date();
-            const cstDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
             
-            // Create start and end times in CST
-            const startCST = new Date(cstDate);
-            startCST.setHours(shiftTimes[shift].start, 0, 0, 0);
+            // Get today's date in CST
+            const formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'America/Chicago',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            const parts = formatter.formatToParts(now);
+            const cstYear = parts.find(p => p.type === 'year').value;
+            const cstMonth = parts.find(p => p.type === 'month').value;
+            const cstDay = parts.find(p => p.type === 'day').value;
             
-            const endCST = new Date(cstDate);
-            endCST.setHours(shiftTimes[shift].end, 0, 0, 0);
+            // Create ISO string for CST date at shift start/end times
+            // Format: YYYY-MM-DDTHH:MM:SS-06:00 (CST is UTC-6, or -05:00 during CDT)
+            const isDST = new Date(now.getFullYear(), 0, 1).getTimezoneOffset() !== now.getTimezoneOffset();
+            const cstOffset = isDST ? '-05:00' : '-06:00';
             
-            // Convert to user's local timezone
-            const userStart = new Date(startCST.toLocaleString('en-US'));
-            const userEnd = new Date(endCST.toLocaleString('en-US'));
+            const startISO = `${cstYear}-${cstMonth}-${cstDay}T${shiftTimes[shift].start.toString().padStart(2, '0')}:00:00${cstOffset}`;
+            const endISO = `${cstYear}-${cstMonth}-${cstDay}T${shiftTimes[shift].end.toString().padStart(2, '0')}:00:00${cstOffset}`;
+            
+            const startTime = new Date(startISO);
+            const endTime = new Date(endISO);
             
             return {
-                start: userStart.getHours(),
-                end: userEnd.getHours(),
-                startMinutes: userStart.getHours() * 60,
-                endMinutes: userEnd.getHours() * 60,
-                displayStart: userStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
-                displayEnd: userEnd.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+                start: startTime.getHours(),
+                end: endTime.getHours(),
+                startMinutes: startTime.getHours() * 60 + startTime.getMinutes(),
+                endMinutes: endTime.getHours() * 60 + endTime.getMinutes(),
+                displayStart: startTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+                displayEnd: endTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
             };
         }
         
