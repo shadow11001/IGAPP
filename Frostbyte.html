@@ -9058,6 +9058,12 @@ verified in {SYSTEM}
             WAR_ROOM_SYSTEM.state.sessionStartTime = new Date();
             WAR_ROOM_SYSTEM.state.sessionId = WAR_ROOM_SYSTEM.generateSessionId();
             
+            // Set 20-minute countdown timer for this check
+            const completionDeadline = new Date();
+            completionDeadline.setMinutes(completionDeadline.getMinutes() + 20);
+            AppState.warRoomSchedule.nextCheck = completionDeadline;
+            updateWarRoomStatusDisplay();
+            
             // Show progress tracker and store checker
             document.getElementById('war-room-progress').style.display = 'block';
             document.getElementById('store-checker').style.display = 'block';
@@ -9281,6 +9287,11 @@ verified in {SYSTEM}
             document.getElementById('war-room-results').style.display = 'block';
             
             showNotification('🎉 War Room check completed!', 'success', 5000);
+            
+            // Reschedule next War Room check
+            if (AppState.warRoomSchedule.enabled) {
+                scheduleAllWarRoomChecks();
+            }
         }
         
         function generateWarRoomTemplate() {
