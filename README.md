@@ -606,6 +606,49 @@ Frostbyte/
 
 ## 📋 Detailed Changelog
 
+### Version 1.2.0 - War Room Schedule & UI Fixes (October 2025)
+
+#### 🔧 War Room Notification System Fixes
+- **Notification dismiss functionality** - Fixed notifications that wouldn't go away when dismissed, snoozed, or skipped
+- **State management enhancement** - Added `notificationShown` flag to AppState to prevent notification re-appearance
+- **Check completion integration** - War Room notifications now properly dismiss when starting or completing checks
+- **Persistent state tracking** - Notification state saved to localStorage to maintain across sessions
+- **Smart scheduling logic** - Each new check period (every 2 hours) resets notification state automatically
+- **Check-in tracking** - System tracks `currentCheckDue` to differentiate between check periods
+- **Multiple notification prevention** - Enhanced logic to prevent duplicate notifications for same check period
+
+#### 🎨 Button Group Visibility System
+- **Page refresh initialization** - Fixed button groups (Call Status, Special Cases, Recommendations, Communication) incorrectly visible on page refresh
+- **System selection dependency** - Button groups now properly hidden until a system is selected (Novar, CPC, Danfoss, etc.)
+- **State reset on load** - `AppState.selectedSystem` now properly cleared during page initialization
+- **CSS class management** - `hidden-until-system` class properly applied/removed based on system selection
+- **Heading visibility control** - H4 headings for button groups now show/hide in sync with their sections
+- **Downloads section logic** - Downloads section correctly hidden on page load and only shown for Novar system
+- **Clear form integration** - Clear Form button now properly hides all system-dependent button groups
+
+#### 🛠️ Technical Infrastructure Improvements
+- **DOMContentLoaded initialization** - Added comprehensive button group visibility initialization on page load
+- **State synchronization** - Better coordination between AppState and DOM elements
+- **Function integration** - `dismissWarRoomNotification()` now called from both `startWarRoomCheck()` and `completeWarRoomCheck()`
+- **Notification scheduling enhancement** - `scheduleWarRoomCheck()` now checks notification state before showing alerts
+- **Memory management** - Proper cleanup of notification timeouts and state variables
+- **localStorage persistence** - War Room schedule state properly saved and restored across sessions
+
+#### 🐛 Bug Fixes
+- **War Room notification persistence** - Notifications no longer reappear after being dismissed
+- **Button group state retention** - Button groups no longer incorrectly visible after page refresh
+- **System selection reset** - selectedSystem properly cleared on page initialization
+- **Clear form behavior** - Form clearing now correctly hides Downloads and other system-dependent sections
+- **Notification dismissal** - "Check due now!" notifications properly respond to all dismiss actions
+- **State consistency** - AppState and UI now stay synchronized across user actions
+
+#### 🎯 User Experience Enhancements
+- **Cleaner page loads** - Page refreshes now show clean UI with only essential buttons visible
+- **Better notification control** - Users have full control over War Room notifications with proper dismiss functionality
+- **Intuitive system selection** - Button groups reveal logically as systems are selected
+- **Reduced UI clutter** - System-specific options hidden until relevant
+- **Professional appearance** - Clean, organized interface that adapts to user workflow
+
 ### Version 1.1.8 - Analytics Dashboard & Advanced Settings (October 2025)
 
 #### 📊 Complete Analytics Dashboard Implementation

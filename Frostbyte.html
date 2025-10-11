@@ -2267,6 +2267,191 @@
             box-shadow: none;
         }
 
+        /* War Room Schedule Styles */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        body.dark-mode .checkbox-label {
+            background: #3a3a3a;
+        }
+
+        .checkbox-label:hover {
+            background: #e0e0e0;
+        }
+
+        body.dark-mode .checkbox-label:hover {
+            background: #4a4a4a;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .war-room-info .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #0066cc;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        body.dark-mode .war-room-info .info-box {
+            background: #1a3a52;
+            border-left-color: #4da6ff;
+        }
+
+        .war-room-info .info-box ul {
+            margin: 8px 0 0 0;
+            padding-left: 20px;
+        }
+
+        .war-room-info .info-box li {
+            margin: 4px 0;
+        }
+
+        .schedule-preview {
+            background: #e8f5e9;
+            border-left: 4px solid #28a745;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        body.dark-mode .schedule-preview {
+            background: #1a3a1f;
+            border-left-color: #4caf50;
+        }
+
+        .war-room-notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 10001;
+            max-width: 400px;
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        .war-room-notification.urgent {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .war-room-notification .notification-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .war-room-notification .notification-body {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .war-room-notification .notification-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .war-room-notification button {
+            flex: 1;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .war-room-notification button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .war-room-notification .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .war-room-notification .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .war-room-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            margin-left: 10px;
+        }
+
+        .war-room-icon {
+            font-size: 18px;
+        }
+
+        /* Hidden button groups until system selected */
+        .button-group.hidden-until-system {
+            display: none;
+        }
+
+        .button-group.hidden-until-system.visible {
+            display: block;
+        }
+
         /* Database Storage Settings */
         .database-controls {
             margin-top: 10px;
@@ -2557,6 +2742,81 @@
             </div>
         </div>
         
+        <!-- War Room Schedule Configuration -->
+        <div class="settings-item">
+            <span class="settings-label">🕐 War Room Schedule</span>
+            <div class="settings-toggle" id="war-room-schedule-toggle" onclick="toggleWarRoomSchedule()">
+                <div class="settings-toggle-slider"></div>
+            </div>
+        </div>
+        <div class="war-room-schedule-config" id="war-room-schedule-config" style="display: none; padding: 10px 0;">
+            <div class="settings-item">
+                <span class="settings-label">⏰ Shift Time</span>
+                <select class="branch-selector" id="warRoomShift" onchange="saveWarRoomSchedule()">
+                    <option value="">Select shift...</option>
+                    <option value="7am-1pm">7:00 AM - 1:00 PM CST</option>
+                    <option value="3pm-9pm">3:00 PM - 9:00 PM CST</option>
+                    <option value="7am-5pm">7:00 AM - 5:00 PM CST</option>
+                </select>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">👤 Role</span>
+                <select class="branch-selector" id="warRoomRole" onchange="saveWarRoomSchedule()">
+                    <option value="primary">Primary</option>
+                    <option value="backup">Backup</option>
+                </select>
+            </div>
+            <div class="settings-item" style="display: block; padding: 10px 0;">
+                <span class="settings-label" style="display: block; margin-bottom: 8px;">📅 War Room Days</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="warRoomDay" value="Monday" onchange="saveWarRoomSchedule()">
+                        Mon
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="warRoomDay" value="Tuesday" onchange="saveWarRoomSchedule()">
+                        Tue
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="warRoomDay" value="Wednesday" onchange="saveWarRoomSchedule()">
+                        Wed
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="warRoomDay" value="Thursday" onchange="saveWarRoomSchedule()">
+                        Thu
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="warRoomDay" value="Friday" onchange="saveWarRoomSchedule()">
+                        Fri
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="warRoomDay" value="Saturday" onchange="saveWarRoomSchedule()">
+                        Sat
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="warRoomDay" value="Sunday" onchange="saveWarRoomSchedule()">
+                        Sun
+                    </label>
+                </div>
+            </div>
+            <div class="settings-item war-room-info" style="display: block;">
+                <div class="info-box">
+                    <strong>📋 War Room Check Schedule:</strong>
+                    <ul style="font-size: 12px;">
+                        <li>Checks every <strong>2 hours</strong> during your shift</li>
+                        <li>Can start <strong>20 min early</strong> (3:40 PM for 4:00 PM check)</li>
+                        <li><strong>20 minutes to complete</strong> from when you start</li>
+                        <li>Must start by <strong>20 min after</strong> due time (4:20 PM latest)</li>
+                        <li><strong>Backup</strong> notified at 15-20 min after due time</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="war-room-schedule-preview" class="schedule-preview" style="display: none; font-size: 13px;">
+                <strong>Your Schedule:</strong><br>
+                <div id="war-room-schedule-text"></div>
+            </div>
+        </div>
+        
         <!-- Database Storage Section -->
         <div class="settings-separator"></div>
         <div class="settings-item">
@@ -2620,16 +2880,16 @@
                 <div id="quick-notes" class="tab-content active">
                     <h4>System Login</h4>
                     <div class="button-group">
-                        <button onclick="addQuickNote('Logged into Novar.'); showDownloadsSection();" class="quick-note-btn" title="Novar Login">Novar</button>
-                        <button onclick="addQuickNote('Logged into Opus Arch.')" class="quick-note-btn" title="Opus Arch Login">Opus Arch</button>
-                        <button onclick="addQuickNote('Logged into Opus Mag.')" class="quick-note-btn" title="Opus Mag Login">Opus Mag</button>
-                        <button onclick="addQuickNote('Logged into CPC.')" class="quick-note-btn" title="CPC Login">CPC</button>
-                        <button onclick="addQuickNote('Logged into Danfoss AKA65.')" class="quick-note-btn" title="Danfoss AKA65 Login">AKA65</button>
-                        <button onclick="addQuickNote('Logged into Danfoss Storeview.')" class="quick-note-btn" title="Danfoss Storeview Login">Storeview</button>
+                        <button onclick="addQuickNote('Logged into Novar.'); selectSystem('Novar');" class="quick-note-btn" title="Novar Login">Novar</button>
+                        <button onclick="addQuickNote('Logged into Opus Arch.'); selectSystem('Opus Arch');" class="quick-note-btn" title="Opus Arch Login">Opus Arch</button>
+                        <button onclick="addQuickNote('Logged into Opus Mag.'); selectSystem('Opus Mag');" class="quick-note-btn" title="Opus Mag Login">Opus Mag</button>
+                        <button onclick="addQuickNote('Logged into CPC.'); selectSystem('CPC');" class="quick-note-btn" title="CPC Login">CPC</button>
+                        <button onclick="addQuickNote('Logged into Danfoss AKA65.'); selectSystem('AKA65');" class="quick-note-btn" title="Danfoss AKA65 Login">AKA65</button>
+                        <button onclick="addQuickNote('Logged into Danfoss Storeview.'); selectSystem('Storeview');" class="quick-note-btn" title="Danfoss Storeview Login">Storeview</button>
                     </div>
 
-                    <h4>Diagnostics</h4>
-                    <div class="button-group">
+                    <h4 style="display: none;">Diagnostics</h4>
+                    <div class="button-group hidden-until-system">
                         <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
                         <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
                         <button onclick="addQuickNote('Checked temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
@@ -2647,8 +2907,8 @@
                         <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Tested</button>
                     </div>
 
-            <h4>Actions</h4>
-            <div class="button-group">
+            <h4 style="display: none;">Actions</h4>
+            <div class="button-group hidden-until-system">
                 <button onclick="addQuickNoteWithInput('Forced defrost on ', 'Enter circuit:')" class="quick-note-btn" title="Force Defrost">Defrost</button>
                 <button onclick="addQuickNote('Terminated Defrost.')" class="quick-note-btn" title="Stop Defrost">Stop Defrost</button>
                 <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
@@ -2932,6 +3192,10 @@
         <div class="form-section">
             <div class="notes-header">
                 <h1>Notes</h1>
+                <div id="warRoomStatus" class="war-room-status" style="display: none;">
+                    <span class="war-room-icon">📋</span>
+                    <span id="warRoomNextCheck"></span>
+                </div>
                 <div class="dead-air-timer" id="dead-air-timer">
                     <div class="mic-status" id="mic-status" title="Microphone status"></div>
                     <span id="timer-display">00:00</span>
@@ -3048,7 +3312,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.1.9', // Update this when you make changes
+            currentVersion: '1.2.0', // Update this when you make changes
             githubRepo: 'shadow11001/Frostbyte',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -3072,6 +3336,22 @@
                 beta: 'IGISAWESOME',
                 dev: 'freemind596'
             },
+            
+            // War Room Schedule
+            warRoomSchedule: {
+                enabled: false,
+                shift: null, // '7am-1pm', '3pm-9pm', '7am-5pm'
+                role: 'primary', // 'primary' or 'backup'
+                days: [], // ['Monday', 'Tuesday', etc.]
+                nextCheck: null,
+                checkInterval: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
+                reminderTimeouts: [],
+                notificationShown: false,
+                currentCheckDue: null
+            },
+            
+            // Selected system for button group visibility
+            selectedSystem: null,
             
             // Visual dead air warnings
             visualDeadAirWarnings: true,
@@ -5965,6 +6245,16 @@ ${subIssueNumbers.map((num, index) =>
                 }
             }
             
+            // Update War Room Schedule toggle
+            const warRoomScheduleToggle = document.getElementById('war-room-schedule-toggle');
+            if (warRoomScheduleToggle) {
+                if (AppState.warRoomSchedule.enabled) {
+                    warRoomScheduleToggle.classList.add('active');
+                } else {
+                    warRoomScheduleToggle.classList.remove('active');
+                }
+            }
+            
             // Update Database toggle
             const databaseToggle = document.getElementById('database-toggle');
             if (databaseToggle) {
@@ -6415,6 +6705,453 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             }
             
             console.log(`⚠️ Visual dead air warnings ${status}`);
+        }
+        
+        // ============= War Room Schedule Functions =============
+        
+        function toggleWarRoomSchedule() {
+            AppState.warRoomSchedule.enabled = !AppState.warRoomSchedule.enabled;
+            const config = document.getElementById('war-room-schedule-config');
+            if (config) {
+                config.style.display = AppState.warRoomSchedule.enabled ? 'block' : 'none';
+            }
+            updateSettingsToggles();
+            saveWarRoomSchedule();
+        }
+        
+        function getShiftTimesInUserTimezone(shift) {
+            // CST shift times
+            const shiftTimes = {
+                '7am-1pm': { start: 7, end: 13 },
+                '3pm-9pm': { start: 15, end: 21 },
+                '7am-5pm': { start: 7, end: 17 }
+            };
+            
+            if (!shiftTimes[shift]) return null;
+            
+            // Create a date in CST
+            const now = new Date();
+            const cstDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+            
+            // Create start and end times in CST
+            const startCST = new Date(cstDate);
+            startCST.setHours(shiftTimes[shift].start, 0, 0, 0);
+            
+            const endCST = new Date(cstDate);
+            endCST.setHours(shiftTimes[shift].end, 0, 0, 0);
+            
+            // Convert to user's local timezone
+            const userStart = new Date(startCST.toLocaleString('en-US'));
+            const userEnd = new Date(endCST.toLocaleString('en-US'));
+            
+            return {
+                start: userStart.getHours(),
+                end: userEnd.getHours(),
+                startMinutes: userStart.getHours() * 60,
+                endMinutes: userEnd.getHours() * 60,
+                displayStart: userStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+                displayEnd: userEnd.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+            };
+        }
+        
+        function saveWarRoomSchedule() {
+            const enabled = AppState.warRoomSchedule.enabled;
+            const shift = document.getElementById('warRoomShift')?.value;
+            const role = document.getElementById('warRoomRole')?.value;
+            const days = Array.from(document.querySelectorAll('.warRoomDay:checked')).map(cb => cb.value);
+            
+            AppState.warRoomSchedule = {
+                ...AppState.warRoomSchedule,
+                enabled,
+                shift,
+                role,
+                days
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('warRoomSchedule', JSON.stringify(AppState.warRoomSchedule));
+            
+            // Update preview
+            const preview = document.getElementById('war-room-schedule-preview');
+            const previewText = document.getElementById('war-room-schedule-text');
+            
+            if (enabled && shift && days.length > 0) {
+                const shiftDisplay = getShiftTimesInUserTimezone(shift);
+                preview.style.display = 'block';
+                previewText.innerHTML = `
+                    <em>${days.join(', ')}</em><br>
+                    <em>${shiftDisplay.displayStart} - ${shiftDisplay.displayEnd} (your timezone)</em><br>
+                    <em>Role: ${role.charAt(0).toUpperCase() + role.slice(1)}</em>
+                `;
+                initializeWarRoomSchedule();
+                showNotification('✅ War Room schedule saved!', 'success', 2000);
+            } else {
+                preview.style.display = 'none';
+                stopWarRoomSchedule();
+                if (enabled) {
+                    showNotification('⚠️ Please select shift time and days', 'warning', 2000);
+                }
+            }
+            
+            console.log('War Room schedule saved:', AppState.warRoomSchedule);
+        }
+        
+        function initializeWarRoomSchedule() {
+            // Clear any existing timers
+            stopWarRoomSchedule();
+            
+            if (!AppState.warRoomSchedule.enabled || !AppState.warRoomSchedule.shift || AppState.warRoomSchedule.days.length === 0) {
+                return;
+            }
+            
+            // Check if today is a War Room day
+            const now = new Date();
+            const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
+            
+            if (!AppState.warRoomSchedule.days.includes(dayName)) {
+                console.log(`📅 Today (${dayName}) is not a War Room day`);
+                scheduleNextWarRoomDay();
+                return;
+            }
+            
+            console.log('📋 War Room schedule active - calculating check times');
+            scheduleAllWarRoomChecks();
+        }
+        
+        function scheduleAllWarRoomChecks() {
+            const now = new Date();
+            const shiftTimes = getShiftTimesInUserTimezone(AppState.warRoomSchedule.shift);
+            if (!shiftTimes) return;
+            
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            
+            // Calculate all check times (every 2 hours starting from shift start)
+            const checkTimes = [];
+            for (let checkMinutes = shiftTimes.startMinutes; checkMinutes <= shiftTimes.endMinutes; checkMinutes += 120) {
+                checkTimes.push(checkMinutes);
+            }
+            
+            console.log('📋 War Room check times today:', checkTimes.map(m => {
+                const h = Math.floor(m / 60);
+                const min = m % 60;
+                return `${h}:${min.toString().padStart(2, '0')}`;
+            }));
+            
+            // Schedule each upcoming check
+            let nextCheckScheduled = false;
+            for (const checkMinutes of checkTimes) {
+                const latestStartTime = checkMinutes + 20; // Can start up to 20 min after due time
+                
+                if (currentMinutes < latestStartTime) {
+                    scheduleWarRoomCheck(checkMinutes);
+                    if (!nextCheckScheduled) {
+                        // This is the next check
+                        const checkTime = new Date(now);
+                        checkTime.setHours(Math.floor(checkMinutes / 60), checkMinutes % 60, 0, 0);
+                        AppState.warRoomSchedule.nextCheck = checkTime;
+                        AppState.warRoomSchedule.currentCheckDue = checkTime;
+                        nextCheckScheduled = true;
+                    }
+                }
+            }
+            
+            if (!nextCheckScheduled) {
+                console.log('📋 No more War Room checks today');
+                scheduleNextWarRoomDay();
+            } else {
+                updateWarRoomStatusDisplay();
+            }
+        }
+        
+        function scheduleWarRoomCheck(checkMinutes) {
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            
+            const earliestStartTime = checkMinutes - 20; // Can start 20 min early
+            const dueTime = checkMinutes;
+            const backupNotifyTime = checkMinutes + 15; // Backup notified 15 min after
+            const latestStartTime = checkMinutes + 20; // Must start by this time
+            
+            const isBackup = AppState.warRoomSchedule.role === 'backup';
+            
+            // Reset notification shown state for this new check period
+            if (AppState.warRoomSchedule.currentCheckDue !== checkMinutes) {
+                AppState.warRoomSchedule.currentCheckDue = checkMinutes;
+                AppState.warRoomSchedule.notificationShown = false;
+            }
+            
+            // Schedule primary notification (due time or 20 min before if we're ahead)
+            if (!isBackup) {
+                if (currentMinutes < earliestStartTime) {
+                    // Schedule notification for 20 min before
+                    const msUntil = (earliestStartTime - currentMinutes) * 60 * 1000;
+                    const timeout = setTimeout(() => {
+                        showWarRoomNotification('can-start', checkMinutes);
+                    }, msUntil);
+                    AppState.warRoomSchedule.reminderTimeouts.push(timeout);
+                    console.log(`📋 Primary can-start notification in ${Math.round(msUntil / 60000)} minutes`);
+                } else if (currentMinutes < dueTime && !AppState.warRoomSchedule.notificationShown) {
+                    // We're in the "can start early" window
+                    showWarRoomNotification('can-start', checkMinutes);
+                }
+                
+                // Schedule due time notification
+                if (currentMinutes < dueTime) {
+                    const msUntilDue = (dueTime - currentMinutes) * 60 * 1000;
+                    const timeout = setTimeout(() => {
+                        if (!AppState.warRoomSchedule.notificationShown) {
+                            showWarRoomNotification('due-now', checkMinutes);
+                        }
+                    }, msUntilDue);
+                    AppState.warRoomSchedule.reminderTimeouts.push(timeout);
+                    console.log(`📋 Primary due notification in ${Math.round(msUntilDue / 60000)} minutes`);
+                } else if (currentMinutes >= dueTime && currentMinutes < latestStartTime && !AppState.warRoomSchedule.notificationShown) {
+                    // We're past due time but within deadline window
+                    showWarRoomNotification('due-now', checkMinutes);
+                }
+            }
+            
+            // Schedule backup notification (15 min after due time)
+            if (isBackup && currentMinutes < backupNotifyTime) {
+                const msUntilBackup = (backupNotifyTime - currentMinutes) * 60 * 1000;
+                const timeout = setTimeout(() => {
+                    if (!AppState.warRoomSchedule.notificationShown) {
+                        showWarRoomNotification('backup-check', checkMinutes);
+                    }
+                }, msUntilBackup);
+                AppState.warRoomSchedule.reminderTimeouts.push(timeout);
+                console.log(`📋 Backup notification in ${Math.round(msUntilBackup / 60000)} minutes`);
+            } else if (isBackup && currentMinutes >= backupNotifyTime && currentMinutes < latestStartTime && !AppState.warRoomSchedule.notificationShown) {
+                // Backup notification time has arrived
+                showWarRoomNotification('backup-check', checkMinutes);
+            }
+        }
+        
+        function showWarRoomNotification(type, checkMinutes) {
+            // Don't show if already dismissed for this check period
+            if (AppState.warRoomSchedule.notificationShown) return;
+            
+            // Don't show multiple notifications
+            if (document.getElementById('warRoomNotif')) return;
+            
+            const isBackup = AppState.warRoomSchedule.role === 'backup';
+            const checkTime = new Date();
+            checkTime.setHours(Math.floor(checkMinutes / 60), checkMinutes % 60, 0, 0);
+            const timeStr = checkTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            
+            let notification;
+            if (type === 'can-start') {
+                notification = {
+                    title: '📋 War Room Check Available',
+                    message: `You can start your ${timeStr} War Room check now (20 minutes early). You'll have 20 minutes to complete it from when you start.`,
+                    urgent: false,
+                    buttons: [
+                        { text: 'Start Now', action: () => { dismissWarRoomNotification(); addQuickNote(`War Room Check - Started at ${new Date().toLocaleTimeString()}`); } },
+                        { text: 'Later', action: () => dismissWarRoomNotification() }
+                    ]
+                };
+            } else if (type === 'due-now') {
+                notification = {
+                    title: '⚠️ War Room Check Due NOW',
+                    message: `Your War Room check is due at ${timeStr}! You have until ${calculateLatestStart(checkMinutes)} to start (20 minutes). Complete within 20 minutes of starting.`,
+                    urgent: true,
+                    buttons: [
+                        { text: 'Start Check', action: () => { dismissWarRoomNotification(); addQuickNote(`War Room Check - Starting`); } },
+                        { text: 'Dismiss', action: () => dismissWarRoomNotification() }
+                    ]
+                };
+            } else if (type === 'backup-check') {
+                notification = {
+                    title: '📋 Backup War Room Check',
+                    message: `Primary's ${timeStr} War Room check is 15 minutes overdue. Please verify the check has been completed or prepare to assist.`,
+                    urgent: false,
+                    buttons: [
+                        { text: 'Check Status', action: () => { dismissWarRoomNotification(); addQuickNote(`Backup checking War Room status for ${timeStr} check`); } },
+                        { text: 'Dismiss', action: () => dismissWarRoomNotification() }
+                    ]
+                };
+            }
+            
+            const notif = document.createElement('div');
+            notif.className = `war-room-notification ${notification.urgent ? 'urgent' : ''}`;
+            notif.id = 'warRoomNotif';
+            notif.innerHTML = `
+                <div class="notification-header">
+                    <span>${notification.title}</span>
+                </div>
+                <div class="notification-body">
+                    ${notification.message}
+                </div>
+                <div class="notification-actions">
+                    ${notification.buttons.map((btn, idx) => `
+                        <button class="${idx === 0 ? 'btn-primary' : 'btn-secondary'}" onclick="warRoomActions[${idx}]()">${btn.text}</button>
+                    `).join('')}
+                </div>
+            `;
+            
+            window.warRoomActions = notification.buttons.map(btn => btn.action);
+            document.body.appendChild(notif);
+            
+            // Play sound for urgent notifications
+            if (notification.urgent) {
+                try {
+                    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuFzvLZiTYIG2m98OScTgwOUKzn77ZiFwU7k9n0y4IuBSp+zO/glUQMFGS56+ibUBELTKXh8bllHgYuhND03YoxBSF1xe/mnUoODlSq5O+1YhgFOpPX88yDLgUpfsrv4JVEDBVku+rorVERC0um4PK8YyMGLITN8tyJNQcdaLvt455ODA5QrOTvsWIYBTuR1/PMgi4FK37L7+CVRAwVZLvr6qxREAtLpuDyvWMjBSyEzvLaijUHHWi77uScTgwOUKvj77JiFwY7k9nyzIIuBSl+yu/glUQMFWS76+usURQLS6bg8rxjIwUshdDy2Yk1Bx1nvu3knE4MDlCs5O+xYhgFPJPZ88yDLgYuf8vu3490EwwTYrfp6alTFApIo+DyvmQjBSuEzvHaizYHHGi77OOdTgwPUKvj7rJhGAU8kdnyzIItBSl+zO/glEQNFGO56+qrURQLSqXh8r1kJAUshdDy2Yk1Bx1nvu3jnE4MD1Cr4+2yYhgFPJPZ88yELgYpf8vu35BzEwwSYrjp6alTFApIpODyvmQjBSuFzvLaizUHHGi87OSfTgwOUavj7rNiGAU8kdnzzIMuBSl+y+/fkHQTDBJit+rpqlQUCkek4PK+ZSQFLIXu8dmJNQcNZ77t5JxODA9Qq+Pts2IYBTqT2/PMgy4FKX7L7t+QdBQNEmK46umqVBQLSKTg8r5lJAYrhc7y2ok1Bxxnu+zkn04OD1Gs4+yzYhgFPJHZ88yDLgUpfszv35B0EgwTYbjq6KpUFQpHpODzv2UkBSyF0PLZiTYIHGe77OSdTwwOUKzk7bNiGAU8ktnzzIMuBil/y+7fkHUTDBNht+rpqlUVC0ek4PK+ZSQFLYXu8dqJNggbZrvs5J1PDg5Rq+Pts2IaBjyR2vTMgy4FKX7L7t+QdRMLEmK36umpVRYKSKPg8r5lJAUshdDy2Yk2Bxxnuu3knE8MD1Cr4++zYhgFPJHZ88yELgUpf8vv35B1EwsUYrjq6alUFApIpODyvmUkBi2Fz/HZiTYIG2W77OSeUAwOT6vj7bNiGQY7ktn0y4MuBSl+y+7gkHQUCxFiu+vpq1QVCkik4PO+ZSQFLYXu8dqJNgcbZ7zt45xPDA9Qq+Pvs2IYBTyR2fPMgi4FKH7L7t+RdBQLFGK46+mrVBUKSKPg8r5lJAUthdDy2Yk1CBxnvO3jnU4MD1Cr4++zYhgFOpHa9MyCLgYpfsvv3490FAsUYrjr6atUFApIpODzvmUkBS2F0PLaiTUHHGe67eSdTwwPUKvj77NhGAU8ktn0zIMuBSl+y+7fkHQUCxNiuOvpq1QUEQ==');
+                    audio.play().catch(() => {});
+                } catch (e) {}
+            }
+        }
+        
+        function calculateLatestStart(checkMinutes) {
+            const latestTime = new Date();
+            const latestMinutes = checkMinutes + 20;
+            latestTime.setHours(Math.floor(latestMinutes / 60), latestMinutes % 60, 0, 0);
+            return latestTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        }
+        
+        function dismissWarRoomNotification() {
+            const notif = document.getElementById('warRoomNotif');
+            if (notif) {
+                notif.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => notif.remove(), 300);
+            }
+            
+            // Mark notification as shown to prevent re-appearing
+            AppState.warRoomSchedule.notificationShown = true;
+            
+            // Save state to localStorage
+            localStorage.setItem('warRoomScheduleState', JSON.stringify(AppState.warRoomSchedule));
+        }
+        
+        function scheduleNextWarRoomDay() {
+            const now = new Date();
+            const currentDay = now.getDay();
+            
+            const dayMap = {
+                'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3,
+                'Thursday': 4, 'Friday': 5, 'Saturday': 6
+            };
+            
+            const warRoomDays = AppState.warRoomSchedule.days.map(day => dayMap[day]).sort((a, b) => a - b);
+            
+            let nextDay = null;
+            for (const day of warRoomDays) {
+                if (day > currentDay) {
+                    nextDay = day;
+                    break;
+                }
+            }
+            
+            if (!nextDay && warRoomDays.length > 0) {
+                nextDay = warRoomDays[0];
+            }
+            
+            if (!nextDay) return;
+            
+            let daysUntilNext = nextDay - currentDay;
+            if (daysUntilNext <= 0) daysUntilNext += 7;
+            
+            const nextDate = new Date(now);
+            nextDate.setDate(nextDate.getDate() + daysUntilNext);
+            nextDate.setHours(0, 0, 0, 0);
+            
+            const msUntilNext = nextDate.getTime() - now.getTime();
+            
+            const timeout = setTimeout(() => {
+                initializeWarRoomSchedule();
+            }, msUntilNext);
+            AppState.warRoomSchedule.reminderTimeouts.push(timeout);
+            
+            const dayName = Object.keys(dayMap).find(key => dayMap[key] === nextDay);
+            console.log(`📋 Next War Room day: ${dayName} (${daysUntilNext} days from now)`);
+            
+            // Clear next check display
+            const statusDiv = document.getElementById('warRoomStatus');
+            if (statusDiv) statusDiv.style.display = 'none';
+        }
+        
+        function stopWarRoomSchedule() {
+            AppState.warRoomSchedule.reminderTimeouts.forEach(timeout => clearTimeout(timeout));
+            AppState.warRoomSchedule.reminderTimeouts = [];
+            AppState.warRoomSchedule.nextCheck = null;
+            dismissWarRoomNotification();
+            
+            const statusDiv = document.getElementById('warRoomStatus');
+            if (statusDiv) statusDiv.style.display = 'none';
+        }
+        
+        function updateWarRoomStatusDisplay() {
+            const statusDiv = document.getElementById('warRoomStatus');
+            const nextCheckSpan = document.getElementById('warRoomNextCheck');
+            
+            if (!AppState.warRoomSchedule.enabled || !AppState.warRoomSchedule.nextCheck) {
+                if (statusDiv) statusDiv.style.display = 'none';
+                return;
+            }
+            
+            if (statusDiv) statusDiv.style.display = 'inline-flex';
+            
+            const updateDisplay = () => {
+                const now = new Date();
+                const next = AppState.warRoomSchedule.nextCheck;
+                const diff = next - now;
+                
+                if (diff <= 0) {
+                    nextCheckSpan.textContent = 'Check due now!';
+                    return;
+                }
+                
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                
+                if (hours > 0) {
+                    nextCheckSpan.textContent = `Next: ${hours}h ${minutes}m`;
+                } else if (minutes > 20) {
+                    nextCheckSpan.textContent = `Next: ${minutes}m`;
+                } else {
+                    nextCheckSpan.textContent = `Due in ${minutes}m`;
+                }
+            };
+            
+            updateDisplay();
+            setInterval(updateDisplay, 60000);
+        }
+        
+        function loadWarRoomSchedule() {
+            const saved = localStorage.getItem('warRoomSchedule');
+            if (saved) {
+                try {
+                    const schedule = JSON.parse(saved);
+                    AppState.warRoomSchedule = { ...AppState.warRoomSchedule, ...schedule };
+                    
+                    // Update UI
+                    const shiftSelect = document.getElementById('warRoomShift');
+                    const roleSelect = document.getElementById('warRoomRole');
+                    if (shiftSelect) shiftSelect.value = schedule.shift || '';
+                    if (roleSelect) roleSelect.value = schedule.role || 'primary';
+                    
+                    // Update day checkboxes
+                    document.querySelectorAll('.warRoomDay').forEach(cb => {
+                        cb.checked = schedule.days?.includes(cb.value);
+                    });
+                    
+                    // Show/hide config
+                    const config = document.getElementById('war-room-schedule-config');
+                    if (config && schedule.enabled) {
+                        config.style.display = 'block';
+                    }
+                    
+                    // Initialize if enabled and configured
+                    if (schedule.enabled && schedule.shift && schedule.days?.length > 0) {
+                        initializeWarRoomSchedule();
+                        console.log('📋 War Room schedule loaded and initialized');
+                        
+                        // Update preview
+                        saveWarRoomSchedule();
+                    }
+                } catch (e) {
+                    console.error('Failed to load War Room schedule:', e);
+                }
+            }
         }
 
         // ============= Database Management Functions =============
@@ -8269,6 +9006,9 @@ verified in {SYSTEM}
             // Track war room check start
             trackButtonClick('Start War Room Check', 'war-room');
             
+            // Dismiss any active War Room notification
+            dismissWarRoomNotification();
+            
             const storesText = document.getElementById('assigned-stores').value.trim();
             if (!storesText) {
                 showNotification('❌ Please enter store numbers first', 'error', 3000);
@@ -8486,6 +9226,9 @@ verified in {SYSTEM}
         function completeWarRoomCheck() {
             // Track war room completion
             trackButtonClick('Complete War Room Check', 'war-room');
+            
+            // Dismiss any active War Room notification and mark as completed
+            dismissWarRoomNotification();
             
             // Hide progress and checker
             document.getElementById('war-room-progress').style.display = 'none';
@@ -9577,12 +10320,39 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             }
         }
 
-        // Show Downloads section (triggered by Novar button)
-        function showDownloadsSection() {
+        // Show/hide button groups based on system selection
+        function selectSystem(system) {
+            AppState.selectedSystem = system;
+            
+            // Show Downloads only for Novar
             const downloadsSection = document.getElementById('downloads-section');
             if (downloadsSection) {
-                downloadsSection.style.display = 'block';
+                downloadsSection.style.display = system === 'Novar' ? 'block' : 'none';
             }
+            
+            // Show all other button groups when any system is selected
+            const buttonGroups = document.querySelectorAll('.button-group');
+            const headings = document.querySelectorAll('#quick-notes h4');
+            
+            buttonGroups.forEach((group, index) => {
+                const heading = headings[index];
+                const isSystemLogin = heading?.textContent?.includes('System Login');
+                const isDownloads = group.id === 'downloads-section' || heading?.textContent?.includes('Downloads');
+                
+                if (!isSystemLogin && !isDownloads) {
+                    // Show all other groups
+                    group.classList.add('visible');
+                    group.classList.remove('hidden-until-system');
+                    if (heading) heading.style.display = 'block';
+                }
+            });
+            
+            console.log('Selected system:', system);
+        }
+        
+        // Show Downloads section (triggered by Novar button)
+        function showDownloadsSection() {
+            selectSystem('Novar');
         }
         
         // Hide Downloads section (triggered by clearing form)
@@ -9591,6 +10361,22 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             if (downloadsSection) {
                 downloadsSection.style.display = 'none';
             }
+            AppState.selectedSystem = null;
+            
+            // Hide all button groups except System Login
+            const buttonGroups = document.querySelectorAll('.button-group');
+            const headings = document.querySelectorAll('#quick-notes h4');
+            
+            buttonGroups.forEach((group, index) => {
+                const heading = headings[index];
+                const isSystemLogin = heading?.textContent?.includes('System Login');
+                
+                if (!isSystemLogin) {
+                    group.classList.remove('visible');
+                    group.classList.add('hidden-until-system');
+                    if (heading && !isSystemLogin) heading.style.display = 'none';
+                }
+            });
         }
 
         // Enhanced form management
@@ -9654,6 +10440,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 
                 // Clear infraction display
                 clearInfractionDisplay();
+                
+                // Hide button groups
+                hideDownloadsSection();
                 
                 showNotification('Everything cleared', 'success');
             } catch (error) {
@@ -9858,6 +10647,20 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                         isDark ? 'Switch to light mode' : 'Switch to dark mode'
                     );
                 }
+                
+                // Initialize button group visibility - hide all system-dependent groups on load
+                AppState.selectedSystem = null;
+                const hiddenGroups = document.querySelectorAll('.button-group.hidden-until-system');
+                hiddenGroups.forEach(group => {
+                    group.classList.remove('visible');
+                    const heading = group.previousElementSibling;
+                    if (heading && heading.tagName === 'H4') {
+                        heading.style.display = 'none';
+                    }
+                });
+                
+                // Ensure Downloads section is hidden initially
+                hideDownloadsSection();
 
                 // Update history dropdown
                 updateHistoryDropdown();
@@ -9910,6 +10713,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             
             // Initialize War Room system
             initializeWarRoom();
+            
+            // Initialize War Room Schedule
+            loadWarRoomSchedule();
             
             // Initialize SQLite storage system
             initializeDatabaseOnStartup();
