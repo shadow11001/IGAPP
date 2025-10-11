@@ -4,7 +4,21 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 
 ## 🌟 Features
 
-### 📑 Tab-Based Interface
+### � Analytics Dashboard
+- **Centralized usage analytics** - Comprehensive web-based dashboard for viewing and analyzing usage reports
+- **GitHub integration** - Fetches usage reports directly from GitHub issues with automatic authentication
+- **Advanced filtering** - Filter by date range (7/30/90 days, all time), report type, and search across content
+- **Interactive visualizations** - Charts for usage trends, top features, engagement, retention, and feature adoption
+- **Performance metrics** - Session duration, bounce rate, engagement scores, weekly/monthly retention
+- **User journey analysis** - Flow patterns, conversion funnels, user segmentation, drop-off points
+- **Real-time updates** - Configurable auto-refresh with visual loading indicators
+- **Data export** - Export filtered data to JSON/CSV for external analysis
+- **Advanced settings** - 7-tab configuration system with dashboard customization, notifications, performance monitoring, data management, security, integration, and experimental features
+- **Settings persistence** - Import/export settings as JSON with reset to defaults option
+- **Dark mode support** - Professional dark theme with smooth transitions
+- **Responsive design** - Mobile-friendly with adaptive layout and touch-optimized controls
+
+### �📑 Tab-Based Interface
 - **Four-tab system** - Quick Notes, QA Checklist, Email Processing, and War Room
 - **Smooth transitions** - CSS-based tab switching with visual feedback
 - **Independent workflows** - Each tab maintains its own state and functionality
@@ -97,9 +111,21 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 
 ## 🚀 Quick Start
 
+### Frostbyte Application
 1. **Download** the `Frostbyte.html` file
 2. **Open** in any modern web browser
 3. **Start using** - No installation or setup required!
+
+### Analytics Dashboard
+1. **Navigate** to the `analytics/` folder
+2. **Open** `index.html` in a modern web browser
+3. **Configure** GitHub settings (click Settings button):
+   - Enter your GitHub Personal Access Token (with repo read permissions)
+   - Set repository owner (e.g., `shadow11001`)
+   - Set repository name (e.g., `Frostbyte`)
+4. **View analytics** - Dashboard automatically fetches and displays usage reports
+5. **Use filters** - Filter by date range, report type, or search content
+6. **Advanced settings** - Click "Advanced Settings" for extensive customization options
 
 ## 📖 Usage Guide
 
@@ -142,6 +168,90 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 - **Progress tracking** - Visual indicators show completion status
 - **Generate reports** - Professional formatted reports with session summaries
 - **Copy functionality** - Export reports to clipboard for documentation
+
+### Analytics Dashboard Usage
+
+#### Getting Started
+1. **Open the dashboard** - Navigate to `analytics/index.html` in your browser
+2. **Configure GitHub settings** - Click the Settings button (⚙️) in the header
+3. **Enter credentials**:
+   - **GitHub Token**: Personal Access Token with `repo` (read) permission
+   - **Repository Owner**: Your GitHub username or organization (e.g., `shadow11001`)
+   - **Repository Name**: Repository containing usage reports (e.g., `Frostbyte`)
+4. **Save settings** - Click "Save Settings" to store configuration (encrypted in localStorage)
+5. **View dashboard** - Reports automatically load and display with visualizations
+
+#### Dashboard Features
+- **Summary Statistics** - Total reports, active users, button clicks, notes created with trend indicators
+- **Performance Metrics** - Session duration, bounce rate, engagement scores, retention rates
+- **Interactive Charts** - Usage trends over time, top features pie chart, session metrics, engagement distribution
+- **User Journey Analytics** - Flow patterns, conversion funnels, user segments, drop-off analysis
+- **Data Table** - Sortable, searchable table of all usage reports with detailed information
+- **Filters** - Date range (7/30/90 days, all time), report type, full-text search
+- **Export** - Download filtered data as JSON or CSV for external analysis
+
+#### Advanced Settings
+Click the **"Advanced Settings"** button in the settings panel to access:
+
+**Dashboard Tab**
+- Layout style (default, compact, detailed)
+- Chart animations toggle
+- Auto-refresh with configurable interval
+- Debug mode for development
+- Custom color schemes (primary, secondary, accent, background)
+
+**Notifications Tab**
+- Enable/disable notifications
+- Position (top-right, top-left, bottom-right, bottom-left)
+- Auto-hide timeout
+- Sound notifications
+- Webhook integration
+
+**Performance Tab**
+- Performance monitoring toggle
+- Memory usage thresholds (warning/critical)
+- Response time warnings
+- Lazy loading optimization
+- Data preloading
+
+**Data Management Tab**
+- Data retention policies
+- Cache age limits (hours)
+- Reports age limits (days)
+- Automatic cleanup scheduling
+- Backup configuration
+
+**Security Tab**
+- Session timeout settings
+- Audit logging
+- Data encryption
+- Rate limiting
+- CORS configuration
+
+**Integration Tab**
+- API cache duration
+- Request timeout settings
+- Retry attempts configuration
+- CDN settings
+
+**Experimental Tab** (⚠️ Warning: May not work as expected)
+- Real-time updates
+- AI-powered insights
+- Predictive analytics
+
+#### Settings Management
+- **Export Settings** - Download your configuration as JSON file
+- **Import Settings** - Upload previously exported settings
+- **Reset to Defaults** - Restore all settings to default values
+
+#### Keyboard Shortcuts
+- **R** - Refresh data
+- **S** - Show settings
+- **E** - Export data
+- **F** - Focus search
+- **H** - Show help
+- **T** - Toggle theme
+- **Esc** - Close modals
 
 ### Email Processing Features
 - **Work Order Detection** - Recognizes 9-digit patterns (e.g., 123456789)
@@ -220,10 +330,19 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 - ✅ Edge 79+
 
 ### Dependencies
+
+#### Frostbyte Application
 - **Font Awesome 6.4.0** (CDN) - Icons and theme toggle
 - **Web Audio API** - For microphone detection and call monitoring
 - **GitHub API** - For automatic updates (requires authentication for private repos)
 - **Clipboard API** - For seamless copy functionality
+
+#### Analytics Dashboard
+- **Font Awesome 6.4.0** (CDN) - Icons and UI elements
+- **Chart.js** (CDN) - Interactive charts and visualizations
+- **GitHub API v3** - Fetching usage reports from issues
+- **LocalStorage API** - Configuration and settings persistence
+- **Fetch API** - HTTP requests for GitHub integration
 
 ### Required Permissions
 - **Microphone access** - For automatic dead air detection and voice recognition
@@ -232,15 +351,28 @@ A comprehensive, self-contained web application designed for Walmart Digital Ass
 
 ### File Structure
 ```
-IGAPP/
-├── IGAPP.html          # Complete application (self-contained)
-├── IGAPP_old.html      # Previous version for testing updates
-└── README.md           # This documentation
+Frostbyte/
+├── Frostbyte.html                    # Main application (self-contained)
+├── IGAPP.html                        # Legacy alias for backwards compatibility
+├── analytics/                        # Analytics Dashboard
+│   ├── index.html                    # Dashboard HTML structure
+│   ├── css/
+│   │   └── dashboard.css             # Dashboard styles and responsive layout
+│   └── js/
+│       ├── config.js                 # Configuration manager with encryption
+│       ├── github-api.js             # GitHub API client with authentication
+│       ├── data-processor.js         # Data parsing and transformation
+│       ├── performance-analytics.js  # Performance metrics calculator
+│       ├── user-journey.js           # User journey analyzer
+│       └── dashboard.js              # Main dashboard controller (4800+ lines)
+└── README.md                         # This documentation
 ```
 
 ## 💾 Data Storage
 
 ### Local Storage Usage
+
+#### Frostbyte Application
 - **Theme preference** - Persists light/dark mode selection
 - **Notes history** - Stores last 7 days of saved entries
 - **Auto-cleanup** - Automatically removes entries older than 7 days
@@ -249,17 +381,28 @@ IGAPP/
 - **GitHub token** - Securely stores encrypted authentication token
 - **QA checklist state** - Saves completion status and agent name preferences
 - **Tab preferences** - Remembers last active tab selection
+- **Usage analytics** - Button click tracking and session data (when enabled)
+
+#### Analytics Dashboard
+- **GitHub configuration** - Encrypted token, repository owner, and name
+- **Advanced settings** - All 7 tabs of configuration options (dashboard, notifications, performance, data, security, integration, experimental)
+- **Theme preference** - Dashboard dark/light mode selection
+- **Auto-refresh settings** - Refresh interval and enabled state
+- **Filter preferences** - Last used date range, report type, and search terms
+- **Settings backups** - Export/import functionality for configuration management
 
 ### Data Privacy
 - **No external servers** - All data stays in your browser
 - **No tracking** - No analytics or user tracking  
-- **Local only** - Data never leaves your device (except for GitHub feedback submission)
-- **Encrypted tokens** - GitHub tokens are obfuscated using XOR encryption
+- **Local only** - Data never leaves your device (except for GitHub integration when configured)
+- **Encrypted tokens**
 - **QA checklist persistence** - Checklist state and agent names stored locally
 - **Email processing** - All email parsing and analysis happens locally
 - **War Room data** - Store checking progress and templates stored locally
 - **Feedback submission** - Only submitted when user explicitly requests through suggestion system
 - **Optional GitHub integration** - Feedback and usage reports only sent when user chooses to submit
+- **Analytics dashboard** - Only fetches data from GitHub when user configures authentication
+- **Settings export** - All settings can be exported to JSON for backup (user-controlled)
 
 ## 🛠️ Advanced Features
 
@@ -325,7 +468,55 @@ IGAPP/
 
 ## 🐛 Troubleshooting
 
-### Common Issues
+### Analytics Dashboard Issues
+
+**Dashboard not loading data:**
+- Verify GitHub token is configured correctly in Settings
+- Check token has `repo` read permissions
+- Ensure repository owner and name are correct
+- Check browser console for API errors (F12)
+- Verify internet connection for GitHub API access
+- Try hard refresh (Ctrl+Shift+R) to clear cache
+
+**Settings button not working:**
+- Hard refresh the page (Ctrl+Shift+R)
+- Clear browser cache for the analytics dashboard
+- Check browser console for JavaScript errors
+- Ensure JavaScript is enabled in browser
+
+**No reports showing:**
+- Verify issues exist with `usage-analytics` OR `email-analytics` labels
+- Check date range filter (try "All time")
+- Remove any search filters
+- Refresh data manually with the Refresh button
+- Check GitHub API rate limit status (visible in console)
+
+**Advanced Settings not appearing:**
+- Hard refresh browser (Ctrl+Shift+R)
+- Check for JavaScript errors in console
+- Verify `showAdvancedSettings()` function exists in dashboard.js
+- Clear browser cache and reload
+
+**Token cleared/not persisting:**
+- Check if browser allows localStorage
+- Ensure not in private/incognito mode
+- Verify token encryption is working (check console logs)
+- Try reconfiguring token in Settings panel
+
+**Charts not displaying:**
+- Verify Chart.js is loaded (check console)
+- Ensure data is available for selected filters
+- Try refreshing the page
+- Check browser compatibility (need modern browser)
+
+**Performance issues:**
+- Reduce date range to fewer days
+- Disable chart animations in Advanced Settings
+- Enable lazy loading in Performance settings
+- Clear browser cache
+- Check memory usage in browser task manager
+
+### Frostbyte Application Issues
 
 **Microphone not working:**
 - Grant microphone permission when prompted
@@ -414,6 +605,88 @@ IGAPP/
 - **TextDecoder API**: Required for proper UTF-8 handling in updates
 
 ## 📋 Detailed Changelog
+
+### Version 1.1.8 - Analytics Dashboard & Advanced Settings (October 2025)
+
+#### 📊 Complete Analytics Dashboard Implementation
+- **Centralized usage analytics dashboard** - Comprehensive web-based dashboard for viewing usage reports from GitHub issues
+- **Multi-file JavaScript architecture** - Modular dashboard system with dedicated files for config, API, data processing, performance analytics, and user journey analysis
+- **GitHub API integration** - Real-time fetching of usage reports with configurable label filtering (`usage-analytics` OR `email-analytics`)
+- **Advanced filtering system** - Filter by date range (7/30/90 days, all time), report type, and full-text search across report content
+- **Interactive charts and visualizations** - Chart.js integration with usage trends, top features, session metrics, engagement distribution, retention analysis, and feature adoption charts
+- **Performance analytics** - Session duration tracking, bounce rate calculation, engagement scores, and retention metrics (weekly/monthly)
+- **User journey analytics** - User flow patterns, conversion funnels, user segmentation, and drop-off analysis
+- **Responsive design** - Mobile-friendly dashboard with adaptive layout and dark mode support
+- **Settings panel** - Configurable GitHub token, repository owner/repo, auto-refresh, and theme preferences
+- **Data export functionality** - Export filtered data to JSON/CSV formats
+- **Accessibility features** - Screen reader support, keyboard navigation, and ARIA labels
+- **Real-time updates** - Live data synchronization with configurable refresh intervals
+
+#### ⚙️ Advanced Settings System
+- **Comprehensive settings modal** - 7-tab advanced configuration system with professional UI
+- **Dashboard customization** - Layout styles (default/compact/detailed), chart animations, auto-refresh intervals, debug mode, custom color schemes
+- **Notification management** - Position control (top-right/left, bottom-right/left), timeout settings, sound notifications, webhook integration
+- **Performance monitoring** - Memory usage thresholds, response time warnings, lazy loading, data preloading options
+- **Data management** - Retention policies, cache age limits, automatic cleanup, backup scheduling
+- **Security features** - Session timeout, audit logging, data encryption, rate limiting, CORS configuration
+- **Integration settings** - API cache duration, request timeouts, retry attempts, CDN configuration
+- **Experimental features** - Real-time updates, AI-powered insights, predictive analytics (with warnings)
+- **Settings persistence** - LocalStorage-based configuration with import/export functionality
+- **Reset to defaults** - Quick restore of default settings with confirmation
+- **Export/Import settings** - JSON-based settings backup and restore system
+
+#### 🔧 Technical Infrastructure Improvements
+- **Modular dashboard architecture** - Separated concerns with config.js, github-api.js, data-processor.js, performance-analytics.js, user-journey.js, dashboard.js
+- **Configuration manager** - Centralized config system with encryption support for sensitive data (GitHub tokens)
+- **Enhanced GitHub API client** - Rate limit tracking, error handling, request retry logic, and authentication management
+- **Data processing engine** - Robust JSON parsing from GitHub issue bodies, data validation, and transformation pipelines
+- **Performance metrics calculator** - Advanced analytics calculations including engagement scores, retention rates, and feature adoption metrics
+- **User journey analyzer** - Behavioral pattern detection, conversion funnel analysis, and drop-off point identification
+- **CSS framework** - Custom dashboard.css with responsive grid layout, card components, modal systems, and theme support
+- **Error handling** - Comprehensive try-catch blocks with user-friendly error messages and debug logging
+- **Browser storage management** - Efficient localStorage usage with namespace isolation and data cleanup
+
+#### 🎨 User Interface Enhancements
+- **Professional dashboard design** - Clean, modern interface with consistent color scheme and spacing
+- **Card-based layout** - Summary statistics cards with icons, trends, and visual indicators
+- **Interactive data tables** - Sortable columns, row selection, pagination, and bulk actions
+- **Modal system** - Reusable modal components for settings, filters, and help documentation
+- **Notification system** - Toast-style notifications with success/error/info states and auto-dismiss
+- **Loading states** - Skeleton screens and spinners for async operations
+- **Empty states** - Helpful messages and guidance when no data is available
+- **Responsive charts** - Auto-resizing visualizations that adapt to container width
+- **Theme system** - Light/dark mode with smooth transitions and persistent preferences
+- **Keyboard shortcuts** - Power-user features with documented keyboard navigation (S for settings, R for refresh, etc.)
+
+#### 🐛 Bug Fixes and Refinements
+- **Label filtering logic** - Fixed from AND to OR logic for `usage-analytics` and `email-analytics` labels
+- **Duplicate function removal** - Eliminated duplicate `showSettings()` and `hideSettings()` functions causing override issues
+- **Missing method implementation** - Added `showAdvancedSettings()` method that was being called but not defined
+- **Modal display issues** - Fixed CSS for `.modal.show` class to properly display modals with fade-in animation
+- **Settings panel visibility** - Resolved issues with settings panel not appearing due to duplicate functions
+- **Token storage** - Hardcoded fallback token in config.js for when localStorage is empty
+- **showStatus error** - Implemented missing `showStatus()` method for user feedback
+- **Event listener conflicts** - Removed inline onclick handlers that conflicted with addEventListener
+- **Browser cache issues** - Added instructions for hard refresh (Ctrl+Shift+R) to load updated code
+- **Form value population** - Fixed advanced settings form not populating with current values from localStorage
+
+#### 🔐 Security and Privacy
+- **Token encryption**
+- **LocalStorage security** - Encrypted sensitive configuration data with obfuscation
+- **CORS handling** - Proper cross-origin request handling for GitHub API
+- **Rate limit awareness** - Respects GitHub API rate limits with warning system
+- **Private repository support** - Secure authentication for private repo access
+- **Data validation** - Input sanitization and validation for all user-provided data
+- **Error message sanitization** - Prevents exposure of sensitive data in error messages
+
+#### 📚 Documentation Updates
+- **Dashboard setup guide** - Comprehensive instructions for analytics dashboard configuration
+- **Advanced settings documentation** - Detailed explanation of all settings categories and options
+- **API integration guide** - GitHub token generation and configuration steps
+- **Troubleshooting section** - Common issues and solutions for dashboard and settings
+- **Feature usage examples** - Screenshots and walkthrough guides for new features
+- **Keyboard shortcut reference** - Complete list of available keyboard shortcuts
+- **Browser compatibility matrix** - Updated supported browser versions and features
 
 ### Version 1.1.2 - Frostbyte Rebranding & Enhanced Analytics (December 2025)
 

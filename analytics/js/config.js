@@ -142,9 +142,12 @@ class ConfigManager {
      * Get default configuration
      */
     getDefaultConfig() {
+        // Default token (can be overridden by localStorage)
+        const defaultToken = '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';
+        
         return {
             github: {
-                token: '',
+                token: defaultToken,
                 owner: 'shadow11001',
                 repo: 'Frostbyte',
                 apiUrl: 'https://api.github.com',

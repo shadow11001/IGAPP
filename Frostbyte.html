@@ -2689,6 +2689,7 @@
                 <button onclick="addQuickNote('This is a Sams store.')" class="quick-note-btn" title="Sam's Club Store">Sams</button>
                 <button onclick="addQuickNote('Submitted PCR.')" class="quick-note-btn success-quick" title="Point Change Request Submitted">Submitted PCR</button>
                 <button onclick="addQuickNote('Submitted PDR.')" class="quick-note-btn success-quick" title="Parameter Deviation Request Submitted">Submitted PDR</button>
+                <button onclick="addQuickNote('Adv tech to restart the Sporlan case controllers and the Sporlan Gateway and adv tech that if it continues, they will need to contact Sporlan.')" class="quick-note-btn" title="Sporlan Controller Restart">Sporlan</button>
                 <button onclick="addAdvisoryNote()" class="quick-note-btn" title="Advise Tech of Issue">Advisory</button>
             </div>
 
@@ -3793,18 +3794,24 @@
             }
         }
         
-        // Tab flashing functions
+        // Tab flashing functions with color
         function startTabFlash(alertMessage) {
             if (AppState.isTabFlashing) return; // Already flashing
             
             AppState.isTabFlashing = true;
             let showAlert = true;
             
+            // Determine color based on alert type
+            const isWarning = alertMessage.includes('⚠️');
+            const warningColor = isWarning ? '#ffc107' : '#dc3545'; // Yellow for warning, red for critical
+            
             AppState.tabFlashInterval = setInterval(() => {
                 if (showAlert) {
                     document.title = alertMessage;
+                    setFaviconColor(warningColor);
                 } else {
                     document.title = AppState.originalTitle;
+                    setFaviconColor('#0078d4'); // Default blue
                 }
                 showAlert = !showAlert;
             }, 1000); // Flash every second
@@ -3817,6 +3824,40 @@
             }
             AppState.isTabFlashing = false;
             document.title = AppState.originalTitle; // Restore original title
+            setFaviconColor('#0078d4'); // Restore default blue favicon
+        }
+        
+        // Helper function to dynamically set favicon color
+        function setFaviconColor(color) {
+            // Remove existing favicon
+            let link = document.querySelector("link[rel*='icon']");
+            if (link) {
+                document.head.removeChild(link);
+            }
+            
+            // Create new favicon with the specified color
+            const canvas = document.createElement('canvas');
+            canvas.width = 32;
+            canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            
+            // Draw colored circle
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(16, 16, 14, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Add white border
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Set as favicon
+            link = document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'icon';
+            link.href = canvas.toDataURL();
+            document.head.appendChild(link);
         }
 
         // Microphone Detection (for voice detection only)

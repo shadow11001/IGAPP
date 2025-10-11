@@ -1862,7 +1862,28 @@ class FrostbyteAnalytics {
         // Settings panel
         const settingsBtn = document.getElementById('settings-btn');
         if (settingsBtn) {
-            settingsBtn.addEventListener('click', () => this.showSettings());
+            console.log('✅ Settings button found, adding click listener');
+            settingsBtn.addEventListener('click', (e) => {
+                console.log('🖱️ Settings button clicked!');
+                e.preventDefault();
+                e.stopPropagation();
+                
+                try {
+                    console.log('📞 Calling showSettings()...');
+                    this.showSettings();
+                    console.log('✅ showSettings() completed');
+                } catch (error) {
+                    console.error('❌ Error in showSettings():', error);
+                }
+            });
+            
+            // Also add global function as backup
+            window.showDashboardSettings = () => {
+                console.log('📞 Global showDashboardSettings called');
+                this.showSettings();
+            };
+        } else {
+            console.error('❌ Settings button not found in DOM!');
         }
 
         // Refresh button
@@ -1994,10 +2015,18 @@ class FrostbyteAnalytics {
      * Show settings panel
      */
     showSettings() {
+        console.log('🔧 showSettings() called');
         const panel = document.getElementById('settings-panel');
+        console.log('📋 Settings panel element:', panel);
+        
         if (panel) {
+            console.log('✅ Panel found, removing hidden class');
             panel.classList.remove('hidden');
+            panel.style.display = 'block'; // Force display
             this.loadSettingsForm();
+            console.log('✅ Settings panel should now be visible');
+        } else {
+            console.error('❌ Settings panel element not found!');
         }
     }
 
@@ -2009,6 +2038,16 @@ class FrostbyteAnalytics {
         if (panel) {
             panel.classList.add('hidden');
         }
+    }
+
+    /**
+     * Show advanced settings section
+     */
+    showAdvancedSettings() {
+        console.log('🔧 showAdvancedSettings() called');
+        // This would show additional advanced configuration options
+        // For now, just show the regular settings panel with all options
+        this.showSettings();
     }
 
     /**
@@ -2135,6 +2174,30 @@ class FrostbyteAnalytics {
     showConfigurationRequired() {
         this.showStatus('Please configure your GitHub token to load usage analytics', 'error');
         this.showSettings();
+    }
+
+    /**
+     * Show status message
+     */
+    showStatus(message, type = 'info') {
+        const statusIndicator = document.getElementById('status-indicator');
+        const statusText = document.getElementById('status-text');
+        
+        if (statusIndicator && statusText) {
+            statusText.textContent = message;
+            statusIndicator.className = `status-indicator ${type}`;
+            statusIndicator.classList.remove('hidden');
+            
+            // Auto-hide after 5 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusIndicator.classList.add('hidden');
+                }, 5000);
+            }
+        } else {
+            // Fallback to notification if status indicator doesn't exist
+            this.showNotification(message, type);
+        }
     }
 
     /**
@@ -4054,26 +4117,6 @@ class FrostbyteAnalytics {
     }
 
     /**
-     * Show settings panel
-     */
-    showSettings() {
-        const settingsPanel = document.getElementById('settings-panel');
-        if (settingsPanel) {
-            settingsPanel.style.display = 'block';
-        }
-    }
-
-    /**
-     * Hide settings panel
-     */
-    hideSettings() {
-        const settingsPanel = document.getElementById('settings-panel');
-        if (settingsPanel) {
-            settingsPanel.style.display = 'none';
-        }
-    }
-
-    /**
      * Update last update time
      */
     updateLastUpdateTime() {
@@ -4185,6 +4228,553 @@ class FrostbyteAnalytics {
         });
         this.charts = {};
         this.performanceCharts = {};
+    }
+
+    // =============================================
+    // ADVANCED SETTINGS METHODS
+    // =============================================
+
+    /**
+     * Show advanced settings modal
+     */
+    showAdvancedSettings() {
+        console.log('🔧 showAdvancedSettings() called');
+        const modal = this.createAdvancedSettingsModal();
+        document.body.appendChild(modal);
+        
+        // Animate modal in
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    }
+
+    /**
+     * Create advanced settings modal
+     */
+    createAdvancedSettingsModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal advanced-settings-modal';
+        modal.innerHTML = `
+            <div class="modal-overlay" onclick="this.closest('.modal').remove()"></div>
+            <div class="modal-dialog modal-xl">
+                <div class="modal-header">
+                    <h3><i class="fas fa-cogs"></i> Advanced Settings & Configuration</h3>
+                    <button class="modal-close" onclick="this.closest('.modal').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-content">
+                    <div class="settings-tabs">
+                        <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+                        <button class="tab-btn" data-tab="notifications">Notifications</button>
+                        <button class="tab-btn" data-tab="performance">Performance</button>
+                        <button class="tab-btn" data-tab="data">Data Management</button>
+                        <button class="tab-btn" data-tab="security">Security</button>
+                        <button class="tab-btn" data-tab="integration">Integration</button>
+                        <button class="tab-btn" data-tab="experimental">Experimental</button>
+                    </div>
+                    
+                    <div class="settings-content">
+                        ${this.generateAdvancedSettingsContent()}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="window.dashboard.resetAdvancedSettings()">
+                        <i class="fas fa-undo"></i> Reset to Defaults
+                    </button>
+                    <button class="btn btn-warning" onclick="window.dashboard.exportAdvancedSettings()">
+                        <i class="fas fa-download"></i> Export Settings
+                    </button>
+                    <button class="btn btn-info" onclick="window.dashboard.importAdvancedSettings()">
+                        <i class="fas fa-upload"></i> Import Settings
+                    </button>
+                    <button class="btn btn-primary" onclick="window.dashboard.saveAdvancedSettingsFromModal(this.closest('.modal'))">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Setup tab switching
+        setTimeout(() => {
+            this.setupAdvancedSettingsTabs(modal);
+            this.populateAdvancedSettingsForm(modal);
+        }, 100);
+        
+        return modal;
+    }
+
+    /**
+     * Generate advanced settings content HTML
+     */
+    generateAdvancedSettingsContent() {
+        return `
+            <!-- Dashboard Settings -->
+            <div class="tab-content active" data-tab="dashboard">
+                <h4>Dashboard Customization</h4>
+                <div class="form-group">
+                    <label for="adv-custom-layout">Layout Style</label>
+                    <select id="adv-custom-layout" class="form-input">
+                        <option value="default">Default</option>
+                        <option value="compact">Compact</option>
+                        <option value="detailed">Detailed</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-chart-animations" class="checkbox-input">
+                        <span class="checkbox-text">Enable Chart Animations</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-auto-refresh" class="checkbox-input">
+                        <span class="checkbox-text">Auto Refresh Data</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adv-refresh-interval">Refresh Interval (minutes)</label>
+                    <input type="number" id="adv-refresh-interval" class="form-input" min="1" max="60">
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-debug-mode" class="checkbox-input">
+                        <span class="checkbox-text">Enable Debug Mode</span>
+                    </label>
+                </div>
+                
+                <h4>Custom Colors</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="adv-primary-color">Primary Color</label>
+                        <input type="color" id="adv-primary-color" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="adv-secondary-color">Secondary Color</label>
+                        <input type="color" id="adv-secondary-color" class="form-input">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notifications Settings -->
+            <div class="tab-content" data-tab="notifications">
+                <h4>Notification Settings</h4>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-notifications-enabled" class="checkbox-input">
+                        <span class="checkbox-text">Enable Notifications</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adv-notification-position">Position</label>
+                    <select id="adv-notification-position" class="form-input">
+                        <option value="top-right">Top Right</option>
+                        <option value="top-left">Top Left</option>
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adv-notification-timeout">Auto-hide Timeout (seconds)</label>
+                    <input type="number" id="adv-notification-timeout" class="form-input" min="1" max="30" value="5">
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-sound-enabled" class="checkbox-input">
+                        <span class="checkbox-text">Enable Sound</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Performance Settings -->
+            <div class="tab-content" data-tab="performance">
+                <h4>Performance Monitoring</h4>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-performance-monitoring" class="checkbox-input">
+                        <span class="checkbox-text">Enable Performance Monitoring</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adv-memory-warning">Memory Warning Threshold (%)</label>
+                    <input type="number" id="adv-memory-warning" class="form-input" min="50" max="95" value="80">
+                </div>
+                
+                <div class="form-group">
+                    <label for="adv-response-warning">Response Time Warning (ms)</label>
+                    <input type="number" id="adv-response-warning" class="form-input" min="100" max="5000" value="2000">
+                </div>
+                
+                <h4>Optimization</h4>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-lazy-loading" class="checkbox-input">
+                        <span class="checkbox-text">Enable Lazy Loading</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Data Management Settings -->
+            <div class="tab-content" data-tab="data">
+                <h4>Data Retention</h4>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-data-retention-enabled" class="checkbox-input">
+                        <span class="checkbox-text">Enable Data Retention Policies</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adv-max-cache-age">Max Cache Age (hours)</label>
+                    <input type="number" id="adv-max-cache-age" class="form-input" min="1" max="168" value="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="adv-max-reports-age">Max Reports Age (days)</label>
+                    <input type="number" id="adv-max-reports-age" class="form-input" min="1" max="365" value="90">
+                </div>
+                
+                <h4>Backup Settings</h4>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-backup-enabled" class="checkbox-input">
+                        <span class="checkbox-text">Enable Automatic Backups</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Security Settings -->
+            <div class="tab-content" data-tab="security">
+                <h4>Security Features</h4>
+                <div class="form-group">
+                    <label for="adv-session-timeout">Session Timeout (minutes)</label>
+                    <input type="number" id="adv-session-timeout" class="form-input" min="5" max="480" value="60">
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-audit-logging" class="checkbox-input">
+                        <span class="checkbox-text">Enable Audit Logging</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-encryption-enabled" class="checkbox-input">
+                        <span class="checkbox-text">Enable Data Encryption</span>
+                    </label>
+                </div>
+                
+                <h4>Rate Limiting</h4>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-rate-limiting" class="checkbox-input">
+                        <span class="checkbox-text">Enable Rate Limiting</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Integration Settings -->
+            <div class="tab-content" data-tab="integration">
+                <h4>GitHub Integration</h4>
+                <div class="form-group">
+                    <label for="adv-api-cache-duration">API Cache Duration (minutes)</label>
+                    <input type="number" id="adv-api-cache-duration" class="form-input" min="1" max="1440" value="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="adv-request-timeout">Request Timeout (seconds)</label>
+                    <input type="number" id="adv-request-timeout" class="form-input" min="5" max="120" value="30">
+                </div>
+                
+                <div class="form-group">
+                    <label for="adv-retry-attempts">Retry Attempts</label>
+                    <input type="number" id="adv-retry-attempts" class="form-input" min="0" max="5" value="3">
+                </div>
+            </div>
+            
+            <!-- Experimental Settings -->
+            <div class="tab-content" data-tab="experimental">
+                <h4>Experimental Features</h4>
+                <div class="alert" style="background: #fff3cd; border: 1px solid #ffc107; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+                    <i class="fas fa-exclamation-triangle" style="color: #856404;"></i>
+                    <strong>Warning:</strong> These features are experimental and may not work as expected.
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-realtime-updates" class="checkbox-input">
+                        <span class="checkbox-text">Enable Real-time Updates</span>
+                    </label>
+                    <small class="form-hint">Live data updates without page refresh</small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="adv-ai-insights" class="checkbox-input">
+                        <span class="checkbox-text">Enable AI-powered Insights</span>
+                    </label>
+                    <small class="form-hint">Experimental AI analysis of usage patterns</small>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Setup advanced settings tabs
+     */
+    setupAdvancedSettingsTabs(modal) {
+        const tabs = modal.querySelectorAll('.tab-btn');
+        const contents = modal.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+                
+                // Update active tab button
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update visible content
+                contents.forEach(content => {
+                    if (content.dataset.tab === targetTab) {
+                        content.style.display = 'block';
+                        content.classList.add('active');
+                    } else {
+                        content.style.display = 'none';
+                        content.classList.remove('active');
+                    }
+                });
+            });
+        });
+    }
+
+    /**
+     * Populate advanced settings form with current values
+     */
+    populateAdvancedSettingsForm(modal) {
+        // Load settings from localStorage
+        try {
+            const stored = localStorage.getItem('frostbyte_advanced_settings');
+            if (stored) {
+                const settings = JSON.parse(stored);
+                
+                // Dashboard settings
+                if (settings.dashboard) {
+                    this.setFormValue(modal, 'adv-custom-layout', settings.dashboard.customLayout);
+                    this.setFormValue(modal, 'adv-chart-animations', settings.dashboard.chartAnimations);
+                    this.setFormValue(modal, 'adv-auto-refresh', settings.dashboard.autoRefresh);
+                    this.setFormValue(modal, 'adv-refresh-interval', settings.dashboard.refreshInterval / 60000);
+                    this.setFormValue(modal, 'adv-debug-mode', settings.dashboard.enableDebugMode);
+                    if (settings.dashboard.customColors) {
+                        this.setFormValue(modal, 'adv-primary-color', settings.dashboard.customColors.primary);
+                        this.setFormValue(modal, 'adv-secondary-color', settings.dashboard.customColors.secondary);
+                    }
+                }
+                
+                // Notification settings
+                if (settings.notifications) {
+                    this.setFormValue(modal, 'adv-notifications-enabled', settings.notifications.enabled);
+                    this.setFormValue(modal, 'adv-notification-position', settings.notifications.position);
+                    this.setFormValue(modal, 'adv-notification-timeout', settings.notifications.timeout / 1000);
+                    this.setFormValue(modal, 'adv-sound-enabled', settings.notifications.soundEnabled);
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to populate advanced settings form:', error);
+        }
+    }
+
+    /**
+     * Helper to set form values
+     */
+    setFormValue(container, id, value) {
+        const element = container.querySelector(`#${id}`);
+        if (!element) return;
+        
+        if (element.type === 'checkbox') {
+            element.checked = !!value;
+        } else {
+            element.value = value;
+        }
+    }
+
+    /**
+     * Save advanced settings from modal
+     */
+    saveAdvancedSettingsFromModal(modal) {
+        try {
+            const settings = {
+                dashboard: {
+                    customLayout: modal.querySelector('#adv-custom-layout')?.value || 'default',
+                    chartAnimations: modal.querySelector('#adv-chart-animations')?.checked || false,
+                    autoRefresh: modal.querySelector('#adv-auto-refresh')?.checked || false,
+                    refreshInterval: (parseInt(modal.querySelector('#adv-refresh-interval')?.value) || 5) * 60000,
+                    enableDebugMode: modal.querySelector('#adv-debug-mode')?.checked || false,
+                    customColors: {
+                        primary: modal.querySelector('#adv-primary-color')?.value || '#667eea',
+                        secondary: modal.querySelector('#adv-secondary-color')?.value || '#6c757d'
+                    }
+                },
+                notifications: {
+                    enabled: modal.querySelector('#adv-notifications-enabled')?.checked ?? true,
+                    position: modal.querySelector('#adv-notification-position')?.value || 'top-right',
+                    timeout: (parseInt(modal.querySelector('#adv-notification-timeout')?.value) || 5) * 1000,
+                    soundEnabled: modal.querySelector('#adv-sound-enabled')?.checked || false
+                },
+                performance: {
+                    monitoring: {
+                        enabled: modal.querySelector('#adv-performance-monitoring')?.checked || false
+                    },
+                    thresholds: {
+                        memoryUsage: { warning: parseInt(modal.querySelector('#adv-memory-warning')?.value) || 80 },
+                        responseTime: { warning: parseInt(modal.querySelector('#adv-response-warning')?.value) || 2000 }
+                    },
+                    optimization: {
+                        lazyLoading: modal.querySelector('#adv-lazy-loading')?.checked || false
+                    }
+                },
+                dataRetention: {
+                    enabled: modal.querySelector('#adv-data-retention-enabled')?.checked || false,
+                    maxCacheAge: (parseInt(modal.querySelector('#adv-max-cache-age')?.value) || 10) * 3600000,
+                    maxReportsAge: (parseInt(modal.querySelector('#adv-max-reports-age')?.value) || 90) * 86400000,
+                    backupEnabled: modal.querySelector('#adv-backup-enabled')?.checked || false
+                },
+                security: {
+                    sessionTimeout: (parseInt(modal.querySelector('#adv-session-timeout')?.value) || 60) * 60000,
+                    auditLogging: modal.querySelector('#adv-audit-logging')?.checked || false,
+                    encryptionEnabled: modal.querySelector('#adv-encryption-enabled')?.checked || false,
+                    rateLimiting: modal.querySelector('#adv-rate-limiting')?.checked || false
+                },
+                integration: {
+                    github: {
+                        apiCacheDuration: (parseInt(modal.querySelector('#adv-api-cache-duration')?.value) || 10) * 60000,
+                        requestTimeout: (parseInt(modal.querySelector('#adv-request-timeout')?.value) || 30) * 1000,
+                        retryAttempts: parseInt(modal.querySelector('#adv-retry-attempts')?.value) || 3
+                    }
+                },
+                experimental: {
+                    realtimeUpdates: modal.querySelector('#adv-realtime-updates')?.checked || false,
+                    aiInsights: modal.querySelector('#adv-ai-insights')?.checked || false
+                }
+            };
+            
+            localStorage.setItem('frostbyte_advanced_settings', JSON.stringify(settings));
+            this.advancedSettings = settings;
+            this.showStatus('✅ Advanced settings saved successfully!', 'success');
+            
+            // Close modal
+            modal.remove();
+            
+            // Apply settings
+            this.applyAdvancedSettings();
+        } catch (error) {
+            console.error('Failed to save advanced settings:', error);
+            this.showStatus('❌ Failed to save advanced settings', 'error');
+        }
+    }
+
+    /**
+     * Apply advanced settings to the dashboard
+     */
+    applyAdvancedSettings() {
+        try {
+            const stored = localStorage.getItem('frostbyte_advanced_settings');
+            if (stored) {
+                const settings = JSON.parse(stored);
+                
+                // Apply debug mode
+                if (settings.dashboard?.enableDebugMode) {
+                    console.log('🐛 Debug mode enabled');
+                    document.body.classList.add('debug-mode');
+                } else {
+                    document.body.classList.remove('debug-mode');
+                }
+                
+                // Apply custom colors
+                if (settings.dashboard?.customColors) {
+                    document.documentElement.style.setProperty('--color-primary', settings.dashboard.customColors.primary);
+                    document.documentElement.style.setProperty('--color-secondary', settings.dashboard.customColors.secondary);
+                }
+                
+                console.log('✅ Advanced settings applied');
+            }
+        } catch (error) {
+            console.warn('Failed to apply advanced settings:', error);
+        }
+    }
+
+    /**
+     * Reset advanced settings to defaults
+     */
+    resetAdvancedSettings() {
+        if (confirm('Are you sure you want to reset all advanced settings to their default values?')) {
+            localStorage.removeItem('frostbyte_advanced_settings');
+            this.showStatus('✅ Advanced settings reset to defaults', 'success');
+            
+            // Close and reopen modal to show defaults
+            document.querySelector('.advanced-settings-modal')?.remove();
+            this.showAdvancedSettings();
+        }
+    }
+
+    /**
+     * Export advanced settings
+     */
+    exportAdvancedSettings() {
+        try {
+            const settings = localStorage.getItem('frostbyte_advanced_settings') || '{}';
+            const blob = new Blob([settings], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `frostbyte-advanced-settings-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            this.showStatus('✅ Settings exported successfully', 'success');
+        } catch (error) {
+            console.error('Failed to export settings:', error);
+            this.showStatus('❌ Failed to export settings', 'error');
+        }
+    }
+
+    /**
+     * Import advanced settings
+     */
+    importAdvancedSettings() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const settings = JSON.parse(event.target.result);
+                    localStorage.setItem('frostbyte_advanced_settings', JSON.stringify(settings));
+                    this.showStatus('✅ Settings imported successfully', 'success');
+                    
+                    // Close and reopen modal to show imported settings
+                    document.querySelector('.advanced-settings-modal')?.remove();
+                    this.showAdvancedSettings();
+                } catch (error) {
+                    console.error('Failed to import settings:', error);
+                    this.showStatus('❌ Invalid settings file', 'error');
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
     }
 }
 

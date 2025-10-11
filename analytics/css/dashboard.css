@@ -735,7 +735,7 @@ body {
 
 /* === Interactive Chart Modals === */
 .modal {
-    display: none;
+    display: flex;
     position: fixed;
     top: 0;
     left: 0;
@@ -743,14 +743,16 @@ body {
     height: 100%;
     z-index: 1000;
     opacity: 0;
+    pointer-events: none;
     transition: opacity 0.3s ease;
-}
-
-.modal.active {
-    display: flex;
-    opacity: 1;
     align-items: center;
     justify-content: center;
+}
+
+.modal.show,
+.modal.active {
+    opacity: 1;
+    pointer-events: all;
 }
 
 .modal-overlay {

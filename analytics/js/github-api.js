@@ -218,7 +218,7 @@ class GitHubAPI {
     async fetchIssues(params = {}) {
         const config = this.getConfig();
         const { owner, repo } = config;
-        const labels = config.labels || ['usage-analytics', 'frostbyte-analytics'];
+        const targetLabels = ['usage-analytics', 'email-analytics'];
         
         // Default parameters
         const defaultParams = {
@@ -233,29 +233,31 @@ class GitHubAPI {
         const endpoint = `/repos/${owner}/${repo}/issues?${queryString}`;
         
         console.log(`📥 Fetching issues from: ${endpoint}`);
-        console.log(`🏷️ Will filter for labels: ${labels.join(', ')}`);
+        console.log(`🏷️ Looking for issues with ANY of these labels: ${targetLabels.join(' OR ')}`);
 
         const allIssues = await this.makeRequest(endpoint);
         console.log(`📊 Total issues fetched: ${allIssues.length}`);
         
-        // Filter issues that have any of our target labels
+        // Filter issues that have ANY of the target labels
         const filteredIssues = allIssues.filter(issue => {
             const issueLabels = issue.labels?.map(l => l.name.toLowerCase()) || [];
-            const hasTargetLabel = issueLabels.some(label => 
-                labels.some(targetLabel => 
-                    label.includes(targetLabel.toLowerCase()) || 
-                    targetLabel.toLowerCase().includes(label)
+            
+            // Check if issue has ANY of the target labels
+            const hasTargetLabel = targetLabels.some(targetLabel => 
+                issueLabels.some(label => 
+                    label === targetLabel.toLowerCase() || 
+                    label.includes(targetLabel.toLowerCase())
                 )
             );
             
             if (hasTargetLabel) {
-                console.log(`✅ Issue #${issue.number} matches target labels:`, issueLabels);
+                console.log(`✅ Issue #${issue.number} has target label(s):`, issueLabels);
             }
             
             return hasTargetLabel;
         });
         
-        console.log(`🎯 Filtered to ${filteredIssues.length} relevant issues`);
+        console.log(`🎯 Filtered to ${filteredIssues.length} issues with target labels`);
         return filteredIssues;
     }
 
