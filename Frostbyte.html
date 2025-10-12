@@ -9292,10 +9292,20 @@ verified in {SYSTEM}
             
             showNotification('🎉 War Room check completed!', 'success', 5000);
             
-            // Clear the completion deadline timer and reschedule next War Room check
+            // Reschedule next War Room check (don't use stopWarRoomSchedule as it hides the display)
             if (AppState.warRoomSchedule.enabled) {
-                // Stop all existing timers
-                stopWarRoomSchedule();
+                // Clear all reminder timeouts
+                AppState.warRoomSchedule.reminderTimeouts.forEach(timeout => clearTimeout(timeout));
+                AppState.warRoomSchedule.reminderTimeouts = [];
+                
+                // Clear display update interval
+                if (AppState.warRoomSchedule.displayUpdateInterval) {
+                    clearInterval(AppState.warRoomSchedule.displayUpdateInterval);
+                    AppState.warRoomSchedule.displayUpdateInterval = null;
+                }
+                
+                // Clear the completion deadline (20-minute timer)
+                AppState.warRoomSchedule.nextCheck = null;
                 
                 // Re-initialize the schedule to calculate and set next check
                 initializeWarRoomSchedule();
