@@ -6843,9 +6843,11 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             console.log('War Room schedule saved:', AppState.warRoomSchedule);
         }
         
-        function initializeWarRoomSchedule() {
-            // Clear any existing timers
-            stopWarRoomSchedule();
+        function initializeWarRoomSchedule(skipTimerClear = false) {
+            // Clear any existing timers (unless we're reinitializing after a check completion)
+            if (!skipTimerClear) {
+                stopWarRoomSchedule();
+            }
             
             if (!AppState.warRoomSchedule.enabled || !AppState.warRoomSchedule.shift || AppState.warRoomSchedule.days.length === 0) {
                 return;
@@ -8764,7 +8766,8 @@ ${analysisData.originalEmail}
                 storeResults: [],
                 currentTemplate: null,
                 sessionStartTime: null,
-                sessionId: null
+                sessionId: null,
+                currentStoreWorkOrders: [] // Store-specific work orders for current store
             },
             
             templates: {
@@ -9059,6 +9062,7 @@ verified in {SYSTEM}
             // Initialize session
             WAR_ROOM_SYSTEM.state.currentStoreIndex = 0;
             WAR_ROOM_SYSTEM.state.storeResults = [];
+            WAR_ROOM_SYSTEM.state.currentStoreWorkOrders = []; // Clear work orders
             WAR_ROOM_SYSTEM.state.sessionStartTime = new Date();
             WAR_ROOM_SYSTEM.state.sessionId = WAR_ROOM_SYSTEM.generateSessionId();
             
@@ -9107,7 +9111,7 @@ verified in {SYSTEM}
                 document.getElementById('rack-list').innerHTML = '<p>Select a control system to see available racks/components</p>';
             }
             
-            // Load persistent work orders
+            // Render work orders for this store (starts empty)
             renderWorkOrders();
         }
         
@@ -9176,14 +9180,13 @@ verified in {SYSTEM}
             
             const description = prompt('Enter work order description (optional):') || 'Standard work order';
             
-            // Add to persistent storage
+            // Add to current store's work orders (not global)
             const workOrder = {
                 number: workOrderNumber,
                 description: description,
                 addedDate: new Date().toISOString()
             };
-            AppState.persistentWorkOrders.push(workOrder);
-            localStorage.setItem('persistentWorkOrders', JSON.stringify(AppState.persistentWorkOrders));
+            WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.push(workOrder);
             
             // Update UI
             renderWorkOrders();
@@ -9192,12 +9195,12 @@ verified in {SYSTEM}
         function renderWorkOrders() {
             const workOrderList = document.getElementById('work-order-list');
             
-            if (AppState.persistentWorkOrders.length === 0) {
+            if (WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.length === 0) {
                 workOrderList.innerHTML = '<p>No work orders monitored for this store</p>';
                 return;
             }
             
-            workOrderList.innerHTML = AppState.persistentWorkOrders.map((wo, index) => `
+            workOrderList.innerHTML = WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.map((wo, index) => `
                 <div class="work-order-item" data-index="${index}">
                     <strong>${wo.number}</strong> - ${wo.description}
                     <button onclick="removeWorkOrder(${index})" class="danger-button" style="float: right; padding: 2px 6px; font-size: 12px;">✕</button>
@@ -9206,8 +9209,7 @@ verified in {SYSTEM}
         }
         
         function removeWorkOrder(index) {
-            AppState.persistentWorkOrders.splice(index, 1);
-            localStorage.setItem('persistentWorkOrders', JSON.stringify(AppState.persistentWorkOrders));
+            WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.splice(index, 1);
             renderWorkOrders();
         }
         
@@ -9236,8 +9238,8 @@ verified in {SYSTEM}
                 });
             });
             
-            // Use persistent work orders from AppState
-            const workOrders = AppState.persistentWorkOrders.map(wo => `${wo.number} - ${wo.description}`);
+            // Use current store's work orders
+            const workOrders = WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.map(wo => `${wo.number} - ${wo.description}`);
             
             // Store the data
             const storeData = {
@@ -9262,6 +9264,9 @@ verified in {SYSTEM}
                 // All stores completed
                 completeWarRoomCheck();
             } else {
+                // Clear work orders for the new store
+                WAR_ROOM_SYSTEM.state.currentStoreWorkOrders = [];
+                
                 updateProgress();
                 loadCurrentStore();
             }
@@ -9292,7 +9297,7 @@ verified in {SYSTEM}
             
             showNotification('🎉 War Room check completed!', 'success', 5000);
             
-            // Reschedule next War Room check (don't use stopWarRoomSchedule as it hides the display)
+            // Reschedule next War Room check
             if (AppState.warRoomSchedule.enabled) {
                 // Clear all reminder timeouts
                 AppState.warRoomSchedule.reminderTimeouts.forEach(timeout => clearTimeout(timeout));
@@ -9308,7 +9313,8 @@ verified in {SYSTEM}
                 AppState.warRoomSchedule.nextCheck = null;
                 
                 // Re-initialize the schedule to calculate and set next check
-                initializeWarRoomSchedule();
+                // Pass true to skip stopWarRoomSchedule() which would hide the display
+                initializeWarRoomSchedule(true);
             }
         }
         
