@@ -3343,7 +3343,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.2.0', // Update this when you make changes
+            currentVersion: '1.2.1', // Update this when you make changes
             githubRepo: 'shadow11001/Frostbyte',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -9062,7 +9062,7 @@ verified in {SYSTEM}
             // Initialize session
             WAR_ROOM_SYSTEM.state.currentStoreIndex = 0;
             WAR_ROOM_SYSTEM.state.storeResults = [];
-            WAR_ROOM_SYSTEM.state.currentStoreWorkOrders = []; // Clear work orders
+            // Work orders are now persistent and store-specific - don't clear
             WAR_ROOM_SYSTEM.state.sessionStartTime = new Date();
             WAR_ROOM_SYSTEM.state.sessionId = WAR_ROOM_SYSTEM.generateSessionId();
             
@@ -9180,12 +9180,21 @@ verified in {SYSTEM}
             
             const description = prompt('Enter work order description (optional):') || 'Standard work order';
             
-            // Add to current store's work orders (not global)
+            const currentStore = WAR_ROOM_SYSTEM.state.assignedStores[WAR_ROOM_SYSTEM.state.currentStoreIndex];
+            
+            // Add to both persistent storage and current store
             const workOrder = {
                 number: workOrderNumber,
                 description: description,
-                addedDate: new Date().toISOString()
+                addedDate: new Date().toISOString(),
+                store: currentStore // Track which store this work order belongs to
             };
+            
+            // Add to persistent storage
+            AppState.persistentWorkOrders.push(workOrder);
+            localStorage.setItem('persistentWorkOrders', JSON.stringify(AppState.persistentWorkOrders));
+            
+            // Also add to current store's temporary array for this check
             WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.push(workOrder);
             
             // Update UI
@@ -9194,22 +9203,38 @@ verified in {SYSTEM}
         
         function renderWorkOrders() {
             const workOrderList = document.getElementById('work-order-list');
+            const currentStore = WAR_ROOM_SYSTEM.state.assignedStores[WAR_ROOM_SYSTEM.state.currentStoreIndex];
             
-            if (WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.length === 0) {
+            // Filter persistent work orders for current store
+            const storeWorkOrders = AppState.persistentWorkOrders.filter(wo => wo.store === currentStore);
+            
+            if (storeWorkOrders.length === 0) {
                 workOrderList.innerHTML = '<p>No work orders monitored for this store</p>';
                 return;
             }
             
-            workOrderList.innerHTML = WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.map((wo, index) => `
-                <div class="work-order-item" data-index="${index}">
+            workOrderList.innerHTML = storeWorkOrders.map((wo, index) => `
+                <div class="work-order-item" data-wo-number="${wo.number}">
                     <strong>${wo.number}</strong> - ${wo.description}
-                    <button onclick="removeWorkOrder(${index})" class="danger-button" style="float: right; padding: 2px 6px; font-size: 12px;">✕</button>
+                    <button onclick="removeWorkOrder('${wo.number}', '${currentStore}')" class="danger-button" style="float: right; padding: 2px 6px; font-size: 12px;">✕</button>
                 </div>
             `).join('');
         }
         
-        function removeWorkOrder(index) {
-            WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.splice(index, 1);
+        function removeWorkOrder(woNumber, store) {
+            // Remove from persistent storage
+            const index = AppState.persistentWorkOrders.findIndex(wo => wo.number === woNumber && wo.store === store);
+            if (index !== -1) {
+                AppState.persistentWorkOrders.splice(index, 1);
+                localStorage.setItem('persistentWorkOrders', JSON.stringify(AppState.persistentWorkOrders));
+            }
+            
+            // Remove from current store's temporary array
+            const tempIndex = WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.findIndex(wo => wo.number === woNumber);
+            if (tempIndex !== -1) {
+                WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.splice(tempIndex, 1);
+            }
+            
             renderWorkOrders();
         }
         
@@ -9238,8 +9263,9 @@ verified in {SYSTEM}
                 });
             });
             
-            // Use current store's work orders
-            const workOrders = WAR_ROOM_SYSTEM.state.currentStoreWorkOrders.map(wo => `${wo.number} - ${wo.description}`);
+            // Get work orders for this store from persistent storage
+            const storeWorkOrders = AppState.persistentWorkOrders.filter(wo => wo.store === currentStore);
+            const workOrders = storeWorkOrders.map(wo => `${wo.number} - ${wo.description}`);
             
             // Store the data
             const storeData = {
@@ -9264,8 +9290,8 @@ verified in {SYSTEM}
                 // All stores completed
                 completeWarRoomCheck();
             } else {
-                // Clear work orders for the new store
-                WAR_ROOM_SYSTEM.state.currentStoreWorkOrders = [];
+                // Work orders are now store-specific and loaded from persistent storage
+                // No need to clear currentStoreWorkOrders
                 
                 updateProgress();
                 loadCurrentStore();
