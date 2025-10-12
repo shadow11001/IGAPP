@@ -3343,7 +3343,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.2.1', // Update this when you make changes
+            currentVersion: '1.2.2', // Update this when you make changes
             githubRepo: 'shadow11001/Frostbyte',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -7043,14 +7043,30 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                 nextDay = warRoomDays[0];
             }
             
-            if (!nextDay) return;
+            if (!nextDay) {
+                // No War Room days configured - clear display
+                AppState.warRoomSchedule.nextCheck = null;
+                updateWarRoomStatusDisplay();
+                return;
+            }
             
             let daysUntilNext = nextDay - currentDay;
             if (daysUntilNext <= 0) daysUntilNext += 7;
             
             const nextDate = new Date(now);
             nextDate.setDate(nextDate.getDate() + daysUntilNext);
-            nextDate.setHours(0, 0, 0, 0);
+            
+            // Get the shift start time for that next day
+            const shiftTimes = getShiftTimesInUserTimezone(AppState.warRoomSchedule.shift);
+            if (shiftTimes) {
+                nextDate.setHours(Math.floor(shiftTimes.startMinutes / 60), shiftTimes.startMinutes % 60, 0, 0);
+            } else {
+                nextDate.setHours(0, 0, 0, 0);
+            }
+            
+            // Set the nextCheck to the first check of the next War Room day
+            AppState.warRoomSchedule.nextCheck = nextDate;
+            AppState.warRoomSchedule.currentCheckDue = nextDate;
             
             const msUntilNext = nextDate.getTime() - now.getTime();
             
@@ -7061,6 +7077,9 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             
             const dayName = Object.keys(dayMap).find(key => dayMap[key] === nextDay);
             console.log(`📋 Next War Room day: ${dayName} (${daysUntilNext} days from now)`);
+            
+            // Update display to show next check date
+            updateWarRoomStatusDisplay();
             
             // Clear next check display
             const statusDiv = document.getElementById('warRoomStatus');
@@ -7124,7 +7143,24 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                 const hours = Math.floor(diff / (1000 * 60 * 60));
                 const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 
-                if (hours > 0) {
+                // If next check is more than 12 hours away, it's likely tomorrow or another day
+                if (hours >= 12) {
+                    const nextDate = new Date(next);
+                    const today = new Date(now);
+                    const isToday = nextDate.toDateString() === today.toDateString();
+                    const isTomorrow = nextDate.toDateString() === new Date(today.getTime() + 86400000).toDateString();
+                    
+                    const timeStr = nextDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                    
+                    if (isToday) {
+                        nextCheckSpan.textContent = `Next: Today ${timeStr}`;
+                    } else if (isTomorrow) {
+                        nextCheckSpan.textContent = `Next: Tomorrow ${timeStr}`;
+                    } else {
+                        const dayStr = nextDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                        nextCheckSpan.textContent = `Next: ${dayStr} ${timeStr}`;
+                    }
+                } else if (hours > 0) {
                     nextCheckSpan.textContent = `Next: ${hours}h ${minutes}m`;
                 } else if (minutes > 20) {
                     nextCheckSpan.textContent = `Next: ${minutes}m`;
