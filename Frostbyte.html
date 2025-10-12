@@ -2917,6 +2917,7 @@
                         <button onclick="addQuickNote('Logged into CPC.'); selectSystem('CPC');" class="quick-note-btn" title="CPC Login">CPC</button>
                         <button onclick="addQuickNote('Logged into Danfoss AKA65.'); selectSystem('AKA65');" class="quick-note-btn" title="Danfoss AKA65 Login">AKA65</button>
                         <button onclick="addQuickNote('Logged into Danfoss Storeview.'); selectSystem('Storeview');" class="quick-note-btn" title="Danfoss Storeview Login">Storeview</button>
+                        <button onclick="addQuickNote('Did not login to an EMS.'); selectSystem('None');" class="quick-note-btn" title="No EMS Login">None</button>
                     </div>
 
                     <h4 style="display: none;">Diagnostics</h4>
@@ -2949,6 +2950,7 @@
                 <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
                 <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">RTU Setpoint</button>
                 <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
+                <button onclick="addQuickNote('Changed Lighting schedule.')" class="quick-note-btn" title="Change Lighting Schedule">Light Schedule</button>
             </div>
 
             <div id="downloads-section" style="display: none;">
@@ -3343,7 +3345,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.2.2', // Update this when you make changes
+            currentVersion: '1.2.0', // Update this when you make changes
             githubRepo: 'shadow11001/Frostbyte',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -6891,7 +6893,9 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             for (const checkMinutes of checkTimes) {
                 const latestStartTime = checkMinutes + 20; // Can start up to 20 min after due time
                 
-                if (currentMinutes < latestStartTime) {
+                // Only schedule if the check time hasn't passed yet (not if we're within the window)
+                // This prevents re-scheduling a check we just completed
+                if (currentMinutes < checkMinutes) {
                     scheduleWarRoomCheck(checkMinutes);
                     if (!nextCheckScheduled) {
                         // This is the next check
@@ -7080,10 +7084,6 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             
             // Update display to show next check date
             updateWarRoomStatusDisplay();
-            
-            // Clear next check display
-            const statusDiv = document.getElementById('warRoomStatus');
-            if (statusDiv) statusDiv.style.display = 'none';
         }
         
         function stopWarRoomSchedule() {
@@ -9361,20 +9361,12 @@ verified in {SYSTEM}
             
             // Reschedule next War Room check
             if (AppState.warRoomSchedule.enabled) {
-                // Clear all reminder timeouts
+                // Clear all reminder timeouts (notifications)
                 AppState.warRoomSchedule.reminderTimeouts.forEach(timeout => clearTimeout(timeout));
                 AppState.warRoomSchedule.reminderTimeouts = [];
                 
-                // Clear display update interval
-                if (AppState.warRoomSchedule.displayUpdateInterval) {
-                    clearInterval(AppState.warRoomSchedule.displayUpdateInterval);
-                    AppState.warRoomSchedule.displayUpdateInterval = null;
-                }
-                
-                // Clear the completion deadline (20-minute timer)
-                AppState.warRoomSchedule.nextCheck = null;
-                
                 // Re-initialize the schedule to calculate and set next check
+                // This will recalculate nextCheck and update the display properly
                 // Pass true to skip stopWarRoomSchedule() which would hide the display
                 initializeWarRoomSchedule(true);
             }
