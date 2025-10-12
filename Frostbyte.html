@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Walmart Digital Assets QA Checklist and Notes Application">
-    <title>Walmart Digital Assets - QA Checklist</title>
+    <meta name="description" content="Walmart Digital Assets Notes Application">
+    <title>Walmart Digital Assets - Frostbyte</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         /* Fix Font Awesome font display issues */
@@ -982,7 +982,387 @@
 
         .error-quick:hover {
             background-color: #c82333 !important;
-        }        textarea, input, select {
+        }
+
+        /* Collapsible Accordion Groups */
+        .accordion-group {
+            margin-bottom: 5px;
+        }
+
+        .accordion-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 0;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            color: #0071ce;
+            border-bottom: 1px solid transparent;
+        }
+
+        .accordion-header:hover {
+            border-bottom-color: #0071ce;
+        }
+
+        .accordion-header i {
+            transition: transform 0.3s ease;
+            font-size: 10px;
+            margin-left: 6px;
+        }
+
+        .accordion-group.collapsed .accordion-header i {
+            transform: rotate(-90deg);
+        }
+
+        .accordion-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+            opacity: 1;
+            padding-top: 5px;
+        }
+
+        .accordion-group.collapsed .accordion-content {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+        }
+
+        body.dark-mode .accordion-header {
+            color: #4da6ff;
+        }
+
+        body.dark-mode .accordion-header:hover {
+            border-bottom-color: #4da6ff;
+        }
+
+        /* Sub-Category Tabs */
+        .sub-category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 5px;
+        }
+
+        .sub-category-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 4px 4px 0 0;
+            position: relative;
+        }
+
+        .sub-category-btn:hover {
+            color: #0071ce;
+            background: rgba(0, 113, 206, 0.05);
+        }
+
+        .sub-category-btn.active {
+            color: #0071ce;
+            font-weight: 600;
+        }
+
+        .sub-category-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -7px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0071ce;
+        }
+
+        .sub-category-content {
+            display: none;
+        }
+
+        .sub-category-content.active {
+            display: block;
+        }
+
+        body.dark-mode .sub-category-tabs {
+            border-bottom-color: #444;
+        }
+
+        body.dark-mode .sub-category-btn {
+            color: #adb5bd;
+        }
+
+        body.dark-mode .sub-category-btn:hover {
+            color: #4da6ff;
+            background: rgba(77, 166, 255, 0.1);
+        }
+
+        body.dark-mode .sub-category-btn.active {
+            color: #4da6ff;
+        }
+
+        body.dark-mode .sub-category-btn.active::after {
+            background: #4da6ff;
+        }
+
+        /* Custom Modal System */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        body.dark-mode .modal-content {
+            background: #2d2d2d;
+            color: #ffffff;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #0071ce;
+        }
+
+        body.dark-mode .modal-header {
+            color: #4da6ff;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 2px solid #ccc;
+            font-size: 15px;
+            margin-top: 8px;
+            transition: border-color 0.3s ease;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: #0071ce;
+        }
+
+        body.dark-mode .modal-input {
+            background-color: #333;
+            color: #ffffff;
+            border-color: #555;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #0071ce 0%, #004c91 100%);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #003d75 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 113, 206, 0.3);
+        }
+
+        .modal-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        body.dark-mode .modal-btn-secondary {
+            background: #495057;
+        }
+
+        body.dark-mode .modal-btn-secondary:hover {
+            background: #3a3f44;
+        }
+
+        /* Keyboard Shortcuts Help Modal */
+        .keyboard-help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 10001;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .keyboard-help-modal.show {
+            display: flex;
+        }
+
+        .keyboard-help-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        body.dark-mode .keyboard-help-content {
+            background: #2d2d2d;
+            color: #ffffff;
+        }
+
+        .keyboard-help-header {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #0071ce;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        body.dark-mode .keyboard-help-header {
+            color: #4da6ff;
+        }
+
+        .keyboard-shortcut-group {
+            margin-bottom: 20px;
+        }
+
+        .keyboard-shortcut-group h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+            border-bottom: 2px solid #0071ce;
+            padding-bottom: 6px;
+        }
+
+        body.dark-mode .keyboard-shortcut-group h3 {
+            color: #ffffff;
+            border-bottom-color: #4da6ff;
+        }
+
+        .keyboard-shortcut {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark-mode .keyboard-shortcut {
+            border-bottom-color: #444;
+        }
+
+        .keyboard-shortcut:last-child {
+            border-bottom: none;
+        }
+
+        .keyboard-shortcut-desc {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .keyboard-shortcut-keys {
+            display: flex;
+            gap: 6px;
+        }
+
+        .keyboard-key {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: monospace;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        body.dark-mode .keyboard-key {
+            background: linear-gradient(135deg, #444 0%, #333 100%);
+            border-color: #555;
+            color: #ffffff;
+        }
+
+        .keyboard-help-close {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        textarea, input, select {
             width: 100%;
             margin-top: 10px;
             padding: 5px;
@@ -2000,6 +2380,35 @@
             box-shadow: 0 6px 16px rgba(0,0,0,0.2);
         }
 
+        .keyboard-help-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 80px;
+            background: linear-gradient(135deg, #0071ce 0%, #004c91 100%);
+            color: white;
+            border: none;
+            padding: 0;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .keyboard-help-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,113,206,0.3);
+        }
+
+        .keyboard-help-btn i {
+            font-size: 13px;
+        }
+
         .settings-dropdown {
             position: fixed;
             bottom: 80px;
@@ -2713,6 +3122,11 @@
         <i class="fas fa-sync-alt" id="update-icon-top" aria-hidden="true"></i>
     </button>
     
+    <!-- Keyboard Shortcuts Help -->
+    <button class="keyboard-help-btn" aria-label="Keyboard Shortcuts" onclick="toggleKeyboardHelp()" id="keyboard-help-btn" tabindex="0">
+        <i class="fas fa-keyboard" aria-hidden="true"></i>
+    </button>
+    
     <!-- Settings Menu -->
     <button class="settings-menu" aria-label="Open Settings" onclick="toggleSettingsMenu()" id="settings-btn" tabindex="0">
         <i class="fas fa-cog" aria-hidden="true"></i>
@@ -2788,6 +3202,7 @@
                     <option value="7am-1pm">7:00 AM - 1:00 PM CST</option>
                     <option value="3pm-9pm">3:00 PM - 9:00 PM CST</option>
                     <option value="7am-5pm">7:00 AM - 5:00 PM CST</option>
+                    <option value="11pm-5am">11:00 PM - 5:00 AM CST</option>
                 </select>
             </div>
             <div class="settings-item">
@@ -2896,6 +3311,124 @@
     </div>
     </button>
 
+    <!-- Keyboard Shortcuts Help Modal -->
+    <div class="keyboard-help-modal" id="keyboard-help-modal" onclick="closeKeyboardHelpOnOutside(event)">
+        <div class="keyboard-help-content" onclick="event.stopPropagation()">
+            <div class="keyboard-help-header">
+                <i class="fas fa-keyboard"></i>
+                Keyboard Shortcuts
+            </div>
+            
+            <div class="keyboard-shortcut-group">
+                <h3>📝 Notes & Quick Actions</h3>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Copy Notes</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">C</span>
+                    </div>
+                </div>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Clear Form</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">Shift</span>
+                        <span class="keyboard-key">X</span>
+                    </div>
+                </div>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Clear Everything</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">Alt</span>
+                        <span class="keyboard-key">X</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="keyboard-shortcut-group">
+                <h3>📋 Templates & DAE</h3>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Copy DAE</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">D</span>
+                    </div>
+                </div>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Advanced Settings</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">Shift</span>
+                        <span class="keyboard-key">A</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="keyboard-shortcut-group">
+                <h3>🔍 Search & Navigation</h3>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Focus Search</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">F</span>
+                    </div>
+                </div>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Switch to Quick Notes Tab</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">1</span>
+                    </div>
+                </div>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Switch to QA Checklist Tab</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">2</span>
+                    </div>
+                </div>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Switch to War Room Tab</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">3</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="keyboard-shortcut-group">
+                <h3>⚙️ System</h3>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Toggle Theme (Light/Dark)</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">Shift</span>
+                        <span class="keyboard-key">T</span>
+                    </div>
+                </div>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Check for Updates</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">U</span>
+                    </div>
+                </div>
+                <div class="keyboard-shortcut">
+                    <span class="keyboard-shortcut-desc">Show Keyboard Shortcuts</span>
+                    <div class="keyboard-shortcut-keys">
+                        <span class="keyboard-key">Ctrl</span>
+                        <span class="keyboard-key">K</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="keyboard-help-close">
+                <button class="modal-btn modal-btn-primary" onclick="toggleKeyboardHelp()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <div class="form-container">
         <!-- Quick Notes Buttons on the Left -->
         <div class="qa-container">
@@ -2909,96 +3442,241 @@
                 
                 <!-- Quick Notes Tab Content -->
                 <div id="quick-notes" class="tab-content active">
-                    <h4>System Login</h4>
-                    <div class="button-group">
-                        <button onclick="addQuickNote('Logged into Novar.'); selectSystem('Novar');" class="quick-note-btn" title="Novar Login">Novar</button>
-                        <button onclick="addQuickNote('Logged into Opus Arch.'); selectSystem('Opus Arch');" class="quick-note-btn" title="Opus Arch Login">Opus Arch</button>
-                        <button onclick="addQuickNote('Logged into Opus Mag.'); selectSystem('Opus Mag');" class="quick-note-btn" title="Opus Mag Login">Opus Mag</button>
-                        <button onclick="addQuickNote('Logged into CPC.'); selectSystem('CPC');" class="quick-note-btn" title="CPC Login">CPC</button>
-                        <button onclick="addQuickNote('Logged into Danfoss AKA65.'); selectSystem('AKA65');" class="quick-note-btn" title="Danfoss AKA65 Login">AKA65</button>
-                        <button onclick="addQuickNote('Logged into Danfoss Storeview.'); selectSystem('Storeview');" class="quick-note-btn" title="Danfoss Storeview Login">Storeview</button>
-                        <button onclick="addQuickNote('Did not login to an EMS.'); selectSystem('None');" class="quick-note-btn" title="No EMS Login">None</button>
+                    <!-- System Login Group -->
+                    <div class="accordion-group" data-group="system-login">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>System Login</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="button-group">
+                                <button onclick="addQuickNote('Logged into Novar.'); selectSystem('Novar');" class="quick-note-btn" title="Novar Login" data-search="novar login system">Novar</button>
+                                <button onclick="addQuickNote('Logged into Opus Arch.'); selectSystem('Opus Arch');" class="quick-note-btn" title="Opus Arch Login" data-search="opus arch login system">Opus Arch</button>
+                                <button onclick="addQuickNote('Logged into Opus Mag.'); selectSystem('Opus Mag');" class="quick-note-btn" title="Opus Mag Login" data-search="opus mag login system">Opus Mag</button>
+                                <button onclick="addQuickNote('Logged into CPC.'); selectSystem('CPC');" class="quick-note-btn" title="CPC Login" data-search="cpc login system">CPC</button>
+                                <button onclick="addQuickNote('Logged into Danfoss AKA65.'); selectSystem('AKA65');" class="quick-note-btn" title="Danfoss AKA65 Login" data-search="danfoss aka65 aka login system">AKA65</button>
+                                <button onclick="addQuickNote('Logged into Danfoss Storeview.'); selectSystem('Storeview');" class="quick-note-btn" title="Danfoss Storeview Login" data-search="danfoss storeview login system">Storeview</button>
+                                <button onclick="addQuickNote('Did not login to an EMS.'); selectSystem('None');" class="quick-note-btn" title="No EMS Login" data-search="none no login ems">None</button>
+                            </div>
+                        </div>
                     </div>
 
-                    <h4 style="display: none;">Diagnostics</h4>
-                    <div class="button-group hidden-until-system">
-                        <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
-                        <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
-                        <button onclick="addQuickNote('Checked temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
-                        <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
-                        <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn" title="Clock Check">Clocks</button>
-                        <button onclick="addCheckBreakersNote()" class="quick-note-btn" title="Check Breakers">Breakers</button>
-                        <button onclick="addQuickNote('Checked receiver level.')" class="quick-note-btn" title="Check Receiver Level">RECV LVL</button>
-                        <button onclick="addQuickNote('Checked Suction PSI.')" class="quick-note-btn" title="Check Suction Pressure">SUCT PSI</button>
-                        <button onclick="addQuickNote('Checked Discharge PSI.')" class="quick-note-btn" title="Check Discharge Pressure">DISC PSI</button>
-                        <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn" title="Ping Test">Ping</button>
-                        <button onclick="addQuickNote('Receiving good ping.')" class="quick-note-btn success-quick" title="Successful Ping">Good Ping</button>
-                        <button onclick="addQuickNote('Ping timedout.')" class="quick-note-btn error-quick" title="Failed Ping">Ping Timeout</button>
-                        <button onclick="addDefrostAlreadyRunningNote()" class="quick-note-btn" title="Defrost Already Active">Already Defrosting</button>
-                        <button onclick="addQuickNote('Defrost already terminated.')" class="quick-note-btn" title="Defrost Already Ended">Already Terminated</button>
-                        <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Tested</button>
+                    <!-- Diagnostics Group -->
+                    <div class="accordion-group hidden-until-system" data-group="diagnostics">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>Diagnostics</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <!-- Sub-Category Tabs -->
+                            <div class="sub-category-tabs">
+                                <button class="sub-category-btn active" onclick="switchSubCategory('diagnostics', 'hvac')" data-tag="HVAC">HVAC</button>
+                                <button class="sub-category-btn" onclick="switchSubCategory('diagnostics', 'lighting')" data-tag="Lighting">Lighting</button>
+                                <button class="sub-category-btn" onclick="switchSubCategory('diagnostics', 'refrigeration')" data-tag="Refrigeration">Refrigeration</button>
+                            </div>
+
+                            <!-- HVAC Sub-Category -->
+                            <div class="sub-category-content active" data-subcategory="hvac">
+                                <div class="button-group">
+                                    <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
+                                    <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
+                                    <button onclick="addQuickNote('Checked RTU Temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
+                                    <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
+                                    <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn system-novar" title="Clock Check" style="display: none;">Clocks</button>
+                                    <button onclick="addQuickNote('Checked Module Comms.')" class="quick-note-btn success-quick" title="Modulating Communication Check">Mod Comm</button>
+                                    <button onclick="addModCommLossNote()" class="quick-note-btn error-quick" title="Modulating Communication Loss">Mod Comm Loss</button>
+                                    <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Tested</button>
+                                </div>
+                            </div>
+
+                            <!-- Lighting Sub-Category -->
+                            <div class="sub-category-content" data-subcategory="lighting">
+                                <div class="button-group">
+                                    <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
+                                    <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
+                                    <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
+                                    <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn system-novar" title="Clock Check" style="display: none;">Clocks</button>
+                                    <button onclick="addQuickNote('Checked Module Comms.')" class="quick-note-btn success-quick" title="Modulating Communication Check">Mod Comm</button>
+                                    <button onclick="addModCommLossNote()" class="quick-note-btn error-quick" title="Modulating Communication Loss">Mod Comm Loss</button>
+                                    <button onclick="addCheckBreakersNote()" class="quick-note-btn" title="Check Breakers">Breakers</button>
+                                    <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Tested</button>
+                                </div>
+                            </div>
+
+                            <!-- Refrigeration Sub-Category -->
+                            <div class="sub-category-content" data-subcategory="refrigeration">
+                                <div class="button-group">
+                                    <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
+                                    <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
+                                    <button onclick="addQuickNote('Checked Rack/Case Temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
+                                    <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
+                                    <button onclick="addQuickNote('Checked receiver level.')" class="quick-note-btn" title="Check Receiver Level">RECV LVL</button>
+                                    <button onclick="addQuickNote('Checked Suction PSI.')" class="quick-note-btn" title="Check Suction Pressure">SUCT PSI</button>
+                                    <button onclick="addQuickNote('Checked Discharge PSI.')" class="quick-note-btn" title="Check Discharge Pressure">DISC PSI</button>
+                                    <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn system-novar" title="Clock Check" style="display: none;">Clocks</button>
+                                    <button onclick="addQuickNote('Checked Module Comms.')" class="quick-note-btn success-quick" title="Modulating Communication Check">Mod Comm</button>
+                                    <button onclick="addModCommLossNote()" class="quick-note-btn error-quick" title="Modulating Communication Loss">Mod Comm Loss</button>
+                                    <button onclick="addDefrostAlreadyRunningNote()" class="quick-note-btn" title="Defrost Already Active">Already Defrosting</button>
+                                    <button onclick="addQuickNote('Defrost already terminated.')" class="quick-note-btn" title="Defrost Already Ended">Already Terminated</button>
+                                    <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Tested</button>
+                                    <button onclick="addStagingNote()" class="quick-note-btn" title="Check Staging">Staging</button>
+                                    <button onclick="addQuickNote('Unable to Defrost.')" class="quick-note-btn error-quick" title="Defrost Unavailable">Defrost Unavailable</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-            <h4 style="display: none;">Actions</h4>
-            <div class="button-group hidden-until-system">
-                <button onclick="addQuickNoteWithInput('Forced defrost on ', 'Enter circuit:')" class="quick-note-btn" title="Force Defrost">Defrost</button>
-                <button onclick="addQuickNote('Terminated Defrost.')" class="quick-note-btn" title="Stop Defrost">Stop Defrost</button>
-                <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
-                <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
-                <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
-                <button onclick="addShutdownCircuitNote()" class="quick-note-btn" title="Shutdown Circuit">Shutdown Circuit</button>
-                <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
-                <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">RTU Setpoint</button>
-                <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn" title="Reset System Clocks">Reset Clocks</button>
-                <button onclick="addQuickNote('Changed Lighting schedule.')" class="quick-note-btn" title="Change Lighting Schedule">Light Schedule</button>
-            </div>
+                    <!-- Actions Group -->
+                    <div class="accordion-group hidden-until-system" data-group="actions">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>Actions</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <!-- Sub-Category Tabs -->
+                            <div class="sub-category-tabs">
+                                <button class="sub-category-btn active" onclick="switchSubCategory('actions', 'hvac')" data-tag="HVAC">HVAC</button>
+                                <button class="sub-category-btn" onclick="switchSubCategory('actions', 'lighting')" data-tag="Lighting">Lighting</button>
+                                <button class="sub-category-btn" onclick="switchSubCategory('actions', 'refrigeration')" data-tag="Refrigeration">Refrigeration</button>
+                            </div>
 
-            <div id="downloads-section" style="display: none;">
-                <h4>Downloads</h4>
-                <div class="button-group">
-                    <button onclick="addQuickNote('Performed Version Download.')" class="quick-note-btn" title="Version Download">Version</button>
-                    <button onclick="addQuickNote('Performed Load Change Download.')" class="quick-note-btn" title="Load Change Download">Load Change</button>
-                    <button onclick="addQuickNote('Performed Comms and Load Change Download.')" class="quick-note-btn" title="Comms + Load Change">Comms+LC</button>
-                    <button onclick="addQuickNote('Performed Main and Load Change Download.')" class="quick-note-btn" title="Main + Load Change">Main+LC</button>
-                    <button onclick="addQuickNote('Performed Main, Comms, and Load Change Download.')" class="quick-note-btn" title="Full Download">Full DL</button>
-                </div>
-            </div>
+                            <!-- HVAC Sub-Category -->
+                            <div class="sub-category-content active" data-subcategory="hvac">
+                                <div class="button-group">
+                                    <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
+                                    <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
+                                    <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
+                                    <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">RTU Setpoint</button>
+                                    <button onclick="addForcedFanNote()" class="quick-note-btn" title="Force Fan On">Forced Fan</button>
+                                    <button onclick="addSetbackNote()" class="quick-note-btn" title="Change Setback">Setback</button>
+                                </div>
+                            </div>
 
-            <h4>Call Status</h4>
-            <div class="button-group">
-                <button onclick="addQuickNote('All good.')" class="quick-note-btn success-quick" title="Everything Working">All Good</button>
-                <button onclick="addQuickNote('No good.')" class="quick-note-btn error-quick" title="Issue Persists">No Good</button>
-                <button onclick="addQuickNote('Tech will troubleshoot.')" class="quick-note-btn" title="Tech Troubleshooting">Tech T/S</button>
-                <button onclick="addQuickNote('Tech no longer needed assistance.')" class="quick-note-btn success-quick" title="Call Complete">Call Done</button>
-                <button onclick="addEscalateNote()" class="quick-note-btn" title="Escalate with DAE and WO">Escalate</button>
-            </div>
+                            <!-- Lighting Sub-Category -->
+                            <div class="sub-category-content" data-subcategory="lighting">
+                                <div class="button-group">
+                                    <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
+                                    <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
+                                    <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
+                                    <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
+                                    <button onclick="addQuickNote('Changed Lighting schedule.')" class="quick-note-btn" title="Change Lighting Schedule">Light Schedule</button>
+                                    <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn system-novar" title="Reset System Clocks" style="display: none;">Reset Clocks</button>
+                                </div>
+                            </div>
 
-            <h4>Special Cases</h4>
-            <div class="button-group">
-                <button onclick="addQuickNote('Call dropped.')" class="quick-note-btn error-quick" title="Call Disconnected">Call Dropped</button>
-                <button onclick="addQuickNote('Tech called for a suppression. Adv tech of NSRM email.')" class="quick-note-btn" title="Suppression Request">NSRM</button>
-                <button onclick="addQuickNote('Adv tech to power cycle controller.')" class="quick-note-btn" title="Power Cycle Recommendation">Power Cycle</button>
-                <button onclick="addQuickNote('Store is in remodel.')" class="quick-note-btn" title="Store Remodel Status">Remodel</button>
-                <button onclick="addQuickNote('This is a Sams store.')" class="quick-note-btn" title="Sam's Club Store">Sams</button>
-                <button onclick="addQuickNote('Submitted PCR.')" class="quick-note-btn success-quick" title="Point Change Request Submitted">Submitted PCR</button>
-                <button onclick="addQuickNote('Submitted PDR.')" class="quick-note-btn success-quick" title="Parameter Deviation Request Submitted">Submitted PDR</button>
-                <button onclick="addQuickNote('Adv tech to restart the Sporlan case controllers and the Sporlan Gateway and adv tech that if it continues, they will need to contact Sporlan.')" class="quick-note-btn" title="Sporlan Controller Restart">Sporlan</button>
-                <button onclick="addAdvisoryNote()" class="quick-note-btn" title="Advise Tech of Issue">Advisory</button>
-            </div>
+                            <!-- Refrigeration Sub-Category -->
+                            <div class="sub-category-content" data-subcategory="refrigeration">
+                                <div class="button-group">
+                                    <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
+                                    <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
+                                    <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
+                                    <button onclick="addQuickNoteWithInput('Forced defrost on ', 'Enter circuit:')" class="quick-note-btn" title="Force Defrost">Defrost</button>
+                                    <button onclick="addQuickNote('Terminated Defrost.')" class="quick-note-btn" title="Stop Defrost">Stop Defrost</button>
+                                    <button onclick="addShutdownCircuitNote()" class="quick-note-btn" title="Shutdown Circuit">Shutdown Circuit</button>
+                                    <button onclick="addRackSettingsNote()" class="quick-note-btn" title="Change Rack Settings">Rack Settings</button>
+                                    <button onclick="addCaseSettingsNote()" class="quick-note-btn" title="Change Case Settings">Case Settings</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-            <h4>Recommendations</h4>
-            <div class="button-group">
-                <button onclick="addQuickNote('Advised to monitor and call back if issues persist.')" class="quick-note-btn" title="Monitor Instruction">Monitor</button>
-                <button onclick="showContactOptions()" class="quick-note-btn" title="Contact Instruction">Contact</button>
-                <button onclick="addReplaceNote()" class="quick-note-btn" title="Replace Instruction">Replace</button>
-            </div>
+                    <!-- Downloads Group -->
+                    <div class="accordion-group" id="downloads-section" data-group="downloads" style="display: none;">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>Downloads</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="button-group">
+                                <button onclick="addDownloadNote('Performed Version Download.')" class="quick-note-btn" title="Version Download" data-search="version download novar">Version</button>
+                                <button onclick="addDownloadNote('Performed Load Change Download.')" class="quick-note-btn" title="Load Change Download" data-search="load change download lc novar">Load Change</button>
+                                <button onclick="addDownloadNote('Performed Comms and Load Change Download.')" class="quick-note-btn" title="Comms + Load Change" data-search="comms load change download novar">Comms+LC</button>
+                                <button onclick="addDownloadNote('Performed Main and Load Change Download.')" class="quick-note-btn" title="Main + Load Change" data-search="main load change download novar">Main+LC</button>
+                                <button onclick="addDownloadNote('Performed Main, Comms, and Load Change Download.')" class="quick-note-btn" title="Full Download" data-search="full main comms load change download novar">Full DL</button>
+                            </div>
+                        </div>
+                    </div>
 
-            <h4>Communication</h4>
-            <div class="button-group">
-                <button onclick="addTechQuestionNote()" class="quick-note-btn" title="Tech Asked Question">Tech Question</button>
-                <button onclick="addStatusUpdateNote()" class="quick-note-btn" title="Status Update Request">Status Update</button>
-                <button onclick="addTechRefusedNote()" class="quick-note-btn error-quick" title="Tech Refused Action">Tech Refused</button>
-            </div>
+                    <!-- Escalations Group -->
+                    <div class="accordion-group hidden-until-system" data-group="escalations">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>Escalations</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="button-group">
+                                <button onclick="addEscalateNote()" class="quick-note-btn" title="Escalate with DAE and WO" data-search="escalate escalation workorder">Escalate</button>
+                                <button onclick="addQuickNote('Submitted PCR.')" class="quick-note-btn success-quick" title="Point Change Request Submitted" data-search="pcr point change request submitted">Submitted PCR</button>
+                                <button onclick="addQuickNote('Submitted PDR.')" class="quick-note-btn success-quick" title="Parameter Deviation Request Submitted" data-search="pdr parameter deviation request submitted">Submitted PDR</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Call Status Group -->
+                    <div class="accordion-group hidden-until-system" data-group="call-status">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>Call Status</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="button-group">
+                                <button onclick="addQuickNote('All good.')" class="quick-note-btn success-quick" title="Everything Working" data-search="all good success working fixed">All Good</button>
+                                <button onclick="addQuickNote('No good.')" class="quick-note-btn error-quick" title="Issue Persists" data-search="no good bad fail issue">No Good</button>
+                                <button onclick="addQuickNote('Tech will troubleshoot.')" class="quick-note-btn" title="Tech Troubleshooting" data-search="tech troubleshoot ts">Tech T/S</button>
+                                <button onclick="addQuickNote('Tech no longer needed assistance.')" class="quick-note-btn success-quick" title="Call Complete" data-search="call done complete finished">Call Done</button>
+                                <button onclick="addQuickNote('Call dropped.')" class="quick-note-btn error-quick" title="Call Disconnected" data-search="call dropped disconnected">Call Dropped</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Special Cases Group -->
+                    <div class="accordion-group hidden-until-system" data-group="special-cases">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>Special Cases</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="button-group">
+                                <button onclick="addPowerCycleNote()" class="quick-note-btn" title="Power Cycle Recommendation" data-search="power cycle restart reboot">Power Cycle</button>
+                                <button onclick="addQuickNote('Store is in remodel.')" class="quick-note-btn" title="Store Remodel Status" data-search="remodel construction">Remodel</button>
+                                <button onclick="addQuickNote('This is a Sams store.')" class="quick-note-btn" title="Sam's Club Store" data-search="sams club">Sams</button>
+                                <button onclick="addQuickNote('Adv tech to restart the Sporlan case controllers and the Sporlan Gateway and adv tech that if it continues, they will need to contact Sporlan.')" class="quick-note-btn system-opus-cpc" title="Sporlan Controller Restart" data-search="sporlan restart gateway controller" style="display: none;">Sporlan</button>
+                                <button onclick="addAdvisoryNote()" class="quick-note-btn" title="Advise Tech of Issue" data-search="advisory advise note">Advisory</button>
+                                <button onclick="addQuickNote('Tech requested a defrost and is not onsite. Defrost denied.')" class="quick-note-btn error-quick" title="Tech Not Onsite - Defrost Denied" data-search="not onsite defrost denied offsite">Not Onsite</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations Group -->
+                    <div class="accordion-group hidden-until-system" data-group="recommendations">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>Recommendations</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="button-group">
+                                <button onclick="addQuickNote('Advised to monitor and call back if issues persist.')" class="quick-note-btn" title="Monitor Instruction" data-search="monitor watch observe">Monitor</button>
+                                <button onclick="showContactOptions()" class="quick-note-btn" title="Contact Instruction" data-search="contact call vendor">Contact</button>
+                                <button onclick="addReplaceNote()" class="quick-note-btn" title="Replace Instruction" data-search="replace swap change">Replace</button>
+                                <button onclick="addQuickNote('Tech called for a suppression. Adv tech of NSRM email.')" class="quick-note-btn" title="Suppression Request" data-search="nsrm suppression email">NSRM</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Communication Group -->
+                    <div class="accordion-group hidden-until-system" data-group="communication">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>Communication</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="button-group">
+                                <button onclick="addTechQuestionNote()" class="quick-note-btn" title="Tech Asked Question" data-search="tech question asked">Tech Question</button>
+                                <button onclick="addStatusUpdateNote()" class="quick-note-btn" title="Status Update Request" data-search="status update request">Status Update</button>
+                                <button onclick="addTechRefusedNote()" class="quick-note-btn error-quick" title="Tech Refused Action" data-search="tech refused declined">Tech Refused</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- QA Checklist Tab Content -->
@@ -6229,6 +6907,24 @@ ${subIssueNumbers.map((num, index) =>
             }
         }
         
+        // Keyboard Shortcuts Help Functions
+        function toggleKeyboardHelp() {
+            const modal = document.getElementById('keyboard-help-modal');
+            const isVisible = modal.classList.contains('show');
+            
+            if (isVisible) {
+                modal.classList.remove('show');
+            } else {
+                modal.classList.add('show');
+            }
+        }
+        
+        function closeKeyboardHelpOnOutside(event) {
+            if (event.target.id === 'keyboard-help-modal') {
+                toggleKeyboardHelp();
+            }
+        }
+        
         function updateSettingsToggles() {
             // Update analytics toggle
             const analyticsToggle = document.getElementById('analytics-toggle');
@@ -6761,7 +7457,8 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             const shiftTimes = {
                 '7am-1pm': { start: 7, end: 13 },
                 '3pm-9pm': { start: 15, end: 21 },
-                '7am-5pm': { start: 7, end: 17 }
+                '7am-5pm': { start: 7, end: 17 },
+                '11pm-5am': { start: 23, end: 5, overnight: true }
             };
             
             if (!shiftTimes[shift]) return null;
@@ -6888,14 +7585,25 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                 return `${h}:${min.toString().padStart(2, '0')}`;
             }));
             
+            // Get the last completed check time (if any)
+            const lastCompletedCheck = AppState.warRoomSchedule.lastCompletedCheck || 0;
+            console.log(`📋 Current time: ${Math.floor(currentMinutes/60)}:${(currentMinutes%60).toString().padStart(2,'0')} (${currentMinutes} minutes)`);
+            console.log(`📋 Last completed check: ${lastCompletedCheck} minutes`);
+            
             // Schedule each upcoming check
             let nextCheckScheduled = false;
             for (const checkMinutes of checkTimes) {
                 const latestStartTime = checkMinutes + 20; // Can start up to 20 min after due time
                 
-                // Only schedule if the check time hasn't passed yet (not if we're within the window)
-                // This prevents re-scheduling a check we just completed
-                if (currentMinutes < checkMinutes) {
+                // Skip checks that:
+                // 1. Have been completed already (lastCompletedCheck tracks this)
+                // 2. Are in the past beyond the latest start time
+                const isAlreadyCompleted = (lastCompletedCheck === checkMinutes);
+                const isPastDue = (currentMinutes >= latestStartTime);
+                
+                console.log(`📋 Evaluating check at ${Math.floor(checkMinutes/60)}:${(checkMinutes%60).toString().padStart(2,'0')} - completed: ${isAlreadyCompleted}, pastDue: ${isPastDue}`);
+                
+                if (!isAlreadyCompleted && !isPastDue) {
                     scheduleWarRoomCheck(checkMinutes);
                     if (!nextCheckScheduled) {
                         // This is the next check
@@ -6903,8 +7611,14 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                         checkTime.setHours(Math.floor(checkMinutes / 60), checkMinutes % 60, 0, 0);
                         AppState.warRoomSchedule.nextCheck = checkTime;
                         AppState.warRoomSchedule.currentCheckDue = checkTime;
+                        AppState.warRoomSchedule.notificationShown = false; // Reset for new check
                         nextCheckScheduled = true;
+                        console.log('✅ Next War Room check scheduled for:', checkTime.toLocaleTimeString());
                     }
+                } else if (isAlreadyCompleted) {
+                    console.log(`⏭️ Skipping check at ${Math.floor(checkMinutes/60)}:${(checkMinutes%60).toString().padStart(2,'0')} - already completed`);
+                } else if (isPastDue) {
+                    console.log(`⏭️ Skipping check at ${Math.floor(checkMinutes/60)}:${(checkMinutes%60).toString().padStart(2,'0')} - past due`);
                 }
             }
             
@@ -6912,7 +7626,9 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                 console.log('📋 No more War Room checks today');
                 scheduleNextWarRoomDay();
             } else {
+                // Update display and save state
                 updateWarRoomStatusDisplay();
+                localStorage.setItem('warRoomScheduleState', JSON.stringify(AppState.warRoomSchedule));
             }
         }
         
@@ -7020,8 +7736,29 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             // Mark notification as shown to prevent re-appearing
             AppState.warRoomSchedule.notificationShown = true;
             
+            // Track the current check as completed so we don't reschedule it
+            if (AppState.warRoomSchedule.currentCheckDue) {
+                const checkTime = new Date(AppState.warRoomSchedule.currentCheckDue);
+                const checkMinutes = checkTime.getHours() * 60 + checkTime.getMinutes();
+                AppState.warRoomSchedule.lastCompletedCheck = checkMinutes;
+                console.log(`📋 Marking check at ${checkTime.toLocaleTimeString()} (${checkMinutes} minutes) as completed`);
+                console.log(`📋 lastCompletedCheck set to: ${checkMinutes}`);
+            } else {
+                console.log('⚠️ No currentCheckDue found - cannot track completed check');
+            }
+            
             // Save state to localStorage
             localStorage.setItem('warRoomScheduleState', JSON.stringify(AppState.warRoomSchedule));
+            
+            // Clear existing timers and reschedule next check
+            console.log('📋 War Room check completed - scheduling next check');
+            if (AppState.warRoomSchedule.timers) {
+                AppState.warRoomSchedule.timers.forEach(timer => clearTimeout(timer));
+                AppState.warRoomSchedule.timers = [];
+            }
+            
+            // Reschedule all remaining checks for today
+            scheduleAllWarRoomChecks();
         }
         
         function scheduleNextWarRoomDay() {
@@ -7071,6 +7808,9 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             // Set the nextCheck to the first check of the next War Room day
             AppState.warRoomSchedule.nextCheck = nextDate;
             AppState.warRoomSchedule.currentCheckDue = nextDate;
+            
+            // Clear completed check tracking for new day
+            AppState.warRoomSchedule.lastCompletedCheck = null;
             
             const msUntilNext = nextDate.getTime() - now.getTime();
             
@@ -9076,9 +9816,6 @@ verified in {SYSTEM}
             // Track war room check start
             trackButtonClick('Start War Room Check', 'war-room');
             
-            // Dismiss any active War Room notification and stop flashing
-            dismissWarRoomNotification();
-            
             const storesText = document.getElementById('assigned-stores').value.trim();
             if (!storesText) {
                 showNotification('❌ Please enter store numbers first', 'error', 3000);
@@ -9095,6 +9832,37 @@ verified in {SYSTEM}
                 return;
             }
             
+            // Determine which scheduled check this is for
+            // Find the nearest upcoming check (including those that can be started early)
+            if (AppState.warRoomSchedule.enabled && AppState.warRoomSchedule.shift) {
+                const now = new Date();
+                const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                const shiftTimes = getShiftTimesInUserTimezone(AppState.warRoomSchedule.shift);
+                
+                if (shiftTimes) {
+                    // Calculate all check times for today
+                    const checkTimes = [];
+                    for (let checkMinutes = shiftTimes.startMinutes; checkMinutes <= shiftTimes.endMinutes; checkMinutes += 120) {
+                        checkTimes.push(checkMinutes);
+                    }
+                    
+                    // Find the check we're doing (the earliest one that hasn't passed its latest start time)
+                    for (const checkMinutes of checkTimes) {
+                        const earliestStartTime = checkMinutes - 20;
+                        const latestStartTime = checkMinutes + 20;
+                        
+                        // If we're within the window for this check (20 min early to 20 min late)
+                        if (currentMinutes >= earliestStartTime && currentMinutes <= latestStartTime) {
+                            const checkTime = new Date(now);
+                            checkTime.setHours(Math.floor(checkMinutes / 60), checkMinutes % 60, 0, 0);
+                            AppState.warRoomSchedule.currentCheckDue = checkTime;
+                            console.log(`📋 Starting War Room check for scheduled time: ${checkTime.toLocaleTimeString()}`);
+                            break;
+                        }
+                    }
+                }
+            }
+            
             // Initialize session
             WAR_ROOM_SYSTEM.state.currentStoreIndex = 0;
             WAR_ROOM_SYSTEM.state.storeResults = [];
@@ -9102,11 +9870,19 @@ verified in {SYSTEM}
             WAR_ROOM_SYSTEM.state.sessionStartTime = new Date();
             WAR_ROOM_SYSTEM.state.sessionId = WAR_ROOM_SYSTEM.generateSessionId();
             
-            // Set 20-minute countdown timer for this check
+            // Set 20-minute countdown timer for this check completion
+            // Store completion deadline separately - don't overwrite the actual nextCheck time
             const completionDeadline = new Date();
             completionDeadline.setMinutes(completionDeadline.getMinutes() + 20);
-            AppState.warRoomSchedule.nextCheck = completionDeadline;
-            updateWarRoomStatusDisplay();
+            AppState.warRoomSchedule.completionDeadline = completionDeadline;
+            
+            // Dismiss any active War Room notification and stop flashing (after setting currentCheckDue)
+            // Note: We don't call updateWarRoomStatusDisplay() here because we want to keep
+            // showing the actual scheduled check time, not the completion deadline
+            const statusDiv = document.getElementById('warRoomStatus');
+            if (statusDiv) {
+                statusDiv.classList.remove('flash-yellow', 'flash-red');
+            }
             
             // Show progress tracker and store checker
             document.getElementById('war-room-progress').style.display = 'block';
@@ -9343,6 +10119,9 @@ verified in {SYSTEM}
         function completeWarRoomCheck() {
             // Track war room completion
             trackButtonClick('Complete War Room Check', 'war-room');
+            
+            // Clear the completion deadline
+            AppState.warRoomSchedule.completionDeadline = null;
             
             // Dismiss any active War Room notification and mark as completed
             dismissWarRoomNotification();
@@ -10039,23 +10818,23 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
 Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`
         };
         
-        function addQuickNoteWithInput(prefix, prompt) {
-            const userInput = window.prompt(prompt);
-            if (userInput !== null && userInput.trim() !== '') {
+        async function addQuickNoteWithInput(prefix, promptText) {
+            const userInput = await customPrompt(promptText, '', 'Enter Details');
+            if (userInput && userInput.trim() !== '') {
                 addQuickNote(prefix + userInput.trim() + '.');
                 // Tag analysis is handled by addQuickNote
             }
         }
 
-        function addForcedNote() {
-            const parameter = window.prompt('What did you force?\n\nExamples:\n• Suct PSI to 30\n• OAT to 68 degrees\n• Discharge temp to 105\n• Fan speed to 75%');
-            if (parameter !== null && parameter.trim() !== '') {
+        async function addForcedNote() {
+            const parameter = await customPrompt('What did you force?\n\nExamples:\n• Suct PSI to 30\n• OAT to 68 degrees\n• Discharge temp to 105\n• Fan speed to 75%', '', 'Force Parameter');
+            if (parameter && parameter.trim() !== '') {
                 addQuickNote('Forced ' + parameter.trim() + '.');
                 // Tag analysis is handled by addQuickNote
             }
         }
 
-        function addForcedOffNote() {
+        async function addForcedOffNote() {
             const notesContent = document.getElementById('notes').value;
             const daeContent = document.getElementById('dropdown-notes').value;
             const combinedContent = notesContent + ' ' + daeContent;
@@ -10080,46 +10859,46 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 showNotification(`Auto-detected: ${lastForcedItem}`, 'success', 2000);
             } else {
                 // No forced items found, prompt for input
-                const item = window.prompt('What did you force off?\n\nExamples:\n• Bypass Valve\n• Compressor 2\n• Fan speed\n• lights');
-                if (item !== null && item.trim() !== '') {
+                const item = await customPrompt('What did you force off?\n\nExamples:\n• Bypass Valve\n• Compressor 2\n• Fan speed\n• lights', '', 'Force Off Item');
+                if (item && item.trim() !== '') {
                     addQuickNote('Forced off ' + item.trim() + '.');
                 }
             }
         }
 
-        function addShutdownCircuitNote() {
-            const circuit = window.prompt('Enter circuit to shutdown:\n\nExamples:\n• A3\n• B2\n• Circuit 5\n• Comp 1');
-            if (circuit === null || circuit.trim() === '') return;
+        async function addShutdownCircuitNote() {
+            const circuit = await customPrompt('Enter circuit to shutdown:\n\nExamples:\n• A3\n• B2\n• Circuit 5\n• Comp 1', '', 'Shutdown Circuit');
+            if (!circuit || circuit.trim() === '') return;
             
             const note = `Shutdown circuit ${circuit.trim()}.`;
             addQuickNote(note);
         }
 
-        function addCheckBreakersNote() {
+        async function addCheckBreakersNote() {
             // First add the initial check breakers note
             addQuickNote('Checked breakers.');
             
             // Ask if they want to add detailed breaker information
-            const addDetails = window.confirm('Add detailed breaker panel information?');
+            const addDetails = await customConfirm('Add detailed breaker panel information?', 'Breaker Details');
             if (!addDetails) return;
             
             let breakerDetails = [];
             let addMore = true;
             
             while (addMore && breakerDetails.length < 5) { // Limit to 5 panels max
-                const panel = window.prompt(`Enter breaker panel name:\n\nCommon examples:\n• H1P1\n• H1P2\n• H1P\n• H2P\n• L1P\n• L2P\n• Panel A\n\n${breakerDetails.length > 0 ? 'Or leave blank to finish' : ''}`);
+                const panel = await customPrompt(`Enter breaker panel name:\n\nCommon examples:\n• H1P1\n• H1P2\n• H1P\n• H2P\n• L1P\n• L2P\n• Panel A\n\n${breakerDetails.length > 0 ? 'Or leave blank to finish' : ''}`, '', 'Breaker Panel');
                 
                 if (panel === null || panel.trim() === '') {
                     break; // User cancelled or left blank
                 }
                 
-                const breakers = window.prompt(`Enter breaker numbers for panel ${panel.trim()}:\n\nExamples:\n• 15, 16, 17, 18\n• 12, 13, 14\n• 1, 2, 3, 4, 5`);
+                const breakers = await customPrompt(`Enter breaker numbers for panel ${panel.trim()}:\n\nExamples:\n• 15, 16, 17, 18\n• 12, 13, 14\n• 1, 2, 3, 4, 5`, '', 'Breaker Numbers');
                 
                 if (breakers === null || breakers.trim() === '') {
                     continue; // Skip this panel if no breakers entered
                 }
                 
-                const status = window.prompt(`Enter status for these breakers:\n\nCommon statuses:\n• Not Present\n• Faulted On\n• Faulted Off\n• Normal\n• Tripped`);
+                const status = await customPrompt(`Enter status for these breakers:\n\nCommon statuses:\n• Not Present\n• Faulted On\n• Faulted Off\n• Normal\n• Tripped`, '', 'Breaker Status');
                 
                 if (status === null || status.trim() === '') {
                     continue; // Skip this panel if no status entered
@@ -10133,10 +10912,10 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 
                 // Ask if they want to add another panel
                 if (breakerDetails.length < 5) {
-                    addMore = window.confirm('Add another breaker panel?');
+                    addMore = await customConfirm('Add another breaker panel?', 'Add Another Panel');
                 } else {
                     addMore = false;
-                    alert('Maximum of 5 panels reached.');
+                    showNotification('Maximum of 5 panels reached.', 'info', 2000);
                 }
             }
             
@@ -10147,76 +10926,76 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             });
         }
 
-        function addAdvisoryNote() {
-            const issue = window.prompt('Enter issue to advise tech about:\n\nExamples:\n• NSRM email\n• comm loss\n• controller issue\n• parameter deviation');
-            if (issue === null || issue.trim() === '') return;
+        async function addAdvisoryNote() {
+            const issue = await customPrompt('Enter issue to advise tech about:\n\nExamples:\n• NSRM email\n• comm loss\n• controller issue\n• parameter deviation', '', 'Advisory Issue');
+            if (!issue || issue.trim() === '') return;
             
             const note = `Adv tech of ${issue.trim()}.`;
             addQuickNote(note);
         }
 
-        function addTechQuestionNote() {
-            const question = window.prompt('What did the tech want to know?\n\nExamples:\n• how to access the controller\n• what the alarm means\n• if the system is working properly');
-            if (question === null || question.trim() === '') return;
+        async function addTechQuestionNote() {
+            const question = await customPrompt('What did the tech want to know?\n\nExamples:\n• how to access the controller\n• what the alarm means\n• if the system is working properly', '', 'Tech Question');
+            if (!question || question.trim() === '') return;
             
             const note = `Tech wanted to know ${question.trim()}.`;
             addQuickNote(note);
         }
 
-        function addStatusUpdateNote() {
-            const item = window.prompt('What status update did the tech request?\n\nExamples:\n• the work order\n• the repair progress\n• the controller status');
-            if (item === null || item.trim() === '') return;
+        async function addStatusUpdateNote() {
+            const item = await customPrompt('What status update did the tech request?\n\nExamples:\n• the work order\n• the repair progress\n• the controller status', '', 'Status Update');
+            if (!item || item.trim() === '') return;
             
             const note = `Tech wanted a status update on ${item.trim()}.`;
             addQuickNote(note);
         }
 
-        function addTechRefusedNote() {
-            const action = window.prompt('What did the tech refuse to do?\n\nExamples:\n• power cycle the controller\n• check the breakers\n• wait for the download');
-            if (action === null || action.trim() === '') return;
+        async function addTechRefusedNote() {
+            const action = await customPrompt('What did the tech refuse to do?\n\nExamples:\n• power cycle the controller\n• check the breakers\n• wait for the download', '', 'Tech Refused');
+            if (!action || action.trim() === '') return;
             
             const note = `Tech refused ${action.trim()}.`;
             addQuickNote(note);
         }
 
-        function addDefrostAlreadyRunningNote() {
-            const circuit = window.prompt('Enter circuit that is already defrosting:\n\nExamples:\n• C2\n• B3\n• Circuit 5');
-            if (circuit === null || circuit.trim() === '') return;
+        async function addDefrostAlreadyRunningNote() {
+            const circuit = await customPrompt('Enter circuit that is already defrosting:\n\nExamples:\n• C2\n• B3\n• Circuit 5', '', 'Circuit Defrosting');
+            if (!circuit || circuit.trim() === '') return;
             
             const note = `${circuit.trim()} is already defrosting.`;
             addQuickNote(note);
         }
 
-        function addSetpointNote() {
-            const coolTemp = window.prompt('Enter cooling setpoint (°F):\n\nExample: 72');
-            if (coolTemp === null || coolTemp.trim() === '') return;
+        async function addSetpointNote() {
+            const coolTemp = await customPrompt('Enter cooling setpoint:\n\nExample: 72 (degree symbol added automatically)', '', 'Cooling Setpoint');
+            if (!coolTemp || coolTemp.trim() === '') return;
             
-            const heatTemp = window.prompt('Enter heating setpoint (°F):\n\nExample: 68');
-            if (heatTemp === null || heatTemp.trim() === '') return;
+            const heatTemp = await customPrompt('Enter heating setpoint:\n\nExample: 68 (degree symbol added automatically)', '', 'Heating Setpoint');
+            if (!heatTemp || heatTemp.trim() === '') return;
             
-            const unit = window.prompt('Enter RTU/AHU:\n\nExamples:\n• RTU 1\n• AHU 2\n• RG3\n• RE4');
-            if (unit === null || unit.trim() === '') return;
+            const unit = await customPrompt('Enter RTU/AHU number:\n\nExamples: 1, 2, 3', '', 'RTU/AHU Number');
+            if (!unit || unit.trim() === '') return;
             
-            const note = `Changed setpoint to ${coolTemp.trim()}/${heatTemp.trim()} for ${unit.trim()}.`;
+            const note = `Changed setpoint to ${coolTemp.trim()}°/${heatTemp.trim()}° for RTU ${unit.trim()}.`;
             addQuickNote(note);
         }
 
-        function addTestNote() {
-            const component = window.prompt('What did you test?\n\nExamples:\n• controller functionality\n• sensor readings\n• valve operation\n• communication');
-            if (component !== null && component.trim() !== '') {
+        async function addTestNote() {
+            const component = await customPrompt('What did you test?\n\nExamples:\n• controller functionality\n• sensor readings\n• valve operation\n• communication', '', 'Test Component');
+            if (component && component.trim() !== '') {
                 addQuickNote('Tested ' + component.trim() + '.');
                 // Tag analysis is handled by addQuickNote
             }
         }
 
-        function addMonitorNote() {
-            const instruction = window.prompt('Monitor what?\n\nExamples:\n• temperatures for 30 minutes\n• system and call back if issues persist\n• alarms overnight\n• pressures during peak hours');
-            if (instruction !== null && instruction.trim() !== '') {
+        async function addMonitorNote() {
+            const instruction = await customPrompt('Monitor what?\n\nExamples:\n• temperatures for 30 minutes\n• system and call back if issues persist\n• alarms overnight\n• pressures during peak hours', '', 'Monitor Instruction');
+            if (instruction && instruction.trim() !== '') {
                 addQuickNote('Advised to monitor ' + instruction.trim() + '.');
             }
         }
 
-        function showContactOptions() {
+        async function showContactOptions() {
             const contacts = [
                 'Docfit',
                 'Service Channel', 
@@ -10230,16 +11009,16 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 message += `${index + 1}. ${contact}\n`;
             });
             
-            const choice = window.prompt(message + '\nEnter number (1-5):');
+            const choice = await customPrompt(message + '\nEnter number (1-5):', '', 'Contact Selection');
             
-            if (choice !== null && choice.trim() !== '') {
+            if (choice && choice.trim() !== '') {
                 const choiceNum = parseInt(choice.trim());
                 if (choiceNum >= 1 && choiceNum <= 4) {
                     addQuickNote('Advised tech to contact ' + contacts[choiceNum - 1] + '.');
                     // Tag analysis is handled by addQuickNote
                 } else if (choiceNum === 5) {
-                    const customContact = window.prompt('Enter contact details:');
-                    if (customContact !== null && customContact.trim() !== '') {
+                    const customContact = await customPrompt('Enter contact details:', '', 'Custom Contact');
+                    if (customContact && customContact.trim() !== '') {
                         addQuickNote('Advised tech to contact ' + customContact.trim() + '.');
                         // Tag analysis is handled by addQuickNote
                     }
@@ -10247,42 +11026,506 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             }
         }
 
-        function addContactNote() {
-            const contact = window.prompt('Contact who?\n\nExamples:\n• HVAC vendor\n• facilities management\n• IT support\n• local technician');
-            if (contact !== null && contact.trim() !== '') {
+        async function addContactNote() {
+            const contact = await customPrompt('Contact who?\n\nExamples:\n• HVAC vendor\n• facilities management\n• IT support\n• local technician', '', 'Contact Details');
+            if (contact && contact.trim() !== '') {
                 addQuickNote('Advised tech to contact ' + contact.trim() + '.');
             }
         }
 
-        function addReplaceNote() {
-            const component = window.prompt('Replace what?\n\nExamples:\n• temperature sensor\n• controller board\n• communication cable\n• RIM board');
-            if (component !== null && component.trim() !== '') {
+        async function addReplaceNote() {
+            const component = await customPrompt('Replace what?\n\nExamples:\n• temperature sensor\n• controller board\n• communication cable\n• RIM board', '', 'Replace Component');
+            if (component && component.trim() !== '') {
                 addQuickNote('Advised to replace ' + component.trim() + '.');
                 // Tag analysis is handled by addQuickNote
             }
         }
 
-        function addEscalateNote() {
+        async function addEscalateNote() {
             // Get the selected DAE option
             const daeSelect = document.getElementById('autofill');
             const selectedDAE = daeSelect.value;
             
             let daeText = 'Created DAE';
             if (selectedDAE && selectedDAE.trim() !== '') {
-                daeText = 'Created ' + selectedDAE + ' DAE';
+                // Extract short name from dropdown text
+                // For example, "Help Desk Post (For Emergencies or Urgent Issues)" -> "Help Desk Post"
+                let shortName = selectedDAE;
+                if (selectedDAE.includes('(')) {
+                    shortName = selectedDAE.substring(0, selectedDAE.indexOf('(')).trim();
+                }
+                
+                // Check if we have a staging type stored
+                if (window.AppState && window.AppState.stagingType) {
+                    if (shortName.includes('Staging Changes')) {
+                        shortName = window.AppState.stagingType + ' Staging Changes';
+                    }
+                }
+                
+                daeText = 'Created ' + shortName + ' DAE';
             }
             
             // Prompt for work order number
-            const workOrder = window.prompt('Enter Work Order number:');
+            const workOrder = await customPrompt('Enter Work Order number:', '', 'Work Order');
             
-            if (workOrder !== null && workOrder.trim() !== '') {
+            if (workOrder && workOrder.trim() !== '') {
                 addQuickNote(daeText + '. Created WO: ' + workOrder.trim() + '.');
                 // Tag analysis is handled by addQuickNote
-            } else {
-                // If no WO provided, just add the DAE part
+            } else if (workOrder === '') {
+                // If WO is empty string (user clicked OK with empty field), just add the DAE part
                 addQuickNote(daeText + '.');
                 // Tag analysis is handled by addQuickNote
             }
+            // If workOrder is null (user clicked Cancel), do nothing
+        }
+
+        async function addModCommLossNote() {
+            const modules = await customPrompt('Enter modules in Comm Loss:\n\n(Separate multiple modules with commas)', '', 'Modules in Comm Loss');
+            if (modules && modules.trim() !== '') {
+                addQuickNote('Checked Module Comms. Still in mod comm loss. Modules in Comm Loss: ' + modules.trim() + '.');
+            }
+        }
+
+        async function addForcedFanNote() {
+            const choice = await customConfirm('Click OK to specify RTU(s), or Cancel for "all RTUs"', 'Forced Fan');
+            if (choice) {
+                const rtu = await customPrompt('Enter RTU number(s):', '', 'RTU Number(s)');
+                if (rtu && rtu.trim() !== '') {
+                    addQuickNote('Set Fan to Continuous for RTU ' + rtu.trim() + '.');
+                }
+            } else {
+                addQuickNote('Set Fan to Continuous for all RTUs.');
+            }
+        }
+
+        async function addSetbackNote() {
+            const action = await customPrompt('Enter action:\n\n1 - Set Setback\n2 - Disable Setback\n\nEnter 1 or 2:', '', 'Setback Action');
+            
+            if (action === '1') {
+                const coolTemp = await customPrompt('Enter cooling setback:\n\nExample: 72 (degree symbol added automatically)', '', 'Cooling Setback');
+                if (!coolTemp || coolTemp.trim() === '') return;
+                
+                const heatTemp = await customPrompt('Enter heating setback:\n\nExample: 68 (degree symbol added automatically)', '', 'Heating Setback');
+                if (!heatTemp || heatTemp.trim() === '') return;
+                
+                const rtu = await customPrompt('Enter RTU number(s) (or leave blank for all):', '', 'RTU Number(s)');
+                if (rtu !== null && rtu.trim() !== '') {
+                    addQuickNote('Set Setback to ' + coolTemp.trim() + '°/' + heatTemp.trim() + '° for RTU ' + rtu.trim() + '.');
+                } else if (rtu === '') {
+                    addQuickNote('Set Setback to ' + coolTemp.trim() + '°/' + heatTemp.trim() + '° for all RTUs.');
+                }
+            } else if (action === '2') {
+                const rtu = await customPrompt('Enter RTU number(s) (or leave blank for all):', '', 'RTU Number(s)');
+                if (rtu !== null && rtu.trim() !== '') {
+                    addQuickNote('Disabled Setback for RTU ' + rtu.trim() + '.');
+                } else if (rtu === '') {
+                    addQuickNote('Disabled Setback for all RTUs.');
+                }
+            }
+        }
+
+        async function addRackSettingsNote() {
+            const setting = await customPrompt('What did you change?\n\nExamples:\n• Suction PSI\n• Discharge PSI\n• Differential settings\n• Temperature setpoints', '', 'Rack Settings Changed');
+            if (setting && setting.trim() !== '') {
+                addQuickNote('Changed Rack Settings per Parameter Guide. Changed: ' + setting.trim() + '.');
+            }
+        }
+
+        async function addCaseSettingsNote() {
+            const setting = await customPrompt('What did you change?\n\nExamples:\n• Defrosts per day\n• Termination Setpoint\n• Termination Temperature\n• Defrost duration', '', 'Case Settings Changed');
+            if (setting && setting.trim() !== '') {
+                addQuickNote('Changed Case Settings per Crystal. Changed: ' + setting.trim() + '.');
+            }
+        }
+
+        function addPowerCycleNote() {
+            const selectedSystem = AppState.selectedSystem;
+            
+            // Check if Opus system
+            if (selectedSystem === 'Opus Arch' || selectedSystem === 'Opus Mag') {
+                addQuickNote('Adv tech to power cycle controller, 15 min down, 15 min up.');
+            } else {
+                addQuickNote('Adv tech to power cycle controller.');
+            }
+        }
+
+        function addDownloadNote(noteText) {
+            // Add the note
+            addQuickNote(noteText);
+            // Auto-select HVAC tag for all Downloads
+            selectTagByName('HVAC');
+        }
+
+        // ============= Quick Notes Accordion System =============
+        
+        // Toggle accordion group collapse/expand
+        function toggleAccordion(headerElement) {
+            const accordionGroup = headerElement.parentElement;
+            const isCollapsed = accordionGroup.classList.toggle('collapsed');
+            
+            // Save state to localStorage
+            const groupName = accordionGroup.getAttribute('data-group');
+            if (groupName) {
+                const collapsedGroups = JSON.parse(localStorage.getItem('collapsedAccordionGroups') || '[]');
+                
+                if (isCollapsed) {
+                    if (!collapsedGroups.includes(groupName)) {
+                        collapsedGroups.push(groupName);
+                    }
+                } else {
+                    const index = collapsedGroups.indexOf(groupName);
+                    if (index > -1) {
+                        collapsedGroups.splice(index, 1);
+                    }
+                }
+                
+                localStorage.setItem('collapsedAccordionGroups', JSON.stringify(collapsedGroups));
+            }
+        }
+        
+        // Restore accordion collapse state from localStorage
+        function restoreAccordionState() {
+            try {
+                const collapsedGroups = JSON.parse(localStorage.getItem('collapsedAccordionGroups') || '[]');
+                
+                collapsedGroups.forEach(groupName => {
+                    const group = document.querySelector(`.accordion-group[data-group="${groupName}"]`);
+                    if (group) {
+                        group.classList.add('collapsed');
+                    }
+                });
+            } catch (error) {
+                console.error('Error restoring accordion state:', error);
+            }
+        }
+        
+        // ============= Sub-Category System =============
+        
+        // Track current sub-categories for synchronization
+        const SubCategoryState = {
+            diagnostics: 'hvac',
+            actions: 'hvac'
+        };
+        
+        // Switch sub-category within a group
+        function switchSubCategory(group, category) {
+            // Update state
+            SubCategoryState[group] = category;
+            
+            // Get the accordion group
+            const accordionGroup = document.querySelector(`.accordion-group[data-group="${group}"]`);
+            if (!accordionGroup) return;
+            
+            // Update tab buttons
+            const tabs = accordionGroup.querySelectorAll('.sub-category-btn');
+            tabs.forEach(tab => {
+                if (tab.textContent.toLowerCase() === category) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Update content visibility
+            const contents = accordionGroup.querySelectorAll('.sub-category-content');
+            contents.forEach(content => {
+                if (content.getAttribute('data-subcategory') === category) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+            
+            // Auto-set tag based on category
+            const tagMap = {
+                'hvac': 'HVAC',
+                'lighting': 'Lighting',
+                'refrigeration': 'Refrigeration'
+            };
+            
+            const tagToSelect = tagMap[category];
+            if (tagToSelect) {
+                selectTagByName(tagToSelect);
+            }
+            
+            // If switching diagnostics, auto-sync actions (smart automation)
+            if (group === 'diagnostics') {
+                switchSubCategory('actions', category);
+            }
+            
+            // Update conditional buttons visibility based on selected system
+            updateConditionalButtons();
+        }
+        
+        // Select a tag programmatically
+        function selectTagByName(tagName) {
+            // Directly add to AppState without requiring DOM element
+            if (!AppState.selectedTags.has(tagName)) {
+                AppState.selectedTags.add(tagName);
+                
+                // Update visual state if tag exists in DOM
+                const tagElements = document.querySelectorAll('.tag-item');
+                tagElements.forEach(element => {
+                    if (element.textContent.trim() === tagName) {
+                        element.classList.add('selected');
+                    }
+                });
+                
+                // Show notification
+                showNotification(`Selected tag: ${tagName}`, 'success', 1500);
+            }
+        }
+        
+        // Update conditional button visibility based on system selection
+        function updateConditionalButtons() {
+            const selectedSystem = AppState.selectedSystem;
+            
+            // Show/hide Clocks buttons (Novar only)
+            const clockButtons = document.querySelectorAll('.system-novar');
+            clockButtons.forEach(btn => {
+                btn.style.display = selectedSystem === 'Novar' ? '' : 'none';
+            });
+            
+            // Show/hide Sporlan button (Opus/CPC only)
+            const sporlanButtons = document.querySelectorAll('.system-opus-cpc');
+            sporlanButtons.forEach(btn => {
+                const isOpusOrCPC = selectedSystem === 'Opus Arch' || selectedSystem === 'Opus Mag' || selectedSystem === 'CPC';
+                btn.style.display = isOpusOrCPC ? '' : 'none';
+            });
+        }
+        
+        // Helper function for Staging note (determines DAE based on user selection)
+        async function addStagingNote() {
+            const choice = await customPrompt('Staging for:\n1. Compressor\n2. Condenser\n\nEnter 1 or 2:', '', 'Staging Type');
+            
+            if (choice === '1') {
+                addQuickNote('Checked compressor staging.');
+                // Store staging type in AppState for use in Escalate button
+                if (!window.AppState) window.AppState = {};
+                window.AppState.stagingType = 'Compressor';
+                // Auto-select "Condenser and Compressor Staging Changes" DAE
+                selectDAEByName('Condenser and Compressor Staging Changes');
+            } else if (choice === '2') {
+                addQuickNote('Checked condenser staging.');
+                // Store staging type in AppState for use in Escalate button
+                if (!window.AppState) window.AppState = {};
+                window.AppState.stagingType = 'Condenser';
+                // Auto-select "Condenser and Compressor Staging Changes" DAE
+                selectDAEByName('Condenser and Compressor Staging Changes');
+            }
+        }
+        
+        // Select DAE dropdown option by name
+        function selectDAEByName(daeName) {
+            const daeSelect = document.getElementById('autofill');
+            if (!daeSelect) return;
+            
+            for (let i = 0; i < daeSelect.options.length; i++) {
+                if (daeSelect.options[i].text === daeName) {
+                    daeSelect.selectedIndex = i;
+                    daeSelect.value = daeName;
+                    break;
+                }
+            }
+        }
+        
+        // ============= Custom Modal System =============
+        
+        let currentModal = null;
+        let modalResolve = null;
+        
+        // Show custom modal (replaces window.prompt and window.confirm)
+        function showModal(options) {
+            return new Promise((resolve) => {
+                modalResolve = resolve;
+                
+                // Create modal if it doesn't exist
+                let modalOverlay = document.getElementById('custom-modal-overlay');
+                if (!modalOverlay) {
+                    modalOverlay = document.createElement('div');
+                    modalOverlay.id = 'custom-modal-overlay';
+                    modalOverlay.className = 'modal-overlay';
+                    document.body.appendChild(modalOverlay);
+                }
+                
+                // Build modal content
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                
+                const modalHeader = document.createElement('div');
+                modalHeader.className = 'modal-header';
+                modalHeader.textContent = options.title || 'Input Required';
+                
+                const modalBody = document.createElement('div');
+                modalBody.className = 'modal-body';
+                
+                // Format message with proper list formatting
+                const message = options.message || '';
+                
+                // Always process messages that contain line breaks
+                const parts = message.split('\n\n');
+                parts.forEach((part, index) => {
+                    const lines = part.split('\n');
+                    let listContainer = null;
+                    let isNumberedList = false;
+                    
+                    lines.forEach(line => {
+                        const trimmedLine = line.trim();
+                        if (!trimmedLine) return; // Skip empty lines
+                        
+                        // Detect if this is a numbered list item (1. or 1 - or 1) formats)
+                        const isNumbered = /^\d+[\.\-\)]\s/.test(trimmedLine);
+                        const isBulleted = trimmedLine.startsWith('• ') || (trimmedLine.startsWith('- ') && !/^\d+\s*-/.test(trimmedLine));
+                        
+                        if (isNumbered || isBulleted) {
+                            // This is a list item
+                            if (!listContainer || (isNumbered !== isNumberedList)) {
+                                // Create new list container (ol for numbered, ul for bullets)
+                                listContainer = document.createElement(isNumbered ? 'ol' : 'ul');
+                                listContainer.style.marginLeft = '20px';
+                                listContainer.style.marginTop = '8px';
+                                listContainer.style.marginBottom = '8px';
+                                modalBody.appendChild(listContainer);
+                                isNumberedList = isNumbered;
+                            }
+                            const listItem = document.createElement('li');
+                            // Remove number/bullet prefix (handles 1. or 1 - or 1) or • or - formats)
+                            listItem.textContent = trimmedLine.replace(/^[•\-]\s+/, '').replace(/^\d+[\.\-\)]\s+/, '');
+                            listItem.style.marginBottom = '4px';
+                            listContainer.appendChild(listItem);
+                        } else {
+                            // Regular text line
+                            listContainer = null; // Reset list container
+                            const textNode = document.createElement('p');
+                            textNode.textContent = trimmedLine;
+                            textNode.style.margin = '0 0 8px 0';
+                            modalBody.appendChild(textNode);
+                        }
+                    });
+                    
+                    // Add spacing between sections
+                    if (index < parts.length - 1 && part.trim()) {
+                        const spacer = document.createElement('div');
+                        spacer.style.height = '8px';
+                        modalBody.appendChild(spacer);
+                    }
+                });
+                
+                const modalButtons = document.createElement('div');
+                modalButtons.className = 'modal-buttons';
+                
+                let inputElement = null;
+                
+                // Add input field if needed (for prompt-style modals)
+                if (options.input) {
+                    inputElement = document.createElement('input');
+                    inputElement.type = 'text';
+                    inputElement.className = 'modal-input';
+                    inputElement.placeholder = options.placeholder || '';
+                    inputElement.value = options.defaultValue || '';
+                    modalBody.appendChild(inputElement);
+                    
+                    // Focus input after modal shows
+                    setTimeout(() => inputElement.focus(), 100);
+                    
+                    // Allow Enter key to submit
+                    inputElement.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            confirmBtn.click();
+                        } else if (e.key === 'Escape') {
+                            e.preventDefault();
+                            cancelBtn.click();
+                        }
+                    });
+                }
+                
+                // Create buttons
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = 'modal-btn modal-btn-primary';
+                confirmBtn.textContent = options.confirmText || 'OK';
+                confirmBtn.onclick = () => {
+                    const result = inputElement ? inputElement.value : true;
+                    hideModal(result);
+                };
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'modal-btn modal-btn-secondary';
+                cancelBtn.textContent = options.cancelText || 'Cancel';
+                cancelBtn.onclick = () => {
+                    hideModal(options.input ? null : false);
+                };
+                
+                modalButtons.appendChild(cancelBtn);
+                modalButtons.appendChild(confirmBtn);
+                
+                // Assemble modal
+                modalContent.appendChild(modalHeader);
+                modalContent.appendChild(modalBody);
+                modalContent.appendChild(modalButtons);
+                
+                modalOverlay.innerHTML = '';
+                modalOverlay.appendChild(modalContent);
+                
+                // Show modal
+                setTimeout(() => modalOverlay.classList.add('show'), 10);
+                
+                // Close on overlay click
+                modalOverlay.onclick = (e) => {
+                    if (e.target === modalOverlay) {
+                        hideModal(options.input ? null : false);
+                    }
+                };
+                
+                currentModal = modalOverlay;
+            });
+        }
+        
+        // Hide modal and return result
+        function hideModal(result) {
+            if (currentModal) {
+                currentModal.classList.remove('show');
+                setTimeout(() => {
+                    if (currentModal) {
+                        currentModal.remove();
+                        currentModal = null;
+                    }
+                    // Resolve AFTER modal is completely removed
+                    if (modalResolve) {
+                        modalResolve(result);
+                        modalResolve = null;
+                    }
+                }, 200); // Match the CSS transition duration
+            } else {
+                // No modal to hide, resolve immediately
+                if (modalResolve) {
+                    modalResolve(result);
+                    modalResolve = null;
+                }
+            }
+        }
+        
+        // Helper functions to replace window.prompt and window.confirm
+        async function customPrompt(message, defaultValue = '', title = 'Input Required') {
+            return await showModal({
+                title: title,
+                message: message,
+                input: true,
+                defaultValue: defaultValue,
+                placeholder: 'Enter value...',
+                confirmText: 'OK',
+                cancelText: 'Cancel'
+            });
+        }
+        
+        async function customConfirm(message, title = 'Confirm') {
+            return await showModal({
+                title: title,
+                message: message,
+                input: false,
+                confirmText: 'Yes',
+                cancelText: 'No'
+            });
         }
 
         // Enhanced notes updating with validation
@@ -10459,22 +11702,14 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 downloadsSection.style.display = system === 'Novar' ? 'block' : 'none';
             }
             
-            // Show all other button groups when any system is selected
-            const buttonGroups = document.querySelectorAll('.button-group');
-            const headings = document.querySelectorAll('#quick-notes h4');
-            
-            buttonGroups.forEach((group, index) => {
-                const heading = headings[index];
-                const isSystemLogin = heading?.textContent?.includes('System Login');
-                const isDownloads = group.id === 'downloads-section' || heading?.textContent?.includes('Downloads');
-                
-                if (!isSystemLogin && !isDownloads) {
-                    // Show all other groups
-                    group.classList.add('visible');
-                    group.classList.remove('hidden-until-system');
-                    if (heading) heading.style.display = 'block';
-                }
+            // Show all system-dependent accordion groups when any system is selected
+            const hiddenGroups = document.querySelectorAll('.accordion-group.hidden-until-system');
+            hiddenGroups.forEach(group => {
+                group.style.display = 'block';
             });
+            
+            // Update conditional button visibility
+            updateConditionalButtons();
             
             console.log('Selected system:', system);
         }
@@ -10492,19 +11727,10 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             }
             AppState.selectedSystem = null;
             
-            // Hide all button groups except System Login
-            const buttonGroups = document.querySelectorAll('.button-group');
-            const headings = document.querySelectorAll('#quick-notes h4');
-            
-            buttonGroups.forEach((group, index) => {
-                const heading = headings[index];
-                const isSystemLogin = heading?.textContent?.includes('System Login');
-                
-                if (!isSystemLogin) {
-                    group.classList.remove('visible');
-                    group.classList.add('hidden-until-system');
-                    if (heading && !isSystemLogin) heading.style.display = 'none';
-                }
+            // Hide all system-dependent accordion groups
+            const hiddenGroups = document.querySelectorAll('.accordion-group.hidden-until-system');
+            hiddenGroups.forEach(group => {
+                group.style.display = 'none';
             });
         }
 
@@ -10755,6 +11981,12 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                     e.preventDefault();
                     setGitHubToken();
                 }
+                
+                // Toggle keyboard shortcuts help with Ctrl+K
+                if (e.ctrlKey && e.key === 'k') {
+                    e.preventDefault();
+                    toggleKeyboardHelp();
+                }
             });
         }
 
@@ -10777,15 +12009,14 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                     );
                 }
                 
+                // Restore accordion collapse state from localStorage
+                restoreAccordionState();
+                
                 // Initialize button group visibility - hide all system-dependent groups on load
                 AppState.selectedSystem = null;
-                const hiddenGroups = document.querySelectorAll('.button-group.hidden-until-system');
+                const hiddenGroups = document.querySelectorAll('.accordion-group.hidden-until-system');
                 hiddenGroups.forEach(group => {
-                    group.classList.remove('visible');
-                    const heading = group.previousElementSibling;
-                    if (heading && heading.tagName === 'H4') {
-                        heading.style.display = 'none';
-                    }
+                    group.style.display = 'none';
                 });
                 
                 // Ensure Downloads section is hidden initially
