@@ -1,0 +1,70 @@
+# Compact Usage Report Analysis Prompt
+
+## TASK
+Analyze usage report sub-issues #17-22 to identify NEW Quick Note button patterns.
+
+## CRITICAL EXCLUSIONS - Do NOT Recommend These Existing Buttons:
+
+### System Login:
+- Logged into [System] (Novar/Opus Arch/Opus Mag/CPC/AKA65/Storeview)
+- Did not login to an EMS
+
+### Diagnostics (All Categories):
+- Checked comms (success/failure)
+- Pinged controller, Good ping, Ping Timed Out (post-comm loss only)
+- Checked temps/alarms/clocks/Module Comms
+- Tested [component], Check breakers, Staging, Defrost actions
+- Pressures (SUCT PSI/DISC PSI), Receiver level (refrigeration)
+
+### Actions (All Categories):  
+- Forced on [equipment], Forced [parameter], Forced off [item]
+- RTU Setpoint, Rack/Case Settings, Shutdown circuit
+- Lighting schedule, Reset clocks, Terminated Defrost
+
+### Downloads (Novar):
+- All download combinations (Version/Load Change/Comms/Main/Full)
+
+### Status & Communication:
+- All good/No good, Tech T/S, Call Done/Dropped
+- Advisory, Tech asked/refused, Status update (all prompt-based)
+- Monitor advice, Contact advice, Replace advice
+- PCR/PDR submission, Escalate
+
+### Special Cases:
+- Power cycle controller, Remodel, Sams store, Sporlan restart
+- Not onsite defrost denial, NSRM suppression
+
+## ANALYSIS REQUIREMENTS
+
+1. **Read complete notes** (not previews) from Issues #17-22
+2. **Document patterns** with exact quotes + citations
+3. **Minimum 3 occurrences** across different notes  
+4. **Exclude semantic duplicates**:
+   - "Called tech" = existing Communication
+   - "Verified temps" = "Checked temps"  
+   - "Reset controller" = "Power cycle controller"
+   - "Forced compressor on" = "Forced [parameter]" prompt
+
+## OUTPUT FORMAT
+
+### Section 1: Excluded Patterns
+List what you found but excluded and why (which existing button covers it)
+
+### Section 2: Prompt Button Usage Opportunities  
+Document how often existing prompt buttons could have covered found patterns
+
+### Section 3: NEW Recommendations Only
+Only patterns NOT covered by existing buttons or prompts:
+- **Button Name:** [Text]
+- **Frequency:** X notes
+- **Citations:** Issue #X, Note Y, WO: Z, Quote: "exact text"
+- **Category:** [Type]
+
+## KEY REMINDERS
+- If it could be typed into an existing PROMPT button → NOT new
+- 80+ existing buttons cover most patterns → focus on genuinely novel actions
+- Ping buttons are dynamic (only visible after comm loss)
+- Many buttons are system-dependent (Clocks, Sporlan, etc.)
+- Prompt buttons cover wide ranges (Forced [X], Tested [Y], Advisory [Z])
+
+**FINAL CHECK:** Every recommendation must be a pattern NOT covered by existing functionality.

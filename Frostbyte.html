@@ -3516,7 +3516,10 @@
                             <div class="sub-category-content active" data-subcategory="hvac">
                                 <div class="button-group">
                                     <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
-                                    <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
+                                    <button onclick="addQuickNote('Checked comms. Still in comm loss.'); showPingButtons()" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
+                                    <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn ping-button" title="Ping Controller" style="display: none;">Ping</button>
+                                    <button onclick="addQuickNote('Good ping.')" class="quick-note-btn success-quick ping-button" title="Good Ping Response" style="display: none;">Good Ping</button>
+                                    <button onclick="addQuickNote('Ping Timed Out.')" class="quick-note-btn error-quick ping-button" title="Ping Timeout" style="display: none;">Ping Timeout</button>
                                     <button onclick="addQuickNote('Checked RTU Temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
                                     <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
                                     <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn system-novar" title="Clock Check" style="display: none;">Clocks</button>
@@ -3530,7 +3533,10 @@
                             <div class="sub-category-content" data-subcategory="lighting">
                                 <div class="button-group">
                                     <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
-                                    <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
+                                    <button onclick="addQuickNote('Checked comms. Still in comm loss.'); showPingButtons()" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
+                                    <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn ping-button" title="Ping Controller" style="display: none;">Ping</button>
+                                    <button onclick="addQuickNote('Good ping.')" class="quick-note-btn success-quick ping-button" title="Good Ping Response" style="display: none;">Good Ping</button>
+                                    <button onclick="addQuickNote('Ping Timed Out.')" class="quick-note-btn error-quick ping-button" title="Ping Timeout" style="display: none;">Ping Timeout</button>
                                     <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
                                     <button onclick="addQuickNote('Checked clocks.')" class="quick-note-btn system-novar" title="Clock Check" style="display: none;">Clocks</button>
                                     <button onclick="addQuickNote('Checked Module Comms.')" class="quick-note-btn success-quick" title="Modulating Communication Check">Mod Comm</button>
@@ -3544,7 +3550,10 @@
                             <div class="sub-category-content" data-subcategory="refrigeration">
                                 <div class="button-group">
                                     <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
-                                    <button onclick="addQuickNote('Checked comms. Still in comm loss.')" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
+                                    <button onclick="addQuickNote('Checked comms. Still in comm loss.'); showPingButtons()" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
+                                    <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn ping-button" title="Ping Controller" style="display: none;">Ping</button>
+                                    <button onclick="addQuickNote('Good ping.')" class="quick-note-btn success-quick ping-button" title="Good Ping Response" style="display: none;">Good Ping</button>
+                                    <button onclick="addQuickNote('Ping Timed Out.')" class="quick-note-btn error-quick ping-button" title="Ping Timeout" style="display: none;">Ping Timeout</button>
                                     <button onclick="addQuickNote('Checked Rack/Case Temps.')" class="quick-note-btn" title="Temperature Check">Temps</button>
                                     <button onclick="addQuickNote('Checked alarms.')" class="quick-note-btn" title="Alarm Check">Alarms</button>
                                     <button onclick="addQuickNote('Checked receiver level.')" class="quick-note-btn" title="Check Receiver Level">RECV LVL</button>
@@ -4069,7 +4078,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.2.1', // Update this when you make changes
+            currentVersion: '1.2.2', // Update this when you make changes
             githubRepo: 'shadow11001/Frostbyte',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -11099,6 +11108,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 'Service Channel', 
                 'Copeland',
                 'Sporlan',
+                'FS Manager',
+                'InSource',
+                'Remodel Support',
                 'Other'
             ];
             
@@ -11107,14 +11119,14 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 message += `${index + 1}. ${contact}\n`;
             });
             
-            const choice = await customPrompt(message + '\nEnter number (1-5):', '', 'Contact Selection');
+            const choice = await customPrompt(message + '\nEnter number (1-8):', '', 'Contact Selection');
             
             if (choice && choice.trim() !== '') {
                 const choiceNum = parseInt(choice.trim());
-                if (choiceNum >= 1 && choiceNum <= 4) {
+                if (choiceNum >= 1 && choiceNum <= 7) {
                     addQuickNote('Advised tech to contact ' + contacts[choiceNum - 1] + '.');
                     // Tag analysis is handled by addQuickNote
-                } else if (choiceNum === 5) {
+                } else if (choiceNum === 8) {
                     const customContact = await customPrompt('Enter contact details:', '', 'Custom Contact');
                     if (customContact && customContact.trim() !== '') {
                         addQuickNote('Advised tech to contact ' + customContact.trim() + '.');
@@ -11310,6 +11322,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             // Update state
             SubCategoryState[group] = category;
             
+            // Hide ping buttons when switching sub-categories
+            hidePingButtons();
+            
             // Get the accordion group
             const accordionGroup = document.querySelector(`.accordion-group[data-group="${group}"]`);
             if (!accordionGroup) return;
@@ -11389,6 +11404,22 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             sporlanButtons.forEach(btn => {
                 const isOpusOrCPC = selectedSystem === 'Opus Arch' || selectedSystem === 'Opus Mag' || selectedSystem === 'CPC';
                 btn.style.display = isOpusOrCPC ? '' : 'none';
+            });
+        }
+        
+        // Show ping buttons when Comms button is clicked
+        function showPingButtons() {
+            const pingButtons = document.querySelectorAll('.ping-button');
+            pingButtons.forEach(btn => {
+                btn.style.display = '';
+            });
+        }
+        
+        // Hide ping buttons
+        function hidePingButtons() {
+            const pingButtons = document.querySelectorAll('.ping-button');
+            pingButtons.forEach(btn => {
+                btn.style.display = 'none';
             });
         }
         
@@ -11799,6 +11830,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 group.style.display = 'block';
             });
             
+            // Hide ping buttons when switching systems
+            hidePingButtons();
+            
             // Update conditional button visibility
             updateConditionalButtons();
             
@@ -11860,6 +11894,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 
                 // Hide Downloads section
                 hideDownloadsSection();
+                
+                // Hide ping buttons
+                hidePingButtons();
                 
                 showNotification('Form cleared', 'success', 1500);
                 clearAutoSave();
