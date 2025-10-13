@@ -7636,6 +7636,19 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             const now = new Date();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
             
+            // Check if this is for today or a future day
+            const nextCheck = AppState.warRoomSchedule.nextCheck;
+            if (!nextCheck) return;
+            
+            const nextCheckDate = new Date(nextCheck);
+            const isToday = nextCheckDate.toDateString() === now.toDateString();
+            
+            // If the check is not today, don't trigger immediate notifications
+            if (!isToday) {
+                console.log(`📋 Check at ${Math.floor(checkMinutes/60)}:${(checkMinutes%60).toString().padStart(2,'0')} is not today - skipping immediate notifications`);
+                return;
+            }
+            
             const earliestStartTime = checkMinutes - 20; // Can start 20 min early
             const dueTime = checkMinutes;
             const backupNotifyTime = checkMinutes + 15; // Backup notified 15 min after
@@ -11635,12 +11648,6 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 if (formData.storeNumber) copiedText.push(`Store Number: ${formData.storeNumber}`);
                 if (formData.workOrder) copiedText.push(`Work Order Number: ${formData.workOrder}`);
                 if (formData.notes) copiedText.push(formData.notes);
-                
-                // Add selected tags if any
-                const selectedTags = getSelectedTags();
-                if (selectedTags.length > 0) {
-                    copiedText.push(`Tags: ${selectedTags.join(', ')}`);
-                }
 
                 if (copiedText.length === 0) {
                     showNotification('No data to copy', 'error');
@@ -11675,9 +11682,8 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 }
                 
                 addButtonFeedback(button, 'success');
-                const tagInfo = selectedTags.length > 0 ? ` (${selectedTags.length} tags included)` : '';
                 showNotification(
-                    success ? `Copied and saved to history!${tagInfo}` : `Copied successfully!${tagInfo}`, 
+                    success ? 'Copied and saved to history!' : 'Copied successfully!', 
                     'success'
                 );
                 
