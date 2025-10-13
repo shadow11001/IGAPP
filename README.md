@@ -606,6 +606,41 @@ Frostbyte/
 
 ## 📋 Detailed Changelog
 
+### Version 1.2.1 - Critical Bug Fixes (October 2025)
+
+#### 🐛 Critical Bug Fixes
+- **War Room timer fix** - Fixed War Room Check timer flashing yellow/red for checks scheduled tomorrow instead of today
+- **Date validation** - Added proper date checking in `scheduleWarRoomCheck()` to verify checks are scheduled for current day
+- **Tomorrow check prevention** - War Room notifications now only trigger for today's checks, not future days
+- **Tag system fix** - Fixed issue where HVAC/Lighting/Refrigeration tags were being added to copied notes text
+- **Copy functionality** - Removed tag appending from `copyAdditionalNotes()` - tags now only appear in Recommended Tags section
+- **Email processor enhancement** - Split email input into separate Subject and Body fields with individual copy buttons
+- **Email field copying** - Added copy buttons for email subject and body fields for easier workflow
+- **Field organization** - Better separation and organization of email processing inputs
+
+#### 🔧 Technical Improvements
+- **Date comparison logic** - Enhanced `scheduleWarRoomCheck()` with `isToday` validation using `toDateString()` comparison
+- **Notification scheduling** - War Room checks for future days now skip immediate notification triggering
+- **Early return pattern** - Improved function efficiency by returning early for non-today checks
+- **Tag isolation** - Tags remain in `AppState.selectedTags` for recommendations only, not in copied text
+- **Console logging** - Added debug logging for skipped future-day checks
+- **Email processing refactor** - Updated all email functions to handle separate subject/body fields
+- **Field validation** - Enhanced validation to check both subject and body before processing
+
+#### 🎨 User Interface Improvements
+- **Email processor layout** - New two-field layout with labels and copy buttons
+- **Visual separation** - Clear distinction between email subject and body fields
+- **Quick copy workflow** - Individual copy buttons for subject and body fields
+- **Better labeling** - Descriptive labels ("Email Subject", "Email Body") for clarity
+- **Responsive buttons** - Copy buttons aligned with textarea fields for clean appearance
+- **Field containers** - Flexbox containers for proper alignment of textareas and buttons
+
+#### 📝 Documentation Updates
+- **Changelog accuracy** - Updated README with complete version 1.2.1 changes
+- **Bug fix details** - Comprehensive documentation of War Room timer and tag system fixes
+- **Email processor usage** - Updated documentation for new email field structure
+- **Technical details** - Added implementation details for date validation logic
+
 ### Version 1.2.0 - War Room Schedule & UI Fixes (October 2025)
 
 #### 🔧 War Room Notification System Fixes
@@ -929,6 +964,15 @@ Frostbyte/
 - **Local storage** - Simple preference persistence
 
 ### Recent Fixes and Refinements
+
+#### Critical Bug Fixes (v1.2.1)
+- **🔧 War Room timer date validation** - Fixed flashing notifications for tomorrow's checks by adding date comparison in `scheduleWarRoomCheck()`
+- **🔧 Tag system isolation** - Removed tag names from copied notes text, tags now only appear in Recommended Tags section
+- **🔧 Email field separation** - Split email processor into separate Subject and Body fields with individual copy buttons
+- **🔧 Date comparison enhancement** - Added `isToday` validation using `toDateString()` to prevent cross-day notification issues
+- **🔧 Copy functionality cleanup** - Removed `selectedTags` appending from `copyAdditionalNotes()` function
+- **🔧 Email processing workflow** - Updated all email functions (`processEmail()`, `submitEmailForAnalysis()`) to handle two-field structure
+- **🔧 Field validation improvement** - Enhanced validation to check both subject and body fields before processing
 
 #### Email Processing System Fixes (v1.1.0)
 - **🔧 Work order regex accuracy** - Enhanced pattern matching from single `match()` to `matchAll()` for comprehensive detection
