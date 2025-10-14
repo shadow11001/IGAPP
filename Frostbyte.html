@@ -513,6 +513,24 @@
             border-radius: 12px;
         }
         
+        .suggested-templates {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        
+        .email-warning-banner {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #ffc107;
+        }
+        
         /* Dark mode for email processing */
         body.dark-mode .email-processor h3 {
             color: #ecf0f1;
@@ -563,6 +581,18 @@
             background: #f39c12;
             border-color: #e67e22;
             color: #2c3e50;
+        }
+        
+        body.dark-mode .suggested-templates {
+            background: #2d4a2f;
+            border-color: #4caf50;
+            color: #a5d6a7;
+        }
+        
+        body.dark-mode .email-warning-banner {
+            background: #3a3a2a;
+            color: #ffd54f;
+            border-left-color: #ffb300;
         }
 
         /* War Room Styles */
@@ -689,7 +719,8 @@
         
         .rack-item {
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
+            align-items: flex-start;
             gap: 10px;
             margin-bottom: 10px;
             padding: 10px;
@@ -707,11 +738,22 @@
             padding: 5px;
         }
         
-        .rack-item input[type="text"] {
+        .rack-item input[type="text"],
+        .rack-item textarea {
             flex: 1;
-            padding: 5px;
+            padding: 8px;
             border: 1px solid #ced4da;
             border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+        }
+        
+        .rack-item textarea {
+            min-height: 80px;
+            width: 100%;
+            flex-basis: 100%;
+            resize: vertical;
+            margin-top: 0;
         }
         
         .alarm-status {
@@ -902,6 +944,7 @@
         body.dark-mode #control-system,
         body.dark-mode .rack-item select,
         body.dark-mode .rack-item input,
+        body.dark-mode .rack-item textarea,
         body.dark-mode .alarm-details textarea,
         body.dark-mode .alarm-details input,
         body.dark-mode .template-settings input,
@@ -3298,6 +3341,14 @@
                 <strong>Your Schedule:</strong><br>
                 <div id="war-room-schedule-text"></div>
             </div>
+            <div class="settings-item" style="display: block; padding: 10px 0;">
+                <button onclick="manageWarRoomData()" class="primary-button" style="width: 100%; padding: 8px;">
+                    🗄️ Manage Saved Rack Data
+                </button>
+                <p style="font-size: 11px; color: #666; margin-top: 5px; margin-bottom: 0;">
+                    View or clear rack statuses saved from previous War Room checks
+                </p>
+            </div>
         </div>
         
         <!-- Database Storage Section -->
@@ -3788,7 +3839,20 @@
                 <!-- Email Processing Tab Content -->
                 <div id="email-processing" class="tab-content">
                     <div class="email-processor">
-                        <h3>📧 Email Processor</h3>
+                        <h3>📧 Email Info Extractor</h3>
+                        
+                        <!-- Limitation Warning -->
+                        <div class="email-warning-banner">
+                            <strong>ℹ️ What This Tool Does:</strong><br>
+                            • Extracts store numbers, work orders, and tech info from emails<br>
+                            • Suggests which DAE template might be appropriate<br>
+                            • Auto-fills the Quick Notes form to save you time<br>
+                            <br>
+                            <strong>⚠️ Limitations:</strong><br>
+                            • Works best with <strong>initial tech requests</strong><br>
+                            • Does NOT work well with email threads or back-and-forth conversations<br>
+                            • You still need to write your own response based on the situation
+                        </div>
                         
                         <div class="email-input-section">
                             <label for="email-subject">Email Subject:</label>
@@ -3799,12 +3863,12 @@
                             
                             <label for="email-body">Email Body:</label>
                             <div class="email-field-container">
-                                <textarea id="email-body" class="email-field" placeholder="Paste email body here..." rows="8"></textarea>
+                                <textarea id="email-body" class="email-field" placeholder="Paste initial tech email here (not threads)..." rows="8"></textarea>
                                 <button onclick="copyEmailField('email-body')" class="copy-field-btn" title="Copy Body">📋</button>
                             </div>
                             
                             <div class="email-controls">
-                                <button onclick="processEmail()" class="primary-button">🔍 Process Email</button>
+                                <button onclick="processEmail()" class="primary-button">🔍 Extract Info</button>
                                 <button onclick="clearEmailProcessor()" class="danger-button">Clear</button>
                                 <button id="dev-email-analysis-btn" onclick="submitEmailForAnalysis()" class="dev-analysis-button" style="display: none;" title="Submit email for analysis (Dev only)">🧪 Analyze Email (Dev)</button>
                             </div>
@@ -3815,11 +3879,16 @@
                             <h4>📋 Extracted Information:</h4>
                             <div id="extracted-info" class="extracted-info"></div>
                             
-                            <h4>📝 Generated Response:</h4>
-                            <textarea id="generated-response" class="response-textarea" rows="8" readonly></textarea>
-                            <div class="response-controls">
-                                <button onclick="copyEmailResponse()" class="success-button">📋 Copy Response</button>
-                                <button onclick="editResponse()" class="primary-button">✏️ Edit Response</button>
+                            <h4>� Suggested DAE Templates:</h4>
+                            <div id="suggested-templates" class="suggested-templates" style="background: #e8f5e9; padding: 12px; border-radius: 6px; margin-bottom: 15px;"></div>
+                            
+                            <div style="background: #e3f2fd; padding: 12px; border-radius: 6px; border-left: 4px solid #2196f3;">
+                                <strong>Next Steps:</strong><br>
+                                1. Review the extracted info above<br>
+                                2. Check the suggested DAE template(s)<br>
+                                3. Read the actual email to understand the context<br>
+                                4. Write your response based on the situation<br>
+                                5. Use Quick Notes to document your work
                             </div>
                         </div>
                     </div>
@@ -3932,9 +4001,9 @@
                                 </div>
                                 
                                 <div class="store-controls">
-                                    <button onclick="saveStoreData()" class="success-button">✅ Save Store</button>
-                                    <button onclick="nextStore()" class="primary-button">➡️ Next Store</button>
-                                    <button onclick="skipStore()" class="secondary-button">⏭️ Skip Store</button>
+                                    <button id="prev-store-btn" onclick="previousStore()" class="secondary-button" style="display: none;">⬅️ Previous Store</button>
+                                    <button onclick="saveStoreData()" class="success-button">✅ Save & Continue</button>
+                                    <button onclick="skipStore()" class="warning-button">⏭️ Skip Store</button>
                                 </div>
                             </div>
                             
@@ -4078,7 +4147,7 @@
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.2.2', // Update this when you make changes
+            currentVersion: '1.2.3', // Update this when you make changes
             githubRepo: 'shadow11001/Frostbyte',
             githubToken: null, // Will be decoded from masked token
             autoUpdateEnabled: true,
@@ -9177,60 +9246,76 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 return bestMatch;
             },
 
-            // Get time-based greeting
-            getTimeBasedGreeting() {
-                const hour = new Date().getHours();
-                if (hour >= 8 && hour < 12) return 'morning';
-                if (hour >= 12 && hour < 16) return 'afternoon';
-                return 'evening';
-            },
-
-            // Generate response based on email type and extracted data
-            generateResponse(emailData) {
-                const greeting = this.getTimeBasedGreeting();
-                // Extract first name from full name
-                const firstName = emailData.techName ? emailData.techName.split(' ')[0] : 'there';
+            // Get suggested DAE templates based on email content
+            getSuggestedTemplates(emailData) {
+                const suggestions = [];
+                const emailType = emailData.emailType;
                 
-                let response = `Good ${greeting} ${firstName}!\n\nThank you for contacting Walmart Digital Assets!\n\n`;
+                // Template mapping with descriptions and keywords
+                const templateInfo = {
+                    'defrost': {
+                        name: 'Force Defrost Response',
+                        description: 'Tech requested a forced defrost cycle for a case or rack',
+                        keywords: ['defrost', 'force', 'cycle']
+                    },
+                    'pdr': {
+                        name: 'PDR (Parameter Deviation Request)',
+                        description: 'Request involves changing parameters outside normal ranges',
+                        keywords: ['parameter', 'deviation', 'defrost duration', 'cycle change']
+                    },
+                    'pcr': {
+                        name: 'PCR (Point Change Request)',
+                        description: 'Request to change board points or controller configuration',
+                        keywords: ['point change', 'board', 'module']
+                    },
+                    'download': {
+                        name: 'Controller Download',
+                        description: 'Tech needs a controller download or firmware update',
+                        keywords: ['download', 'version', 'firmware']
+                    },
+                    'mastermind': {
+                        name: 'MasterMind/Alarm Response',
+                        description: 'Related to MasterMind alarm system',
+                        keywords: ['mastermind', 'alarm']
+                    },
+                    'escalation': {
+                        name: 'Manager Escalation',
+                        description: 'Urgent issue requiring escalation',
+                        keywords: ['escalation', 'urgent', 'critical']
+                    },
+                    'general': {
+                        name: 'General Response',
+                        description: 'Standard response for common inquiries',
+                        keywords: ['status', 'check', 'verify', 'question']
+                    }
+                };
                 
-                // Add template-specific response
-                switch (emailData.emailType.template) {
-                    case 'defrost':
-                        const caseNumber = emailData.caseNumber || '[CASE NUMBER]';
-                        response += `The defrost you have requested for store ${emailData.storeNumber || '[STORE NUMBER]'},${caseNumber} has been completed. Please see screenshot below:`;
-                        break;
-                        
-                    case 'pdr':
-                        response += `The request you have made is outside of the Walmart Parameters and requires a Parameter Deviation Request (PDR). Your request has been submitted. A member of our team will reach out to you as soon as your request has been reviewed and is approved or denied.`;
-                        break;
-                        
-                    case 'pcr':
-                        response += `The request you have made requires a Point Change Request. Your request has been submitted.\nA member of our team will reach out as soon as your request has been completed.`;
-                        break;
-                        
-                    case 'escalation':
-                        response += `The request you have made requires a Digital Assets Escalation. Your request has been escalated. Your work order number is: ${emailData.workOrder || '[WORK ORDER]'}`;
-                        break;
-                        
-                    case 'mastermind':
-                        response += `Master Mind Report Notes Show:\n\nPlease Email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site date and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri`;
-                        break;
-                        
-                    case 'download':
-                        const rackName = emailData.rackName || '[RACK]';
-                        response += `I see that you wanted a download pushed to the ${rackName} rack. I took a look and see that this is an Opus controller. Opus controllers download automatically but you can force a download by powering off for 15 minutes and then powering on and waiting 15 minutes. During the boot up, it will download if it is needed.`;
-                        break;
-                        
-                    default:
-                        if (emailData.workOrder) {
-                            response += `I have received your request regarding store ${emailData.storeNumber || '[STORE NUMBER]'}. This has been logged under work order ${emailData.workOrder}. I will review your request and provide an update shortly.`;
-                        } else {
-                            response += `The request you have made requires more information. Please provide the best contact number for reaching you.\nA member of our team will reach out via phone as soon as possible.`;
-                        }
-                        break;
+                // Add primary suggestion based on detected type
+                if (emailType.template && templateInfo[emailType.template]) {
+                    suggestions.push(templateInfo[emailType.template]);
                 }
                 
-                return response;
+                // Add alternative suggestions based on extracted data
+                if (emailData.rackName && emailType.template !== 'defrost') {
+                    // If rack is mentioned but not defrost, could be rack-related
+                    const rackSuggestions = ['Controller COMM Loss', 'Changes to Rack Suction Settings'];
+                    suggestions.push({
+                        name: 'Rack-Related Issue',
+                        description: `Rack ${emailData.rackName} mentioned - may need comm check or settings adjustment`,
+                        keywords: ['rack', emailData.rackName]
+                    });
+                }
+                
+                // If work order but no clear type, suggest general templates
+                if (emailData.workOrder && suggestions.length === 0) {
+                    suggestions.push({
+                        name: 'Work Order Follow-up',
+                        description: 'Acknowledge WO and request more details if needed',
+                        keywords: ['work order', emailData.workOrder]
+                    });
+                }
+                
+                return suggestions.length > 0 ? suggestions : null;
             }
         };
 
@@ -9245,9 +9330,9 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             }
             
             // Track email processing usage
-            trackButtonClick('Process Email', 'email-processing');
+            trackButtonClick('Extract Email Info', 'email-processing');
             
-            showNotification('🔍 Processing email...', 'info', 2000);
+            showNotification('🔍 Extracting information...', 'info', 2000);
             
             // Combine subject and body for processing
             const emailText = (emailSubject ? 'Subject: ' + emailSubject + '\n\n' : '') + emailBody;
@@ -9267,8 +9352,8 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 rawContent: emailText
             };
             
-            // Generate response
-            emailData.response = EMAIL_PROCESSOR.generateResponse(emailData);
+            // Get suggested DAE templates
+            emailData.suggestedTemplates = EMAIL_PROCESSOR.getSuggestedTemplates(emailData);
             
             // Display results
             displayEmailAnalysis(emailData);
@@ -9282,7 +9367,7 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
         function displayEmailAnalysis(emailData) {
             const analysisDiv = document.getElementById('email-analysis');
             const extractedInfoDiv = document.getElementById('extracted-info');
-            const responseTextarea = document.getElementById('generated-response');
+            const templatesDiv = document.getElementById('suggested-templates');
             
             // Build extracted info display
             let infoHTML = '';
@@ -9337,31 +9422,52 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             }
             
             infoHTML += `<div class="info-item">
-                <span class="info-label">Email Type:</span>
+                <span class="info-label">Detected Issue Type:</span>
                 <span class="info-value">
                     <span class="email-type-badge">${emailData.emailType.type}</span>
-                    ${emailData.emailType.confidence > 1 ? `(${emailData.emailType.confidence} matches)` : ''}
+                    ${emailData.emailType.confidence > 1 ? `(${emailData.emailType.confidence} keyword matches)` : ''}
                 </span>
             </div>`;
             
             // Notes are ALWAYS needed when work order is present
             if (emailData.workOrder) {
                 infoHTML += `<div class="info-item">
-                    <span class="info-label">Notes Needed:</span>
-                    <span class="info-value highlight">Yes - Work Order ${emailData.workOrder} detected</span>
+                    <span class="info-label">Quick Notes:</span>
+                    <span class="info-value highlight">✅ Auto-filled - Add your work details!</span>
                 </div>`;
-            } else {
-                infoHTML += `<div class="info-item">
-                    <span class="info-label">Notes Needed:</span>
-                    <span class="info-value">No - Template response only</span>
+            }
+            
+            // If no useful data found
+            if (!emailData.workOrder && !emailData.storeNumber && !emailData.techName) {
+                infoHTML += `<div class="info-item" style="background: #fff3cd; padding: 10px; border-radius: 6px;">
+                    <span style="color: #856404;">⚠️ <strong>Limited data extracted.</strong> This may be an email thread or formatted in an unexpected way. Consider manually extracting the information.</span>
                 </div>`;
             }
             
             extractedInfoDiv.innerHTML = infoHTML;
-            responseTextarea.value = emailData.response;
+            
+            // Display suggested templates
+            let templatesHTML = '';
+            if (emailData.suggestedTemplates && emailData.suggestedTemplates.length > 0) {
+                templatesHTML += '<div style="margin-bottom: 10px;"><strong>Based on the email content, consider these DAE templates:</strong></div>';
+                emailData.suggestedTemplates.forEach((template, index) => {
+                    const priority = index === 0 ? '⭐ Primary' : '💡 Alternative';
+                    templatesHTML += `<div style="background: white; padding: 10px; margin-bottom: 8px; border-radius: 4px; border-left: 4px solid ${index === 0 ? '#4caf50' : '#2196f3'};">
+                        <div style="font-weight: bold; margin-bottom: 4px;">${priority}: ${template.name}</div>
+                        <div style="font-size: 0.9em; color: #666; margin-bottom: 6px;">${template.description}</div>
+                        <div style="font-size: 0.85em; color: #999;">Keywords detected: ${template.keywords.join(', ')}</div>
+                    </div>`;
+                });
+            } else {
+                templatesHTML = `<div style="color: #666;">
+                    ℹ️ No specific DAE template detected. Review the email and choose the appropriate response template based on the tech's request.
+                </div>`;
+            }
+            
+            templatesDiv.innerHTML = templatesHTML;
             analysisDiv.style.display = 'block';
             
-            showNotification('✅ Email processed successfully!', 'success', 3000);
+            showNotification('✅ Information extracted!', 'success', 3000);
         }
 
         function populateMainForm(emailData) {
@@ -9411,39 +9517,12 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             });
         }
 
-        function copyEmailResponse() {
-            const responseTextarea = document.getElementById('generated-response');
-            const responseText = responseTextarea.value;
-            
-            if (!responseText) {
-                showNotification('❌ No response to copy', 'error', 2000);
-                return;
-            }
-            
-            navigator.clipboard.writeText(responseText).then(() => {
-                showNotification('📋 Email response copied to clipboard!', 'success', 3000);
-            }).catch(() => {
-                showNotification('❌ Failed to copy response', 'error', 3000);
-            });
-        }
-
-        function editResponse() {
-            const responseTextarea = document.getElementById('generated-response');
-            responseTextarea.readOnly = false;
-            responseTextarea.style.backgroundColor = '#fff3cd';
-            responseTextarea.focus();
-            
-            showNotification('✏️ Response is now editable', 'info', 2000);
-        }
-
         function clearEmailProcessor() {
             document.getElementById('email-subject').value = '';
             document.getElementById('email-body').value = '';
             document.getElementById('email-analysis').style.display = 'none';
-            document.getElementById('generated-response').readOnly = true;
-            document.getElementById('generated-response').style.backgroundColor = '';
             
-            showNotification('🗑️ Email processor cleared', 'success', 2000);
+            showNotification('🗑️ Email extractor cleared', 'success', 2000);
         }
 
         // Dev-only email analysis function
@@ -9734,7 +9813,13 @@ verified in {SYSTEM}
             generateRackStatus(racks, format) {
                 switch(format) {
                     case 'detailed':
-                        return racks.map(rack => `  ${rack.name}: ${rack.status}`).join('\\n');
+                        return racks.map(rack => {
+                            let line = `  ${rack.name}: ${rack.status}`;
+                            if (rack.details && rack.details.trim()) {
+                                line += ` - ${rack.details}`;
+                            }
+                            return line;
+                        }).join('\\n');
                         
                     case 'condensed':
                         const noAlarmRacks = racks.filter(r => r.status === 'No Alarms');
@@ -9745,16 +9830,41 @@ verified in {SYSTEM}
                             result += `${noAlarmRacks.map(r => r.name).join('/')}-No Alarms on monitored assets\\n`;
                         }
                         if (alarmRacks.length > 0) {
-                            result += alarmRacks.map(r => `${r.name} in alarm (${r.status})`).join('\\n');
+                            result += alarmRacks.map(r => {
+                                let line = `${r.name} in alarm (${r.status})`;
+                                if (r.details && r.details.trim()) {
+                                    line += ` - ${r.details}`;
+                                }
+                                return line;
+                            }).join('\\n');
                         }
                         return result;
                         
                     case 'simple':
                         const hasAlarms = racks.some(r => r.status !== 'No Alarms');
-                        return hasAlarms ? 'Alarms Found' : 'No Alarms Found';
+                        if (hasAlarms) {
+                            const alarmDetails = racks
+                                .filter(r => r.status !== 'No Alarms')
+                                .map(r => {
+                                    let line = `${r.name}: ${r.status}`;
+                                    if (r.details && r.details.trim()) {
+                                        line += ` - ${r.details}`;
+                                    }
+                                    return line;
+                                })
+                                .join(', ');
+                            return alarmDetails;
+                        }
+                        return 'No Alarms Found';
                         
                     default:
-                        return racks.map(rack => `${rack.name}: ${rack.status}`).join('\\n');
+                        return racks.map(rack => {
+                            let line = `${rack.name}: ${rack.status}`;
+                            if (rack.details && rack.details.trim()) {
+                                line += ` - ${rack.details}`;
+                            }
+                            return line;
+                        }).join('\\n');
                 }
             },
             
@@ -9998,6 +10108,7 @@ verified in {SYSTEM}
             
             updateProgress();
             loadCurrentStore();
+            updateNavigationButtons();
             
             showNotification(`🚀 War Room check started: ${WAR_ROOM_SYSTEM.state.assignedStores.length} stores`, 'success', 3000);
         }
@@ -10016,53 +10127,103 @@ verified in {SYSTEM}
             const currentStore = WAR_ROOM_SYSTEM.state.assignedStores[WAR_ROOM_SYSTEM.state.currentStoreIndex];
             document.getElementById('current-store').textContent = currentStore || '----';
             
-            // Auto-detect control system for known sites
-            const knownSystem = WAR_ROOM_SYSTEM.getSystemForSite(currentStore);
-            const systemSelect = document.getElementById('control-system');
+            // Check if we have previously saved data for this store (current session first, then localStorage)
+            let savedStoreData = WAR_ROOM_SYSTEM.state.storeResults.find(s => s.store === currentStore);
+            let dataSource = 'session';
             
-            if (knownSystem) {
-                systemSelect.value = knownSystem;
-                generateRackInterface(knownSystem);
-                showNotification(`🎯 Auto-detected: ${currentStore} uses ${knownSystem}`, 'info', 3000);
-            } else {
-                // Reset form for unknown sites
-                systemSelect.value = '';
-                document.getElementById('rack-list').innerHTML = '<p>Select a control system to see available racks/components</p>';
+            if (!savedStoreData) {
+                // No data in current session, check localStorage
+                const persistentData = loadRackDataFromLocalStorage(currentStore);
+                if (persistentData) {
+                    savedStoreData = persistentData;
+                    dataSource = 'localStorage';
+                }
             }
             
-            // Render work orders for this store (starts empty)
+            const systemSelect = document.getElementById('control-system');
+            
+            if (savedStoreData) {
+                // Restore previously saved data
+                systemSelect.value = savedStoreData.system;
+                generateRackInterface(savedStoreData.system);
+                const source = dataSource === 'localStorage' ? ' (from previous check)' : '';
+                showNotification(`📋 Loaded saved data for Store ${currentStore}${source}`, 'info', 3000);
+            } else {
+                // Auto-detect control system for known sites (first visit)
+                const knownSystem = WAR_ROOM_SYSTEM.getSystemForSite(currentStore);
+                
+                if (knownSystem) {
+                    systemSelect.value = knownSystem;
+                    generateRackInterface(knownSystem);
+                    showNotification(`🎯 Auto-detected: ${currentStore} uses ${knownSystem}`, 'info', 3000);
+                } else {
+                    // Reset form for unknown sites
+                    systemSelect.value = '';
+                    document.getElementById('rack-list').innerHTML = '<p>Select a control system to see available racks/components</p>';
+                }
+            }
+            
+            // Render work orders for this store
             renderWorkOrders();
         }
         
         function generateRackInterface(system) {
             const racks = WAR_ROOM_SYSTEM.systemRacks[system] || [];
             const rackListElement = document.getElementById('rack-list');
+            const currentStore = WAR_ROOM_SYSTEM.state.assignedStores[WAR_ROOM_SYSTEM.state.currentStoreIndex];
             
             if (racks.length === 0) {
                 rackListElement.innerHTML = '<p>No predefined racks for this system. Use "Add Custom Rack" button.</p>';
                 return;
             }
             
-            rackListElement.innerHTML = racks.map(rack => `
+            // Check for saved data: First check current session, then localStorage
+            let savedStoreData = WAR_ROOM_SYSTEM.state.storeResults.find(s => s.store === currentStore);
+            
+            if (!savedStoreData) {
+                // No data in current session, check localStorage
+                const persistentData = loadRackDataFromLocalStorage(currentStore);
+                if (persistentData && persistentData.system === system) {
+                    savedStoreData = persistentData;
+                    console.log('📂 Loaded data from localStorage for store:', currentStore);
+                }
+            }
+            
+            console.log('🔍 Generating rack interface for store:', currentStore);
+            console.log('📦 Saved store data:', savedStoreData);
+            
+            rackListElement.innerHTML = racks.map(rack => {
+                // Find saved rack data if it exists
+                const savedRack = savedStoreData?.racks?.find(r => r.name === rack);
+                const savedStatus = savedRack?.status || 'No Alarms';
+                const savedDetails = savedRack?.details || '';
+                
+                console.log(`  📍 Rack ${rack}: status="${savedStatus}", details="${savedDetails}"`);
+                
+                return `
                 <div class="rack-item">
                     <label>${rack}:</label>
                     <select name="rack-${rack}" onchange="toggleRackDetails('${rack}', this.value)">
-                        <option value="No Alarms">No Alarms</option>
-                        <option value="Alarm Found">Alarm Found</option>
-                        <option value="Not Monitored">Not Monitored</option>
-                        <option value="System Down">System Down</option>
+                        <option value="No Alarms" ${savedStatus === 'No Alarms' ? 'selected' : ''}>No Alarms</option>
+                        <option value="Alarm Found" ${savedStatus === 'Alarm Found' ? 'selected' : ''}>Alarm Found</option>
+                        <option value="Not Monitored" ${savedStatus === 'Not Monitored' ? 'selected' : ''}>Not Monitored</option>
+                        <option value="System Down" ${savedStatus === 'System Down' ? 'selected' : ''}>System Down</option>
                     </select>
-                    <input type="text" placeholder="Alarm details (if any)" name="rack-${rack}-details" style="display: none;">
+                    <textarea placeholder="Describe alarm details here..." 
+                              name="rack-${rack}-details" 
+                              style="display: ${savedStatus === 'Alarm Found' ? 'block' : 'none'};"
+                              rows="5">${savedDetails}</textarea>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
         
         function toggleRackDetails(rackName, status) {
-            const detailsInput = document.querySelector(`input[name="rack-${rackName}-details"]`);
-            if (detailsInput) {
-                detailsInput.style.display = (status === 'Alarm Found') ? 'block' : 'none';
+            const detailsTextarea = document.querySelector(`textarea[name="rack-${rackName}-details"]`);
+            if (detailsTextarea) {
+                detailsTextarea.style.display = (status === 'Alarm Found') ? 'block' : 'none';
                 if (status !== 'Alarm Found') {
-                    detailsInput.value = '';
+                    detailsTextarea.value = '';
                 }
             }
         }
@@ -10081,7 +10242,10 @@ verified in {SYSTEM}
                         <option value="Not Monitored">Not Monitored</option>
                         <option value="System Down">System Down</option>
                     </select>
-                    <input type="text" placeholder="Alarm details (if any)" name="rack-${rackName}-details" style="display: none;">
+                    <textarea placeholder="Describe alarm details here..." 
+                              name="rack-${rackName}-details" 
+                              style="display: none;"
+                              rows="5"></textarea>
                     <button onclick="this.parentElement.remove()" class="danger-button" style="padding: 2px 6px; font-size: 12px;">✕</button>
                 </div>
             `;
@@ -10169,11 +10333,17 @@ verified in {SYSTEM}
             // Collect rack data
             const racks = [];
             const rackSelects = document.querySelectorAll('select[name^="rack-"]');
+            
+            console.log('💾 Saving data for store:', currentStore);
+            console.log('📊 Found rack selects:', rackSelects.length);
+            
             rackSelects.forEach(select => {
                 const rackName = select.name.replace('rack-', '');
                 const status = select.value;
-                const detailsInput = document.querySelector(`input[name="rack-${rackName}-details"]`);
-                const details = detailsInput ? detailsInput.value : '';
+                const detailsTextarea = document.querySelector(`textarea[name="rack-${rackName}-details"]`);
+                const details = detailsTextarea ? detailsTextarea.value.trim() : '';
+                
+                console.log(`  💾 Saving ${rackName}: status="${status}", details="${details}"`);
                 
                 racks.push({
                     name: rackName,
@@ -10196,10 +10366,69 @@ verified in {SYSTEM}
                 hasAlarms: racks.some(r => r.status === 'Alarm Found')
             };
             
+            console.log('📦 Complete store data:', storeData);
+            
+            // Remove old data for this store if it exists (allows editing)
+            WAR_ROOM_SYSTEM.state.storeResults = WAR_ROOM_SYSTEM.state.storeResults.filter(s => s.store !== currentStore);
+            
+            // Add the new/updated data
             WAR_ROOM_SYSTEM.state.storeResults.push(storeData);
+            
+            // PERSIST: Save rack data to localStorage for future War Room checks
+            saveRackDataToLocalStorage(currentStore, system, racks);
+            
+            console.log('✅ Updated storeResults:', WAR_ROOM_SYSTEM.state.storeResults);
             
             showNotification(`✅ Store ${currentStore} data saved`, 'success', 2000);
             nextStore();
+        }
+        
+        // Save rack data to localStorage for persistence across War Room sessions
+        function saveRackDataToLocalStorage(store, system, racks) {
+            try {
+                // Get existing persistent rack data
+                let persistentRackData = JSON.parse(localStorage.getItem('persistentRackData') || '{}');
+                
+                // Update data for this store
+                persistentRackData[store] = {
+                    system: system,
+                    racks: racks,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                // Save back to localStorage
+                localStorage.setItem('persistentRackData', JSON.stringify(persistentRackData));
+                console.log(`💾 Persisted rack data for store ${store} to localStorage`);
+            } catch (error) {
+                console.error('❌ Failed to save rack data to localStorage:', error);
+            }
+        }
+        
+        // Load rack data from localStorage
+        function loadRackDataFromLocalStorage(store) {
+            try {
+                const persistentRackData = JSON.parse(localStorage.getItem('persistentRackData') || '{}');
+                const storeData = persistentRackData[store];
+                
+                if (storeData) {
+                    console.log(`📂 Loaded persistent rack data for store ${store}:`, storeData);
+                    return storeData;
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('❌ Failed to load rack data from localStorage:', error);
+                return null;
+            }
+        }
+        
+        function previousStore() {
+            if (WAR_ROOM_SYSTEM.state.currentStoreIndex > 0) {
+                WAR_ROOM_SYSTEM.state.currentStoreIndex--;
+                updateProgress();
+                loadCurrentStore();
+                updateNavigationButtons();
+            }
         }
         
         function nextStore() {
@@ -10214,12 +10443,68 @@ verified in {SYSTEM}
                 
                 updateProgress();
                 loadCurrentStore();
+                updateNavigationButtons();
+            }
+        }
+        
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prev-store-btn');
+            if (prevBtn) {
+                // Show previous button if not on first store
+                prevBtn.style.display = WAR_ROOM_SYSTEM.state.currentStoreIndex > 0 ? 'inline-block' : 'none';
             }
         }
         
         function skipStore() {
             if (confirm('Skip this store? No data will be recorded.')) {
                 nextStore();
+            }
+        }
+        
+        // Manage War Room persistent data
+        function manageWarRoomData() {
+            try {
+                const persistentRackData = JSON.parse(localStorage.getItem('persistentRackData') || '{}');
+                const storeCount = Object.keys(persistentRackData).length;
+                
+                if (storeCount === 0) {
+                    alert('📋 No saved rack data found.\n\nRack statuses and alarm details will be saved automatically when you complete War Room checks.');
+                    return;
+                }
+                
+                // Build summary message
+                let message = `🗄️ War Room Saved Data\n\n`;
+                message += `You have saved rack data for ${storeCount} store(s):\n\n`;
+                
+                Object.keys(persistentRackData).sort((a, b) => a - b).forEach(store => {
+                    const data = persistentRackData[store];
+                    const alarmsFound = data.racks.filter(r => r.status === 'Alarm Found').length;
+                    const lastUpdated = new Date(data.lastUpdated).toLocaleDateString();
+                    
+                    message += `Store ${store} (${data.system}):\n`;
+                    message += `  • Last updated: ${lastUpdated}\n`;
+                    message += `  • ${data.racks.length} racks tracked\n`;
+                    if (alarmsFound > 0) {
+                        message += `  • ⚠️ ${alarmsFound} alarm(s) saved\n`;
+                    }
+                    message += `\n`;
+                });
+                
+                message += `\nWould you like to:\n`;
+                message += `• OK - Keep this data\n`;
+                message += `• Cancel - Clear all saved data`;
+                
+                if (confirm(message)) {
+                    showNotification('✅ Keeping saved War Room data', 'success', 2000);
+                } else {
+                    if (confirm('⚠️ Are you sure you want to clear all saved rack data?\n\nThis cannot be undone!')) {
+                        localStorage.removeItem('persistentRackData');
+                        showNotification('🗑️ All War Room rack data cleared', 'info', 3000);
+                    }
+                }
+            } catch (error) {
+                console.error('Error managing War Room data:', error);
+                showNotification('❌ Error loading War Room data', 'error', 3000);
             }
         }
         
