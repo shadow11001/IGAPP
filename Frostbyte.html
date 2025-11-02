@@ -3193,15 +3193,6 @@
         <i class="fas fa-sun" id="theme-toggle-icon" aria-hidden="true"></i>
     </button>
     
-    <button class="update-button-bottom" aria-label="Check for Updates" onclick="checkForUpdates()" id="update-btn" tabindex="0">
-        <i class="fas fa-sync-alt" id="update-icon" aria-hidden="true"></i>
-        <span>Check for Updates</span>
-    </button>
-    
-    <button class="theme-toggle" aria-label="Check for Updates" onclick="checkForUpdates()" id="update-btn-top" tabindex="0" style="right: 80px;">
-        <i class="fas fa-sync-alt" id="update-icon-top" aria-hidden="true"></i>
-    </button>
-    
     <!-- Keyboard Shortcuts Help -->
     <button class="keyboard-help-btn" aria-label="Keyboard Shortcuts" onclick="toggleKeyboardHelp()" id="keyboard-help-btn" tabindex="0">
         <i class="fas fa-keyboard" aria-hidden="true"></i>
@@ -3214,43 +3205,14 @@
     
     <div class="settings-dropdown" id="settings-dropdown">
         <div class="settings-item">
-            <span class="settings-label">🌿 Update Branch</span>
-        </div>
-        <div style="padding: 0 0 10px 0;">
-            <select class="branch-selector" id="branch-selector" onchange="handleBranchChange()">
-                <option value="main">Stable (Recommended)</option>
-                <option value="beta">Beta (Password Required)</option>
-                <option value="dev">Development (Password Required)</option>
-            </select>
-            <div class="branch-info" id="branch-info">Currently using: Stable branch</div>
-        </div>
-        <div class="settings-item">
-            <span class="settings-label">📊 Usage Analytics</span>
-            <div class="settings-toggle" id="analytics-toggle" onclick="toggleUsageReporting()">
-                <div class="settings-toggle-slider"></div>
-            </div>
-        </div>
-        <div class="settings-item">
-            <span class="settings-label">📤 Send Usage Report</span>
-            <button class="settings-test-btn" id="send-report-btn" onclick="sendUsageReport()" title="Send usage report to GitHub">
-                Send Now
-            </button>
-        </div>
-        <div class="settings-item">
-            <span class="settings-label">🔄 Auto Updates</span>
-            <div class="settings-toggle" id="updates-toggle" onclick="toggleAutoUpdateFromSettings()">
-                <div class="settings-toggle-slider"></div>
-            </div>
-        </div>
-        <div class="settings-item">
-            <span class="settings-label">📊 Export Notes Data</span>
-            <button class="settings-test-btn" onclick="exportNotesData()" title="Export all notes data for analysis">
-                Export
-            </button>
-        </div>
-        <div class="settings-item">
             <span class="settings-label">⚠️ Visual Dead Air Warnings</span>
             <div class="settings-toggle" id="visual-warnings-toggle" onclick="toggleVisualDeadAirWarnings()">
+                <div class="settings-toggle-slider"></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <span class="settings-label">🗣️ "You Spoke" Notifications</span>
+            <div class="settings-toggle" id="you-spoke-toggle" onclick="toggleYouSpokeNotifications()">
                 <div class="settings-toggle-slider"></div>
             </div>
         </div>
@@ -3538,13 +3500,13 @@
                         </div>
                         <div class="accordion-content">
                             <div class="button-group">
-                                <button onclick="addQuickNote('Logged into Novar.'); selectSystem('Novar');" class="quick-note-btn" title="Novar Login" data-search="novar login system">Novar</button>
-                                <button onclick="addQuickNote('Logged into Opus Arch.'); selectSystem('Opus Arch');" class="quick-note-btn" title="Opus Arch Login" data-search="opus arch login system">Opus Arch</button>
-                                <button onclick="addQuickNote('Logged into Opus Mag.'); selectSystem('Opus Mag');" class="quick-note-btn" title="Opus Mag Login" data-search="opus mag login system">Opus Mag</button>
-                                <button onclick="addQuickNote('Logged into CPC.'); selectSystem('CPC');" class="quick-note-btn" title="CPC Login" data-search="cpc login system">CPC</button>
-                                <button onclick="addQuickNote('Logged into Danfoss AKA65.'); selectSystem('AKA65');" class="quick-note-btn" title="Danfoss AKA65 Login" data-search="danfoss aka65 aka login system">AKA65</button>
-                                <button onclick="addQuickNote('Logged into Danfoss Storeview.'); selectSystem('Storeview');" class="quick-note-btn" title="Danfoss Storeview Login" data-search="danfoss storeview login system">Storeview</button>
-                                <button onclick="addQuickNote('Did not login to an EMS.'); selectSystem('None');" class="quick-note-btn" title="No EMS Login" data-search="none no login ems">None</button>
+                                <button onclick="selectSystem('Novar');" class="quick-note-btn" title="Novar Login" data-search="novar login system">Novar</button>
+                                <button onclick="selectSystem('Opus Arch');" class="quick-note-btn" title="Opus Arch Login" data-search="opus arch login system">Opus Arch</button>
+                                <button onclick="selectSystem('Opus Mag');" class="quick-note-btn" title="Opus Mag Login" data-search="opus mag login system">Opus Mag</button>
+                                <button onclick="selectSystem('CPC');" class="quick-note-btn" title="CPC Login" data-search="cpc login system">CPC</button>
+                                <button onclick="selectSystem('AKA65');" class="quick-note-btn" title="Danfoss AKA65 Login" data-search="danfoss aka65 aka login system">AKA65</button>
+                                <button onclick="selectSystem('Storeview');" class="quick-note-btn" title="Danfoss Storeview Login" data-search="danfoss storeview login system">Storeview</button>
+                                <button onclick="selectSystem('None');" class="quick-note-btn" title="No EMS Login" data-search="none no login ems">None</button>
                             </div>
                         </div>
                     </div>
@@ -3870,7 +3832,6 @@
                             <div class="email-controls">
                                 <button onclick="processEmail()" class="primary-button">🔍 Extract Info</button>
                                 <button onclick="clearEmailProcessor()" class="danger-button">Clear</button>
-                                <button id="dev-email-analysis-btn" onclick="submitEmailForAnalysis()" class="dev-analysis-button" style="display: none;" title="Submit email for analysis (Dev only)">🧪 Analyze Email (Dev)</button>
                             </div>
                         </div>
                         
@@ -3922,6 +3883,10 @@
                                 
                                 <label>
                                     <input type="checkbox" id="include-wo-section" checked> Include Work Orders Section
+                                </label>
+                                
+                                <label>
+                                    <input type="checkbox" id="include-summary-section" checked> Include War Room Summary
                                 </label>
                                 
                                 <label>Custom Template:</label>
@@ -3977,9 +3942,13 @@
                                     <label>Control System:</label>
                                     <select id="control-system" onchange="generateRackInterface(this.value)">
                                         <option value="">Select System...</option>
-                                        <option value="Carel Boss">Carel Boss</option>
-                                        <option value="Danfoss">Danfoss</option>
+                                        <option value="Novar">Novar</option>
+                                        <option value="Opus Arch">Opus Arch</option>
+                                        <option value="Opus Mag">Opus Mag</option>
                                         <option value="CPC">CPC</option>
+                                        <option value="AKA65">AKA65 (Danfoss)</option>
+                                        <option value="Danfoss">Danfoss</option>
+                                        <option value="Carel Boss">Carel Boss</option>
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
@@ -4002,7 +3971,7 @@
                                 
                                 <div class="store-controls">
                                     <button id="prev-store-btn" onclick="previousStore()" class="secondary-button" style="display: none;">⬅️ Previous Store</button>
-                                    <button onclick="saveStoreData()" class="success-button">✅ Save & Continue</button>
+                                    <button onclick="saveAndContinue()" class="success-button">✅ Save & Continue</button>
                                     <button onclick="skipStore()" class="warning-button">⏭️ Skip Store</button>
                                 </div>
                             </div>
@@ -4036,7 +4005,6 @@
                     <span id="timer-display">00:00</span>
                     <div class="timer-controls">
                         <button class="timer-btn" onclick="resetTimer()" title="I Spoke / Reset">🗣</button>
-                        <button class="timer-btn" onclick="toggleAutoStart()" title="Toggle Auto-Start">🤖</button>
                     </div>
                     <div class="mic-level-container" id="mic-level-container" style="display: none;">
                         <div class="mic-level-bar">
@@ -4140,29 +4108,20 @@
             speakerAnalyser: null,
             micActive: false,
             callDetected: false,
-            autoStartEnabled: true,
             loudSoundThreshold: 80, // Higher threshold for call detection (speakers)
             speechThreshold: 25,    // Lower threshold for voice detection (microphone)
             selectedTags: new Set(),
             sessionInfractions: 0,  // Resets each call
             totalInfractions: 0,    // Persists across calls
             deadAirThreshold: 30,   // Seconds before infraction
-            currentVersion: '1.2.3', // Update this when you make changes
-            githubRepo: 'shadow11001/Frostbyte',
-            githubToken: null, // Will be decoded from masked token
-            autoUpdateEnabled: true,
-            // Masked GitHub token (Base64 + simple XOR obfuscation)
-            // Your encoded token is now configured
-            maskedToken: 'TUNeQl9IdVpLXnUbG2toGRh4bHsaa1ITZ2hMa0dhYWIYdVtvR2saeRx5cEwTYGRsa2hrGh5NR01MT2caWXlMYmhde2tsa3NoHkNZXm54YB5pYxhtGGxpbx5cUEZN', // Your encoded token
+            currentVersion: '2.0.0', // Update this when you make changes
             
-            // Usage tracking for analytics
+            // Minimal usage tracking for timer functionality only (analytics removed)
             usageTracking: {
-                buttonClicks: {},
-                notePatterns: [],
-                sessionStart: Date.now(),
-                lastReport: null,
-                userHash: null,
-                reportingEnabled: true
+                onCall: false,
+                focusStart: null,
+                windowFocused: true,
+                totalFocusTime: 0
             },
             
             // Branch management
@@ -4194,6 +4153,7 @@
             
             // Visual dead air warnings
             visualDeadAirWarnings: true,
+            youSpokeNotifications: true,
             
             // Microphone sensitivity and level tracking
             micSensitivity: 25, // Default speech threshold
@@ -4281,12 +4241,6 @@
                         
                         if (!db.objectStoreNames.contains('settings')) {
                             db.createObjectStore('settings', { keyPath: 'key' });
-                        }
-                        
-                        if (!db.objectStoreNames.contains('analytics')) {
-                            const analyticsStore = db.createObjectStore('analytics', { keyPath: 'id', autoIncrement: true });
-                            analyticsStore.createIndex('timestamp', 'timestamp', { unique: false });
-                            analyticsStore.createIndex('event_type', 'event_type', { unique: false });
                         }
                         
                         console.log('IndexedDB schema created/upgraded');
@@ -4417,66 +4371,6 @@
                 }
             },
             
-            // Log analytics data to IndexedDB
-            async logAnalytics(eventType, eventData) {
-                if (!this.isEnabled || !this.db) return false;
-                
-                try {
-                    return new Promise((resolve, reject) => {
-                        const transaction = this.db.transaction(['analytics'], 'readwrite');
-                        const store = transaction.objectStore('analytics');
-                        
-                        const request = store.add({
-                            event_type: eventType,
-                            event_data: JSON.stringify(eventData),
-                            timestamp: new Date().toISOString()
-                        });
-                        
-                        request.onsuccess = () => {
-                            console.log(`Analytics logged: ${eventType}`);
-                            resolve(true);
-                        };
-                        
-                        request.onerror = () => {
-                            console.error('Failed to log analytics to IndexedDB:', request.error);
-                            reject(request.error);
-                        };
-                    });
-                } catch (error) {
-                    console.error('Failed to log analytics to IndexedDB:', error);
-                    return false;
-                }
-            },
-            
-            // Log sync operations to IndexedDB
-            async logSync(operation, tableName, recordId, success, errorMessage = null) {
-                if (!this.isEnabled || !this.db) return;
-                
-                try {
-                    return new Promise((resolve, reject) => {
-                        const transaction = this.db.transaction(['analytics'], 'readwrite');
-                        const store = transaction.objectStore('analytics');
-                        
-                        const request = store.add({
-                            event_type: 'sync_operation',
-                            event_data: JSON.stringify({
-                                operation,
-                                table_name: tableName,
-                                record_id: recordId,
-                                success,
-                                error_message: errorMessage
-                            }),
-                            timestamp: new Date().toISOString()
-                        });
-                        
-                        request.onsuccess = () => resolve();
-                        request.onerror = () => reject(request.error);
-                    });
-                } catch (error) {
-                    console.error('Failed to log sync operation:', error);
-                }
-            },
-            
             // Sync data from localStorage to IndexedDB
             async syncFromLocalStorage() {
                 if (!this.isEnabled || !this.db) return false;
@@ -4573,38 +4467,26 @@
                     const notes = await this.loadNotes();
                     
                     return new Promise((resolve) => {
-                        const transaction = this.db.transaction(['settings', 'analytics'], 'readonly');
+                        const transaction = this.db.transaction(['settings'], 'readonly');
                         
                         const settingsStore = transaction.objectStore('settings');
-                        const analyticsStore = transaction.objectStore('analytics');
-                        
                         const settingsRequest = settingsStore.count();
-                        const analyticsRequest = analyticsStore.count();
-                        
-                        let settingsCount = 0;
-                        let analyticsCount = 0;
-                        let completed = 0;
                         
                         settingsRequest.onsuccess = () => {
-                            settingsCount = settingsRequest.result;
-                            completed++;
-                            if (completed === 2) finish();
-                        };
-                        
-                        analyticsRequest.onsuccess = () => {
-                            analyticsCount = analyticsRequest.result;
-                            completed++;
-                            if (completed === 2) finish();
-                        };
-                        
-                        function finish() {
                             resolve({
                                 totalNotes: notes.length,
-                                totalSettings: settingsCount,
-                                totalAnalytics: analyticsCount,
+                                totalSettings: settingsRequest.result,
                                 lastUpdated: new Date().toISOString()
                             });
-                        }
+                        };
+                        
+                        settingsRequest.onerror = () => {
+                            resolve({
+                                totalNotes: notes.length,
+                                totalSettings: 0,
+                                lastUpdated: new Date().toISOString()
+                            });
+                        };
                     });
                 } catch (error) {
                     console.error('Failed to get database statistics:', error);
@@ -4878,7 +4760,9 @@
             updateTimerDisplay();
             updateTimerVisuals();
             stopTabFlash(); // Stop flashing when reset
-            showNotification('Timer reset - You spoke!', 'success', 1000);
+            if (AppState.youSpokeNotifications) {
+                showNotification('Timer reset - You spoke!', 'success', 1000);
+            }
         }
 
         function updateTimer() {
@@ -5033,49 +4917,9 @@
                 console.log('Audio context created, starting voice detection...');
                 startVoiceDetection();
                 
-                // Try to get speaker/system audio for call detection
-                initializeSpeakerDetection();
-                
             } catch (error) {
                 console.error('Microphone initialization failed:', error);
                 showNotification('Microphone access denied - Using manual controls only', 'error', 3000);
-            }
-        }
-
-        async function initializeSpeakerDetection() {
-            try {
-                // Try to capture system audio (speakers) - this requires screen sharing permission
-                AppState.speakerStream = await navigator.mediaDevices.getDisplayMedia({
-                    video: false,
-                    audio: {
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false,
-                        systemAudio: 'include'  // Try to include system audio
-                    }
-                });
-                
-                // Check if we actually got audio
-                const audioTracks = AppState.speakerStream.getAudioTracks();
-                if (audioTracks.length === 0) {
-                    throw new Error('No audio tracks in display media');
-                }
-                
-                AppState.speakerAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-                AppState.speakerAnalyser = AppState.speakerAudioContext.createAnalyser();
-                const speakerSource = AppState.speakerAudioContext.createMediaStreamSource(AppState.speakerStream);
-                speakerSource.connect(AppState.speakerAnalyser);
-                
-                AppState.speakerAnalyser.fftSize = 512;
-                AppState.speakerAnalyser.smoothingTimeConstant = 0.3;
-                
-                startCallDetection();
-                showNotification('� Speaker audio enabled - Auto call detection active!', 'success', 3000);
-                
-            } catch (error) {
-                console.warn('Speaker audio access not available:', error);
-                showNotification('🔊 Speaker detection unavailable - Manual start only', 'error', 3000);
-                // Fall back to manual controls only
             }
         }
 
@@ -5113,54 +4957,6 @@
             
             detectVoice();
             showNotification('🎤 Voice detection active', 'success', 2000);
-        }
-
-        function startCallDetection() {
-            const bufferLength = AppState.speakerAnalyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            let loudSoundCount = 0;
-            let lastLoudSoundTime = 0;
-            
-            function detectCall() {
-                if (!AppState.speakerAnalyser) return;
-                
-                AppState.speakerAnalyser.getByteFrequencyData(dataArray);
-                const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
-                const currentTime = Date.now();
-                
-                // Detect loud sounds from speakers (beep + announcement)
-                const isLoudSound = average > AppState.loudSoundThreshold;
-                
-                // Auto-start timer when call is detected
-                if (!AppState.callDetected && AppState.autoStartEnabled) {
-                    if (isLoudSound) {
-                        loudSoundCount++;
-                        lastLoudSoundTime = currentTime;
-                        
-                        // If we detect sustained loud audio (beep + announcement)
-                        if (loudSoundCount >= 3 && !AppState.timerRunning) {
-                            AppState.callDetected = true;
-                            startTimer();
-                            showNotification('📞 Call detected - Timer started automatically!', 'success', 3000);
-                        }
-                    } else {
-                        // Reset if silence for too long
-                        if (currentTime - lastLoudSoundTime > 3000) {
-                            loudSoundCount = 0;
-                        }
-                    }
-                }
-                
-                requestAnimationFrame(detectCall);
-            }
-            
-            detectCall();
-        }
-
-        function toggleAutoStart() {
-            AppState.autoStartEnabled = !AppState.autoStartEnabled;
-            const status = AppState.autoStartEnabled ? 'enabled' : 'disabled';
-            showNotification(`Auto-start on call detection ${status}`, 'success', 2000);
         }
 
         function resetCallDetection() {
@@ -5320,1688 +5116,6 @@
             return btoa(xored);
         }
 
-        function decodeToken(maskedToken) {
-            try {
-                const key = 42; // Same XOR key
-                const decoded = atob(maskedToken);
-                const result = decoded.split('').map(char => 
-                    String.fromCharCode(char.charCodeAt(0) ^ key)
-                ).join('');
-                return result;
-            } catch (error) {
-                console.error('Token decode failed:', error);
-                return null;
-            }
-        }
-
-        function initializeGitHubToken() {
-            // Try to decode the masked token first
-            if (AppState.maskedToken && AppState.maskedToken !== 'Z2hwX0VYQU1QTEVfVE9LRU5fUkVQTEFDRV9NRQ==') {
-                const decodedToken = decodeToken(AppState.maskedToken);
-                
-                if (decodedToken && decodedToken.length > 10) { // More flexible check
-                    AppState.githubToken = decodedToken;
-                    return;
-                } else {
-                    console.error('❌ Failed to decode masked token or token is invalid');
-                }
-            }
-            
-            // Fall back to saved token in localStorage
-            const savedToken = localStorage.getItem('githubToken');
-            if (savedToken) {
-                AppState.githubToken = savedToken;
-                console.log('GitHub token loaded from localStorage');
-            } else {
-                console.log('No GitHub token found in localStorage either');
-            }
-        }
-        // Version comparison utility
-        function isNewerVersion(remote, current) {
-            const parseVersion = (v) => v.split('.').map(n => parseInt(n) || 0);
-            const [rMajor, rMinor, rPatch] = parseVersion(remote);
-            const [cMajor, cMinor, cPatch] = parseVersion(current);
-            
-            if (rMajor > cMajor) return true;
-            if (rMajor < cMajor) return false;
-            if (rMinor > cMinor) return true;
-            if (rMinor < cMinor) return false;
-            return rPatch > cPatch;
-        }
-
-        async function checkForUpdates() {
-            if (!AppState.autoUpdateEnabled) return;
-            
-            const updateBtn = document.getElementById('update-btn');
-            const updateIcon = document.getElementById('update-icon');
-            const updateBtnTop = document.getElementById('update-btn-top');
-            const updateIconTop = document.getElementById('update-icon-top');
-            
-            // Add visual feedback to both buttons
-            if (updateBtn && updateIcon) {
-                updateBtn.disabled = true;
-                updateIcon.classList.add('fa-spin');
-                updateBtn.style.opacity = '0.7';
-            }
-            if (updateBtnTop && updateIconTop) {
-                updateBtnTop.disabled = true;
-                updateIconTop.classList.add('fa-spin');
-                updateBtnTop.style.opacity = '0.7';
-            }
-            
-            try {
-                console.log('Checking for updates...');
-                console.log('GitHub Repo:', AppState.githubRepo);
-                showNotification('Checking for updates...', 'info');
-                
-                // Try multiple possible file names (case sensitivity) for current branch
-                const fileName = 'Frostbyte.html';
-                const branch = AppState.currentBranch;
-                
-                // Construct API URL for specific branch
-                let apiUrl;
-                if (branch === 'main') {
-                    apiUrl = `https://api.github.com/repos/${AppState.githubRepo}/contents/${fileName}`;
-                } else {
-                    apiUrl = `https://api.github.com/repos/${AppState.githubRepo}/contents/${fileName}?ref=${branch}`;
-                }
-                
-                console.log('Trying API URL:', apiUrl);
-                console.log('Using branch:', branch);
-                    
-                    // Headers for API request - Updated to latest GitHub API standards
-                    const headers = {
-                        'Accept': 'application/vnd.github+json',
-                        'User-Agent': 'Frostbyte-AutoUpdater',
-                        'X-GitHub-Api-Version': '2022-11-28'
-                    };
-                    
-                    // Add authentication for private repo
-                    if (AppState.githubToken) {
-                        headers['Authorization'] = `Bearer ${AppState.githubToken}`;
-                    } else {
-                        console.warn('No GitHub token available for private repo access');
-                    }
-                    
-                response = await fetch(apiUrl, { headers });
-                
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        console.log(`❌ File not found: ${fileName} on ${branch} branch`);
-                        showNotification(`📁 File not found on ${branch} branch`, 'error', 5000);
-                        return;
-                    } else {
-                        // Non-404 error, handle it
-                        const errorText = await response.text();
-                        console.error('API Error Response:', errorText);
-                        
-                        if (response.status === 401) {
-                            showNotification('🔒 Authentication failed - Check your GitHub token', 'error', 5000);
-                            return;
-                        } else if (response.status === 403) {
-                            showNotification('🔒 Access forbidden - Token may lack required permissions', 'error', 5000);
-                            return;
-                        }
-                        throw new Error(`HTTP ${response.status}: ${errorText}`);
-                    }
-                }
-                
-                console.log(`✅ Found file: ${fileName} on ${branch} branch`);
-                
-                data = await response.json();
-                
-                // Properly decode UTF-8 content from GitHub API
-                let remoteContent;
-                if (data.encoding === 'base64') {
-                    // GitHub returns base64-encoded content
-                    const base64Content = data.content.replace(/\s/g, '');
-                    
-                    try {
-                        // Use proper UTF-8 decoding instead of atob
-                        const binaryString = atob(base64Content);
-                        const bytes = new Uint8Array(binaryString.length);
-                        for (let i = 0; i < binaryString.length; i++) {
-                            bytes[i] = binaryString.charCodeAt(i);
-                        }
-                        remoteContent = new TextDecoder('utf-8').decode(bytes);
-                    } catch (decodeError) {
-                        console.error('UTF-8 decode failed, falling back to atob:', decodeError);
-                        remoteContent = atob(base64Content);
-                    }
-                } else {
-                    // Content is not base64 encoded
-                    remoteContent = data.content;
-                }
-                
-                // Extract version from remote content
-                const versionMatch = remoteContent.match(/currentVersion:\s*['"`]([^'"`]+)['"`]/);
-                const remoteVersion = versionMatch ? versionMatch[1] : null;
-                
-                if (remoteVersion && isNewerVersion(remoteVersion, AppState.currentVersion)) {
-                    showUpdateAvailable(remoteVersion, remoteContent);
-                } else {
-                    console.log('App is up to date');
-                    showNotification('✅ App is up to date', 'success', 2000);
-                    // Hide the static update button since no update is available
-                    const staticUpdateBtn = document.getElementById('update-btn');
-                    if (staticUpdateBtn) {
-                        staticUpdateBtn.style.display = 'none';
-                    }
-                }
-                
-            } catch (error) {
-                console.warn('Update check failed:', error);
-                showNotification('⚠️ Update check failed - Check connection', 'error', 3000);
-            } finally {
-                // Reset button state for both buttons
-                if (updateBtn && updateIcon) {
-                    updateBtn.disabled = false;
-                    updateIcon.classList.remove('fa-spin');
-                    updateBtn.style.opacity = '1';
-                }
-                if (updateBtnTop && updateIconTop) {
-                    updateBtnTop.disabled = false;
-                    updateIconTop.classList.remove('fa-spin');
-                    updateBtnTop.style.opacity = '1';
-                }
-            }
-        }
-
-        function showUpdateAvailable(newVersion, newContent) {
-            const updateMessage = `🚀 Update available: v${newVersion} (current: v${AppState.currentVersion})`;
-            showNotification(updateMessage, 'success', 10000);
-            
-            // Show the static update button
-            const staticUpdateBtn = document.getElementById('update-btn');
-            if (staticUpdateBtn) {
-                staticUpdateBtn.style.display = 'flex';
-                staticUpdateBtn.innerHTML = `<i class="fas fa-sync-alt" id="update-icon" aria-hidden="true"></i><span>Update to v${newVersion}</span>`;
-                // Store the update data for when the button is clicked
-                staticUpdateBtn.onclick = () => showUpdateOptions(newVersion, newContent);
-            }
-            
-            // Store update data globally for top button as well
-            const staticUpdateBtnTop = document.getElementById('update-btn-top');
-            if (staticUpdateBtnTop) {
-                staticUpdateBtnTop.onclick = () => showUpdateOptions(newVersion, newContent);
-            }
-        }
-
-        function showUpdateOptions(newVersion, newContent) {
-            // Remove existing dynamic update buttons if present
-            const existingCopyBtn = document.querySelector('.dynamic-update-button');
-            const existingDownloadBtn = document.getElementById('dynamic-update-btn');
-            const existingInstructions = document.querySelector('.update-instructions');
-            
-            if (existingCopyBtn) existingCopyBtn.remove();
-            if (existingDownloadBtn) existingDownloadBtn.remove();
-            if (existingInstructions) existingInstructions.remove();
-            
-            // Don't show button if already up to date
-            if (!isNewerVersion(newVersion, AppState.currentVersion)) {
-                return;
-            }
-            
-            // Create primary copy button (better for preserving encoding)
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'dynamic-update-button';
-            copyBtn.innerHTML = `📋 Copy v${newVersion} Code`;
-            copyBtn.onclick = () => copyUpdateToClipboard(newContent, newVersion);
-            copyBtn.setAttribute('aria-label', `Copy version ${newVersion} code to clipboard`);
-            
-            // Create alternative download button
-            const downloadBtn = document.createElement('button');
-            downloadBtn.id = 'dynamic-update-btn';
-            downloadBtn.className = 'dynamic-update-button-alt';
-            downloadBtn.innerHTML = `💾 Download v${newVersion}`;
-            downloadBtn.onclick = () => applyUpdate(newContent, newVersion);
-            downloadBtn.setAttribute('aria-label', `Download application version ${newVersion}`);
-            
-            // Add to page
-            document.body.appendChild(copyBtn);
-            document.body.appendChild(downloadBtn);
-        }
-
-        function copyUpdateToClipboard(newContent, newVersion) {
-            // Add UTF-8 BOM to preserve encoding
-            const utf8BOM = '\uFEFF';
-            const contentWithBOM = utf8BOM + newContent;
-            
-            navigator.clipboard.writeText(contentWithBOM).then(() => {
-                showNotification(`📋 v${newVersion} code copied to clipboard!`, 'success', 5000);
-                
-                // Show enhanced instructions
-                const instructions = `
-Instructions for manual update (PRESERVES EMOJIS):
-
-METHOD 1 - Direct Replacement:
-1. Right-click this HTML file in your file manager
-2. Open with a text editor (Notepad++, VS Code, etc.)
-3. Select All (Ctrl+A) and Delete
-4. Paste the new code (Ctrl+V)
-5. Save (Ctrl+S) - MAKE SURE TO SAVE AS UTF-8 ENCODING
-6. Refresh this page (F5)
-
-METHOD 2 - Alternative:
-1. Create a new file named "Frostbyte_new.html"
-2. Paste the copied code into it
-3. Save as UTF-8 encoding
-4. Replace your current file with the new one
-5. Refresh
-
-IMPORTANT: Make sure your text editor saves as UTF-8 to preserve emojis!
-
-This method preserves all icons and emojis correctly.
-                `.trim();
-                
-                alert(instructions);
-                
-                // Remove update UI
-                const copyBtn = document.querySelector('.dynamic-update-button');
-                if (copyBtn) copyBtn.remove();
-                const downloadBtn = document.getElementById('dynamic-update-btn');
-                if (downloadBtn) downloadBtn.remove();
-                const inst = document.querySelector('.update-instructions');
-                if (inst) inst.remove();
-                
-            }).catch(() => {
-                showNotification('❌ Failed to copy to clipboard', 'error', 3000);
-            });
-        }
-
-        // Temporary export function for notes analysis
-        function exportNotesData() {
-            try {
-                // Debug: Check all localStorage keys
-                const allLocalStorageKeys = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    allLocalStorageKeys.push(localStorage.key(i));
-                }
-                
-                // Try different possible localStorage keys
-                const possibleKeys = ['savedNotes', 'notes', 'history', 'formData', 'frostbyte_notes', 'notesHistory', 'dashboard_advanced_settings_tracking'];
-                const foundData = {};
-                
-                possibleKeys.forEach(key => {
-                    try {
-                        const data = localStorage.getItem(key);
-                        if (data) {
-                            foundData[key] = JSON.parse(data);
-                        }
-                    } catch (e) {
-                        foundData[key] = localStorage.getItem(key); // Store as string if not JSON
-                    }
-                });
-                
-                // Collect all notes data - check both possible locations
-                let savedNotesData = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-                const notesHistoryData = JSON.parse(localStorage.getItem('notesHistory') || '[]');
-                
-                // Use notesHistory if savedNotes is empty but notesHistory has data
-                if (savedNotesData.length === 0 && notesHistoryData.length > 0) {
-                    savedNotesData = notesHistoryData;
-                }
-                
-                const exportData = {
-                    timestamp: new Date().toISOString(),
-                    currentVersion: AppState.currentVersion,
-                    currentNotes: document.getElementById('notes').value,
-                    savedNotes: savedNotesData,
-                    totalSavedNotes: savedNotesData.length,
-                    sessionInfractions: AppState.sessionInfractions,
-                    totalInfractions: AppState.totalInfractions,
-                    selectedTags: Array.from(AppState.selectedTags || []),
-                    
-                    // Advanced Settings usage tracking
-                    advancedSettingsUsage: JSON.parse(localStorage.getItem('dashboard_advanced_settings_tracking') || '{}'),
-                    
-                    // Debug info
-                    debug: {
-                        allLocalStorageKeys: allLocalStorageKeys,
-                        foundDataInKeys: foundData,
-                        historyDropdownOptions: getHistoryDropdownContent()
-                    },
-                    
-                    // Usage statistics
-                    notesHistory: savedNotesData.map(note => ({
-                        date: note.date || new Date(note.timestamp).toLocaleDateString(),
-                        length: note.notes ? note.notes.length : 0,
-                        hasDAE: (note.dae && note.dae.length > 0) || (note.notes && note.notes.toLowerCase().includes('dae')),
-                        techName: (note.techName && note.techName.trim().length > 0) ? 'present' : 'empty',
-                        storeNumber: (note.storeNumber && note.storeNumber.trim().length > 0) ? 'present' : 'empty',
-                        workOrder: (note.workOrder && note.workOrder.trim().length > 0) ? 'present' : 'empty'
-                    })),
-                    
-                    // Most common words/phrases analysis
-                    commonPhrases: analyzeCommonPhrases(savedNotesData)
-                };
-
-                // Create formatted export with all actual notes content
-                let exportText = `
-=== FROSTBYTE NOTES DATA EXPORT ===
-Export Date: ${exportData.timestamp}
-App Version: ${exportData.currentVersion}
-
-=== DEBUG INFORMATION ===
-All localStorage keys found: ${exportData.debug.allLocalStorageKeys.join(', ')}
-
-Data found in potential keys:
-${Object.keys(exportData.debug.foundDataInKeys).map(key => 
-    `${key}: ${Array.isArray(exportData.debug.foundDataInKeys[key]) ? 
-        `Array with ${exportData.debug.foundDataInKeys[key].length} items` : 
-        typeof exportData.debug.foundDataInKeys[key]}`
-).join('\n')}
-
-History dropdown content: ${exportData.debug.historyDropdownOptions}
-
-=== CURRENT SESSION ===
-Current Notes Length: ${exportData.currentNotes.length} characters
-Current Notes Content:
-${exportData.currentNotes || '(No current notes)'}
-
-Session Infractions: ${exportData.sessionInfractions}
-Total Infractions: ${exportData.totalInfractions}
-Selected Tags: ${exportData.selectedTags.join(', ') || 'None'}
-
-=== ALL SAVED NOTES (${exportData.totalSavedNotes} total) ===
-`;
-
-                // Add each saved note with full content
-                savedNotesData.forEach((note, index) => {
-                    const noteDate = note.date || new Date(note.timestamp).toLocaleString();
-                    exportText += `
---- Note ${index + 1} (${noteDate}) ---
-Tech Name: ${note.techName || '(not provided)'}
-Store Number: ${note.storeNumber || '(not provided)'}
-Work Order: ${note.workOrder || '(not provided)'}
-
-DAE Content:
-${note.dae || (note.notes && note.notes.toLowerCase().includes('dae') ? 'DAE referenced in notes' : '(no DAE content)')}
-
-Notes Content:
-${note.notes || '(no notes content)'}
-
-Tags: ${note.tags ? note.tags.join(', ') : '(no tags)'}
-ID: ${note.id || '(no ID)'}
----------------------------------
-`;
-                });
-
-                exportText += `
-
-=== USAGE STATISTICS ===
-Total Saved Notes: ${exportData.totalSavedNotes}
-Notes with DAE: ${exportData.notesHistory.filter(n => n.hasDAE).length}
-Notes with Tech Name: ${exportData.notesHistory.filter(n => n.techName === 'present').length}
-Notes with Store Number: ${exportData.notesHistory.filter(n => n.storeNumber === 'present').length}
-Notes with Work Order: ${exportData.notesHistory.filter(n => n.workOrder === 'present').length}
-
-Average Notes Length: ${exportData.notesHistory.length > 0 ? Math.round(exportData.notesHistory.reduce((sum, n) => sum + n.length, 0) / exportData.notesHistory.length) : 0} characters
-
-=== ADVANCED SETTINGS USAGE ===
-${Object.keys(exportData.advancedSettingsUsage).length > 0 ? 
-    Object.entries(exportData.advancedSettingsUsage).map(([action, count]) => `${action}: ${count} times`).join('\n') : 
-    'No Advanced Settings usage tracked yet'}
-
-=== COMMON PHRASES ===
-${exportData.commonPhrases.join('\n')}
-
-=== RAW DATA (JSON) ===
-${JSON.stringify(exportData, null, 2)}
-`;
-
-                // Copy to clipboard
-                navigator.clipboard.writeText(exportText).then(() => {
-                    showNotification(`📊 Debug export complete! Found ${allLocalStorageKeys.length} localStorage keys`, 'success', 5000);
-                    alert(`Debug export copied to clipboard!\n\nThis includes:\n- Debug info about localStorage\n- ${exportData.totalSavedNotes} saved notes\n- All available data keys\n\nThis will help identify where your notes are stored.`);
-                }).catch(() => {
-                    // Fallback: download as file
-                    const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = `Frostbyte_Debug_Export_${new Date().toISOString().split('T')[0]}.txt`;
-                    link.click();
-                    URL.revokeObjectURL(url);
-                    showNotification(`📊 Debug data downloaded as file!`, 'success', 5000);
-                });
-
-            } catch (error) {
-                console.error('Export failed:', error);
-                showNotification('❌ Export failed: ' + error.message, 'error', 5000);
-            }
-        }
-
-        function getHistoryDropdownContent() {
-            try {
-                const historyDropdown = document.getElementById('history');
-                if (historyDropdown) {
-                    const options = Array.from(historyDropdown.options).map(option => option.text);
-                    return options.join(', ');
-                }
-                return 'History dropdown not found';
-            } catch (error) {
-                return 'Error reading history dropdown: ' + error.message;
-            }
-        }
-
-        function analyzeCommonPhrases(savedNotesData) {
-            try {
-                if (!savedNotesData || savedNotesData.length === 0) {
-                    return ['No saved notes available for analysis'];
-                }
-
-                const allNotesText = savedNotesData.map(note => (note.notes || '') + ' ' + (note.dae || '')).join(' ').toLowerCase();
-                
-                if (!allNotesText.trim()) {
-                    return ['No notes content available for analysis'];
-                }
-
-                // Common technical phrases to look for
-                const commonPatterns = [
-                    /logged into \w+/gi,
-                    /called \w+/gi,
-                    /contacted \w+/gi,
-                    /replaced \w+/gi,
-                    /tested \w+/gi,
-                    /checked \w+/gi,
-                    /updated \w+/gi,
-                    /installed \w+/gi,
-                    /configured \w+/gi,
-                    /troubleshoot\w*/gi,
-                    /issue with \w+/gi,
-                    /problem with \w+/gi,
-                    /error \w+/gi,
-                    /\d{4,}/gi // Store numbers
-                ];
-
-                const foundPhrases = [];
-                commonPatterns.forEach(pattern => {
-                    const matches = allNotesText.match(pattern);
-                    if (matches) {
-                        foundPhrases.push(...matches);
-                    }
-                });
-
-                if (foundPhrases.length === 0) {
-                    return ['No common technical phrases found'];
-                }
-
-                // Count frequency and return top phrases
-                const frequency = {};
-                foundPhrases.forEach(phrase => {
-                    const cleanPhrase = phrase.trim();
-                    frequency[cleanPhrase] = (frequency[cleanPhrase] || 0) + 1;
-                });
-
-                return Object.entries(frequency)
-                    .sort(([,a], [,b]) => b - a)
-                    .slice(0, 20)
-                    .map(([phrase, count]) => `"${phrase}" (used ${count} times)`);
-
-            } catch (error) {
-                return ['Error analyzing phrases: ' + error.message];
-            }
-        }
-
-        // Generate consistent user hash based on browser/system characteristics
-        async function generateConsistentUserHash() {
-            try {
-                // Try to get system/browser identifying information
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                ctx.textBaseline = 'top';
-                ctx.font = '14px Arial';
-                ctx.fillText('Browser fingerprint', 2, 2);
-                const canvasFingerprint = canvas.toDataURL();
-                
-                // Combine various browser characteristics for a stable hash
-                const fingerprint = [
-                    navigator.userAgent,
-                    navigator.language,
-                    screen.width + 'x' + screen.height,
-                    screen.colorDepth,
-                    new Date().getTimezoneOffset(),
-                    canvasFingerprint.slice(0, 100) // First part of canvas fingerprint
-                ].join('|');
-                
-                // Create a simple hash from the fingerprint
-                let hash = 0;
-                for (let i = 0; i < fingerprint.length; i++) {
-                    const char = fingerprint.charCodeAt(i);
-                    hash = ((hash << 5) - hash) + char;
-                    hash = hash & hash; // Convert to 32bit integer
-                }
-                
-                // Convert to positive hex string
-                const hashHex = Math.abs(hash).toString(16);
-                const consistentHash = 'user_' + hashHex;
-                
-                console.log('Browser fingerprint generated for consistent user ID');
-                return consistentHash;
-                
-            } catch (error) {
-                console.warn('Could not generate fingerprint hash, using fallback:', error);
-                // Fallback to random if fingerprinting fails
-                return 'user_' + Math.random().toString(36).substr(2, 9);
-            }
-        }
-
-        // Usage Analytics System for Central Dashboard
-        async function initializeUsageTracking() {
-            // Generate or retrieve anonymous user hash
-            let userHash = localStorage.getItem('userAnalyticsHash');
-            if (!userHash) {
-                userHash = await generateConsistentUserHash();
-                localStorage.setItem('userAnalyticsHash', userHash);
-                console.log('Generated consistent user hash:', userHash.substring(0, 12) + '...');
-            } else {
-                console.log('Using existing user hash:', userHash.substring(0, 12) + '...');
-            }
-            AppState.usageTracking.userHash = userHash;
-            
-            // Check if we need to reset session start (after a report was sent)
-            const lastReportTime = parseInt(localStorage.getItem('lastUsageReport') || '0');
-            const savedSessionStart = parseInt(localStorage.getItem('sessionStartTime') || '0');
-            const now = Date.now();
-            
-            // If last report was sent and session start is from before the report, reset it
-            if (lastReportTime > 0 && savedSessionStart < lastReportTime) {
-                console.log('📊 Resetting session start time (new reporting period)');
-                AppState.usageTracking.sessionStart = now;
-                localStorage.setItem('sessionStartTime', now.toString());
-            } else if (!savedSessionStart) {
-                // First time initialization
-                AppState.usageTracking.sessionStart = now;
-                localStorage.setItem('sessionStartTime', now.toString());
-            } else {
-                // Use existing session start
-                AppState.usageTracking.sessionStart = savedSessionStart;
-            }
-            
-            // Initialize focus tracking
-            AppState.usageTracking.totalFocusTime = parseInt(localStorage.getItem('totalFocusTime') || '0');
-            AppState.usageTracking.onCall = false;
-            AppState.usageTracking.windowFocused = !document.hidden;
-            
-            // Start tracking if window is already focused on load
-            if (AppState.usageTracking.windowFocused) {
-                AppState.usageTracking.focusStart = Date.now();
-                console.log('📊 Window already focused on load - starting time tracking');
-            } else {
-                AppState.usageTracking.focusStart = null;
-            }
-            
-            // Load existing button click data
-            const savedClicks = localStorage.getItem('buttonClickAnalytics');
-            if (savedClicks) {
-                try {
-                    AppState.usageTracking.buttonClicks = JSON.parse(savedClicks);
-                } catch (e) {
-                    console.error('Failed to parse button click data:', e);
-                    AppState.usageTracking.buttonClicks = {};
-                }
-            }
-            
-            // Load and merge note patterns from localStorage
-            const savedPatterns = localStorage.getItem('notePatterns');
-            if (savedPatterns) {
-                try {
-                    AppState.usageTracking.notePatterns = JSON.parse(savedPatterns);
-                    console.log(`📊 Loaded ${AppState.usageTracking.notePatterns.length} saved note patterns`);
-                } catch (e) {
-                    console.error('Failed to parse note patterns:', e);
-                    AppState.usageTracking.notePatterns = [];
-                }
-            } else {
-                AppState.usageTracking.notePatterns = [];
-            }
-            
-            // Load last report time
-            if (lastReportTime > 0) {
-                AppState.usageTracking.lastReport = lastReportTime;
-            }
-            
-            // Load reporting preference
-            const reportingPref = localStorage.getItem('usageReportingEnabled');
-            if (reportingPref !== null) {
-                AppState.usageTracking.reportingEnabled = reportingPref === 'true';
-            }
-            
-            // Setup focus/blur tracking to only count active usage time
-            window.addEventListener('focus', () => {
-                // Only start tracking if not already on a call
-                if (!AppState.usageTracking.onCall && !AppState.usageTracking.focusStart) {
-                    AppState.usageTracking.focusStart = Date.now();
-                    console.log('📊 Window focused - starting time tracking');
-                }
-                AppState.usageTracking.windowFocused = true;
-            });
-            
-            window.addEventListener('blur', () => {
-                AppState.usageTracking.windowFocused = false;
-                
-                // Only stop tracking if not on a call
-                // If on a call, keep tracking as if window is still focused
-                if (!AppState.usageTracking.onCall && AppState.usageTracking.focusStart) {
-                    const focusedDuration = Date.now() - AppState.usageTracking.focusStart;
-                    AppState.usageTracking.totalFocusTime += focusedDuration;
-                    localStorage.setItem('totalFocusTime', AppState.usageTracking.totalFocusTime.toString());
-                    console.log(`📊 Window blurred - added ${Math.round(focusedDuration / 1000)}s to focus time`);
-                    AppState.usageTracking.focusStart = null;
-                } else if (AppState.usageTracking.onCall) {
-                    console.log('📊 Window blurred but on call - continuing time tracking');
-                }
-            });
-            
-            // Track before unload to save any remaining focus time
-            window.addEventListener('beforeunload', () => {
-                if (AppState.usageTracking.focusStart) {
-                    const focusedDuration = Date.now() - AppState.usageTracking.focusStart;
-                    AppState.usageTracking.totalFocusTime += focusedDuration;
-                    localStorage.setItem('totalFocusTime', AppState.usageTracking.totalFocusTime.toString());
-                }
-                // Save note patterns before unload
-                if (AppState.usageTracking.notePatterns.length > 0) {
-                    localStorage.setItem('notePatterns', JSON.stringify(AppState.usageTracking.notePatterns));
-                }
-            });
-            
-            // Periodic save of tracking data (every 30 seconds) to prevent data loss
-            setInterval(() => {
-                // Save current focus time including active session
-                if (AppState.usageTracking.focusStart) {
-                    const focusedDuration = Date.now() - AppState.usageTracking.focusStart;
-                    const currentTotal = AppState.usageTracking.totalFocusTime + focusedDuration;
-                    localStorage.setItem('totalFocusTime', currentTotal.toString());
-                }
-                // Save note patterns
-                if (AppState.usageTracking.notePatterns.length > 0) {
-                    localStorage.setItem('notePatterns', JSON.stringify(AppState.usageTracking.notePatterns));
-                }
-            }, 30000); // Every 30 seconds
-            
-            // Check if reporting should happen (weekly)
-            if (shouldSendUsageReport()) {
-                setTimeout(generateAndSubmitUsageReport, 15000); // Delay 15 seconds after load
-            }
-            
-            console.log('📊 Usage analytics initialized');
-            console.log('📊 User hash:', userHash.substring(0, 8) + '...');
-            console.log('📊 Session started:', new Date(AppState.usageTracking.sessionStart).toLocaleString());
-            console.log('📊 Total focus time:', Math.round(AppState.usageTracking.totalFocusTime / 1000 / 60), 'minutes');
-            console.log('📊 Note patterns:', AppState.usageTracking.notePatterns.length);
-        }
-        
-        function trackButtonClick(buttonName, category = 'general') {
-            if (!AppState.usageTracking.reportingEnabled) return;
-            
-            // Debounce duplicate clicks (within 100ms)
-            const now = Date.now();
-            const lastClickKey = `lastClick_${category}_${buttonName}`;
-            const lastClick = AppState.usageTracking[lastClickKey] || 0;
-            
-            if (now - lastClick < 100) {
-                console.log(`⚠️ Debounced duplicate click for ${category}:${buttonName}`);
-                return;
-            }
-            
-            AppState.usageTracking[lastClickKey] = now;
-            
-            const key = `${category}:${buttonName}`;
-            AppState.usageTracking.buttonClicks[key] = (AppState.usageTracking.buttonClicks[key] || 0) + 1;
-            
-            // Save to localStorage immediately
-            localStorage.setItem('buttonClickAnalytics', JSON.stringify(AppState.usageTracking.buttonClicks));
-            
-            console.log('📊 Button tracked:', key, '- Total clicks:', AppState.usageTracking.buttonClicks[key]);
-        }
-        
-        function trackNotePattern(noteText) {
-            if (!AppState.usageTracking.reportingEnabled || !noteText) return;
-            
-            // Extract patterns without storing actual content
-            const patterns = {
-                length: noteText.length,
-                wordCount: noteText.split(/\s+/).length,
-                hasNumbers: /\d/.test(noteText),
-                hasSpecialChars: /[!@#$%^&*()]/.test(noteText),
-                timestamp: Date.now()
-            };
-            
-            AppState.usageTracking.notePatterns.push(patterns);
-            
-            // Keep only last 50 patterns to prevent storage bloat
-            if (AppState.usageTracking.notePatterns.length > 50) {
-                AppState.usageTracking.notePatterns = AppState.usageTracking.notePatterns.slice(-50);
-            }
-        }
-        
-        function shouldSendUsageReport() {
-            if (!AppState.usageTracking.reportingEnabled) return false;
-            
-            const lastReport = AppState.usageTracking.lastReport;
-            const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-            
-            return !lastReport || lastReport < weekAgo;
-        }
-        
-        async function generateAndSubmitUsageReport() {
-            if (!AppState.usageTracking.reportingEnabled) return;
-            
-            try {
-                console.log('📊 Generating weekly usage report...');
-                
-                const reportData = generateUsageReportData();
-                
-                // Validate we have meaningful data
-                if (!reportData || !reportData.userHash) {
-                    console.warn('⚠️ Report data invalid, skipping submission');
-                    return;
-                }
-                
-                // Create backup before clearing data
-                const backupData = {
-                    buttonClicks: { ...AppState.usageTracking.buttonClicks },
-                    totalFocusTime: AppState.usageTracking.totalFocusTime,
-                    notePatterns: [...AppState.usageTracking.notePatterns],
-                    sessionStart: AppState.usageTracking.sessionStart,
-                    timestamp: Date.now()
-                };
-                localStorage.setItem('analyticsBackup', JSON.stringify(backupData));
-                console.log('📊 Created analytics backup before submission');
-                
-                await submitUsageReportToGitHub(reportData);
-                
-                // Only clear data if submission was successful
-                console.log('✅ Report submitted successfully - clearing analytics data');
-                
-                // Clear session data
-                localStorage.removeItem('buttonClickAnalytics');
-                localStorage.removeItem('totalFocusTime');
-                localStorage.removeItem('notePatterns');
-                AppState.usageTracking.buttonClicks = {};
-                AppState.usageTracking.totalFocusTime = 0;
-                AppState.usageTracking.notePatterns = [];
-                
-                // Update last report time
-                const reportTime = Date.now();
-                AppState.usageTracking.lastReport = reportTime;
-                localStorage.setItem('lastUsageReport', reportTime.toString());
-                
-                // Reset session start for new reporting period
-                AppState.usageTracking.sessionStart = reportTime;
-                localStorage.setItem('sessionStartTime', reportTime.toString());
-                
-                // Clear backup after successful submission
-                localStorage.removeItem('analyticsBackup');
-                
-                showNotification('📊 Anonymous usage data submitted - Thank you for helping improve the app!', 'success', 5000);
-                console.log('✅ Usage report submitted and data cleared successfully');
-                
-            } catch (error) {
-                console.error('❌ Usage report submission failed:', error.message);
-                showNotification('⚠️ Failed to submit usage report - data preserved for retry', 'warning', 3000);
-                // Don't clear data on failure - keep it for next attempt
-            }
-        }
-        
-        // Helper function to restore backup if needed
-        function restoreAnalyticsBackup() {
-            const backup = localStorage.getItem('analyticsBackup');
-            if (backup) {
-                try {
-                    const data = JSON.parse(backup);
-                    localStorage.setItem('buttonClickAnalytics', JSON.stringify(data.buttonClicks));
-                    localStorage.setItem('totalFocusTime', data.totalFocusTime.toString());
-                    localStorage.setItem('notePatterns', JSON.stringify(data.notePatterns));
-                    localStorage.setItem('sessionStartTime', data.sessionStart.toString());
-                    console.log('📊 Restored analytics backup from:', new Date(data.timestamp).toLocaleString());
-                    return true;
-                } catch (e) {
-                    console.error('Failed to restore analytics backup:', e);
-                    return false;
-                }
-            }
-            return false;
-        }
-        
-        // Anonymization helper functions for usage analytics
-        function hashString(str) {
-            if (!str || str.length === 0) return '';
-            
-            // Simple hash function to create consistent anonymous identifiers
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Convert to 32-bit integer
-            }
-            
-            // Return a shortened hash with prefix to indicate type
-            return 'anon_' + Math.abs(hash).toString(36).substring(0, 8);
-        }
-        
-        function anonymizeContent(content) {
-            // Per requirements: Only anonymize user identity, NOT tech names, work orders, etc.
-            // User anonymization is already handled via userHash system
-            // This function now returns content unchanged to preserve all technical details
-            if (!content || content.length === 0) return '';
-            return content;
-        }
-        
-        function generateUsageReportData() {
-            // Debug: Check all localStorage like the export function does
-            const allLocalStorageKeys = [];
-            const foundDataSummary = {};
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                allLocalStorageKeys.push(key);
-                const data = localStorage.getItem(key);
-                try {
-                    const parsed = JSON.parse(data);
-                    if (Array.isArray(parsed)) {
-                        foundDataSummary[key] = `Array with ${parsed.length} items`;
-                    } else if (typeof parsed === 'object') {
-                        foundDataSummary[key] = `Object with ${Object.keys(parsed).length} keys`;
-                    } else {
-                        foundDataSummary[key] = typeof parsed;
-                    }
-                } catch (e) {
-                    foundDataSummary[key] = `String: ${data.length} chars`;
-                }
-            }
-            
-            // Try multiple possible keys for notes data
-            const possibleNotesKeys = ['savedNotes', 'notes', 'history', 'formData', 'frostbyte_notes', 'notesHistory', 'notesData'];
-            let savedNotes = [];
-            let notesDataSource = 'none';
-            
-            // First try savedNotes
-            try {
-                const savedNotesData = localStorage.getItem('savedNotes');
-                if (savedNotesData) {
-                    const parsed = JSON.parse(savedNotesData);
-                    if (Array.isArray(parsed)) {
-                        savedNotes = parsed;
-                        notesDataSource = 'savedNotes';
-                    }
-                }
-            } catch (e) {
-                // Skip invalid JSON
-            }
-            
-            // If savedNotes is empty, try notesHistory
-            if (savedNotes.length === 0) {
-                try {
-                    const notesHistoryData = localStorage.getItem('notesHistory');
-                    if (notesHistoryData) {
-                        const parsed = JSON.parse(notesHistoryData);
-                        if (Array.isArray(parsed) && parsed.length > 0) {
-                            savedNotes = parsed;
-                            notesDataSource = 'notesHistory';
-                            console.log(`📋 Using notesHistory data: ${parsed.length} items`);
-                        }
-                    }
-                } catch (e) {
-                    // Skip invalid JSON
-                }
-            }
-            
-            // If still no data, try other possible keys
-            if (savedNotes.length === 0) {
-                for (const key of possibleNotesKeys.filter(k => k !== 'savedNotes' && k !== 'notesHistory')) {
-                    try {
-                        const data = localStorage.getItem(key);
-                        if (data) {
-                            const parsed = JSON.parse(data);
-                            if (Array.isArray(parsed) && parsed.length > 0) {
-                                savedNotes = parsed;
-                                notesDataSource = key;
-                                console.log(`📋 Found notes data in localStorage key: ${key} (${parsed.length} items)`);
-                                break;
-                            }
-                        }
-                    } catch (e) {
-                        // Skip invalid JSON
-                    }
-                }
-            }
-            
-            // If still no notes found, check for any localStorage key containing note-like data
-            if (savedNotes.length === 0) {
-                for (const key of allLocalStorageKeys) {
-                    try {
-                        const data = localStorage.getItem(key);
-                        if (data && data.includes('notes') || data.includes('dae') || data.includes('workOrder')) {
-                            console.log(`📋 Potential notes data found in key: ${key}`);
-                            const parsed = JSON.parse(data);
-                            if (Array.isArray(parsed) && parsed.length > 0) {
-                                savedNotes = parsed;
-                                notesDataSource = key;
-                                break;
-                            }
-                        }
-                    } catch (e) {
-                        // Skip invalid data
-                    }
-                }
-            }
-            
-            console.log(`📊 Notes analysis: Found ${savedNotes.length} notes from source: ${notesDataSource}`);
-            
-            // Check for button click analytics
-            const buttonClickData = localStorage.getItem('buttonClickAnalytics');
-            let buttonStats = [];
-            
-            if (buttonClickData) {
-                try {
-                    const clicks = JSON.parse(buttonClickData);
-                    buttonStats = Object.entries(clicks)
-                        .sort(([,a], [,b]) => b - a)
-                        .slice(0, 25);
-                } catch (e) {
-                    console.warn('Error parsing button click data:', e);
-                }
-            }
-            
-            // If no button click data, analyze saved notes for button usage patterns
-            if (buttonStats.length === 0 && savedNotes.length > 0) {
-                console.log('📊 No button click data found, analyzing saved notes for patterns...');
-                const notePatterns = analyzeNotesForButtonPatterns(savedNotes);
-                buttonStats = notePatterns.slice(0, 25);
-            }
-            
-            // Ensure we have some data - add default if empty
-            if (buttonStats.length === 0) {
-                buttonStats.push(['No usage data available', 0]);
-            }
-            
-            // Enhanced note statistics using actual saved notes
-            const notePatternCount = AppState.usageTracking.notePatterns.length;
-            const noteStats = {
-                averageLength: savedNotes.length > 0 ? 
-                    Math.round(savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.length : 0), 0) / savedNotes.length) : 0,
-                averageWordCount: savedNotes.length > 0 ? 
-                    Math.round(savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.split(' ').length : 0), 0) / savedNotes.length) : 0,
-                percentWithNumbers: savedNotes.length > 0 ? 
-                    Math.round(savedNotes.filter(note => note.notes && /\d/.test(note.notes)).length / savedNotes.length * 100) : 0,
-                totalNotesSaved: savedNotes.length,
-                sessionNotesAnalyzed: notePatternCount,
-                notesWithDAE: savedNotes.filter(note => 
-                    (note.dae && note.dae.length > 0) || 
-                    (note.notes && note.notes.toLowerCase().includes('dae'))
-                ).length,
-                notesWithTechName: savedNotes.filter(note => note.techName && note.techName.trim().length > 0).length
-            };
-            
-            // Analyze saved notes for common patterns (anonymized)
-            const commonPhrases = savedNotes.length > 0 ? analyzeCommonPhrasesForButtonSuggestions(savedNotes) : [];
-            
-            // Calculate session duration using tracked focus time
-            // Get accumulated time from localStorage
-            const totalFocusTime = parseInt(localStorage.getItem('totalFocusTime') || '0');
-            
-            // Add current active focus time if currently tracking
-            // (either window is focused OR on a call)
-            let currentFocusTime = 0;
-            if (AppState.usageTracking.focusStart) {
-                currentFocusTime = Date.now() - AppState.usageTracking.focusStart;
-            }
-            
-            // Total active time in milliseconds
-            const totalActiveTime = totalFocusTime + currentFocusTime;
-            let sessionDuration = Math.round(totalActiveTime / 1000 / 60); // minutes
-            
-            // Validate session duration - if unrealistic, use a fallback
-            if (sessionDuration < 0 || sessionDuration > 1440) { // negative or more than 24 hours
-                const savedSessionStart = localStorage.getItem('sessionStartTime');
-                const sessionStartTime = savedSessionStart ? parseInt(savedSessionStart) : AppState.usageTracking.sessionStart;
-                sessionDuration = Math.round((Date.now() - sessionStartTime) / 1000 / 60);
-            }
-            
-            console.log('📊 Session duration calculation:', {
-                totalFocusTime: Math.round(totalFocusTime / 1000 / 60) + ' minutes',
-                currentActiveTime: Math.round(currentFocusTime / 1000 / 60) + ' minutes',
-                totalActiveTime: Math.round(totalActiveTime / 1000 / 60) + ' minutes',
-                onCall: AppState.usageTracking.onCall,
-                windowFocused: AppState.usageTracking.windowFocused,
-                durationMinutes: sessionDuration
-            });
-            
-            const reportData = {
-                userHash: AppState.usageTracking.userHash || 'unknown',
-                reportDate: new Date().toISOString().split('T')[0],
-                sessionDuration: sessionDuration,
-                version: AppState.currentVersion,
-                buttonUsage: buttonStats,
-                noteStatistics: noteStats,
-                buttonSuggestions: commonPhrases,
-                reportingPeriod: '7days',
-                dataQuality: {
-                    hasButtonData: buttonStats.length > 1 || buttonStats[0][0] !== 'No usage data available',
-                    hasNotePatterns: notePatternCount > 0,
-                    hasSavedNotes: savedNotes.length > 0,
-                    localStorageKeys: allLocalStorageKeys,
-                    localStorageData: foundDataSummary,
-                    notesDataSource: notesDataSource,
-                    dataSource: buttonClickData ? 'button_tracking' : (savedNotes.length > 0 ? 'note_analysis' : 'no_data')
-                },
-                // Include condensed notes data for analysis (to avoid GitHub 422 errors)
-                rawNotesData: savedNotes.slice(0, 20).map((note, index) => ({
-                    id: `note_${index + 1}`,
-                    date: note.date || (note.timestamp ? new Date(note.timestamp).toLocaleDateString() : 'unknown'),
-                    noteLength: note.notes ? note.notes.length : 0,
-                    wordCount: note.notes ? note.notes.split(' ').length : 0,
-                    hasDAE: !!(note.dae && note.dae.length > 0) || !!(note.notes && note.notes.toLowerCase().includes('dae')),
-                    hasTechName: !!(note.techName && note.techName.trim().length > 0),
-                    hasStoreNumber: !!(note.storeNumber && note.storeNumber.trim().length > 0),
-                    hasWorkOrder: !!(note.workOrder && note.workOrder.trim().length > 0),
-                    tags: note.tags || [],
-                    // Keep all technical details - only user identity is anonymized (via userHash)
-                    notesPreview: note.notes ? note.notes.substring(0, 150) + (note.notes.length > 150 ? '...' : '') : '',
-                    daePreview: note.dae ? note.dae.substring(0, 100) + (note.dae.length > 100 ? '...' : '') : '',
-                    // Include actual values for analysis
-                    techName: note.techName || '',
-                    storeNumber: note.storeNumber || '',
-                    workOrder: note.workOrder || ''
-                })),
-                // Summary of raw data
-                rawDataSummary: {
-                    totalNotes: savedNotes.length,
-                    totalCharacters: savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.length : 0), 0),
-                    totalWords: savedNotes.reduce((sum, note) => sum + (note.notes ? note.notes.split(' ').length : 0), 0),
-                    notesWithContent: savedNotes.filter(note => note.notes && note.notes.trim().length > 0).length,
-                    notesWithDAE: savedNotes.filter(note => 
-                        (note.dae && note.dae.length > 0) || 
-                        (note.notes && note.notes.toLowerCase().includes('dae'))
-                    ).length,
-                    dateRange: {
-                        earliest: savedNotes.length > 0 ? 
-                            savedNotes.reduce((earliest, note) => {
-                                const noteDate = note.date || (note.timestamp ? new Date(note.timestamp).toLocaleDateString() : 'unknown');
-                                return noteDate && noteDate < earliest ? noteDate : earliest;
-                            }, savedNotes[0]?.date || (savedNotes[0]?.timestamp ? new Date(savedNotes[0].timestamp).toLocaleDateString() : 'unknown')) : 'none',
-                        latest: savedNotes.length > 0 ? 
-                            savedNotes.reduce((latest, note) => {
-                                const noteDate = note.date || (note.timestamp ? new Date(note.timestamp).toLocaleDateString() : 'unknown');
-                                return noteDate && noteDate > latest ? noteDate : latest;
-                            }, savedNotes[0]?.date || (savedNotes[0]?.timestamp ? new Date(savedNotes[0].timestamp).toLocaleDateString() : 'unknown')) : 'none'
-                    }
-                }
-            };
-            
-            // Add full notes data for sub-issue creation (user identity already anonymized via userHash)
-            reportData.fullNotesData = savedNotes.map((note, index) => ({
-                id: `note_${index + 1}`,
-                date: note.date || (note.timestamp ? new Date(note.timestamp).toLocaleDateString() : 'unknown'),
-                noteLength: note.notes ? note.notes.length : 0,
-                wordCount: note.notes ? note.notes.split(' ').length : 0,
-                hasDAE: !!(note.dae && note.dae.length > 0) || !!(note.notes && note.notes.toLowerCase().includes('dae')),
-                hasTechName: !!(note.techName && note.techName.trim().length > 0),
-                hasStoreNumber: !!(note.storeNumber && note.storeNumber.trim().length > 0),
-                hasWorkOrder: !!(note.workOrder && note.workOrder.trim().length > 0),
-                tags: note.tags || [],
-                // Keep all technical details for analysis - only user identity is anonymized (via userHash)
-                fullContent: note.notes || '',
-                fullDAE: note.dae || '',
-                techName: note.techName || '',
-                storeNumber: note.storeNumber || '',
-                workOrder: note.workOrder || ''
-            }));
-            
-            console.log('📊 Generated report data:', reportData);
-            console.log(`📊 Full notes data created: ${reportData.fullNotesData.length} notes`);
-            return reportData;
-        }
-        
-        function analyzeNotesForButtonPatterns(savedNotes) {
-            const patterns = {};
-            
-            // Common patterns that might indicate button usage
-            const buttonPatterns = {
-                'Escalation': /escalat|escalation|tier|t2|t3/i,
-                'Version Download': /version|download|update|dl/i,
-                'Reboot/Restart': /reboot|restart|reset|power/i,
-                'Connection Issues': /connect|connection|network|wifi|internet/i,
-                'Hardware': /hardware|device|equipment|unit/i,
-                'Software': /software|app|application|program/i,
-                'Store Visit': /visit|onsite|store|location/i,
-                'Remote Access': /remote|anydesk|teamviewer|vnc/i,
-                'Testing': /test|testing|check|verify/i,
-                'Documentation': /document|note|record|log/i
-            };
-            
-            savedNotes.forEach(note => {
-                const noteText = note.notes || '';
-                Object.entries(buttonPatterns).forEach(([buttonName, pattern]) => {
-                    if (pattern.test(noteText)) {
-                        patterns[buttonName] = (patterns[buttonName] || 0) + 1;
-                    }
-                });
-            });
-            
-            return Object.entries(patterns)
-                .sort(([,a], [,b]) => b - a)
-                .map(([name, count]) => [name, count]);
-        }
-        
-        function analyzeCommonPhrasesForButtonSuggestions(savedNotesData) {
-            try {
-                if (!savedNotesData || savedNotesData.length === 0) return [];
-                
-                const phraseCount = {};
-                const minOccurrences = 2;
-                
-                // Expanded stopwords list to filter out generic phrases
-                const stopWords = new Set([
-                    'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
-                    'of', 'with', 'by', 'from', 'up', 'about', 'into', 'through', 'during',
-                    'before', 'after', 'above', 'below', 'between', 'under', 'again', 'further',
-                    'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'both',
-                    'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not',
-                    'only', 'own', 'same', 'so', 'than', 'too', 'very', 'can', 'will', 'just',
-                    'should', 'now', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'them', 'their',
-                    'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is',
-                    'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does',
-                    'did', 'doing', 'would', 'could', 'ought', 'im', 'ive', 'id', 'per', 'said'
-                ]);
-                
-                savedNotesData.forEach(noteObj => {
-                    const text = noteObj.notes || '';
-                    const words = text.toLowerCase()
-                        .replace(/[^\w\s]/g, ' ')
-                        .split(/\s+/)
-                        .filter(w => w.length > 2 && !stopWords.has(w));
-                    
-                    // Extract 2-5 word phrases (expanded from 2-4)
-                    for (let len = 2; len <= 5; len++) {
-                        for (let i = 0; i <= words.length - len; i++) {
-                            const phrase = words.slice(i, i + len).join(' ');
-                            
-                            // Skip if phrase is too short or too long
-                            if (phrase.length < 6 || phrase.length > 50) continue;
-                            
-                            // Normalize variations (e.g., "checking" -> "check")
-                            const normalized = normalizePhrase(phrase);
-                            
-                            if (!phraseCount[normalized]) {
-                                phraseCount[normalized] = {
-                                    count: 0,
-                                    originalPhrases: new Set()
-                                };
-                            }
-                            phraseCount[normalized].count++;
-                            phraseCount[normalized].originalPhrases.add(phrase);
-                        }
-                    }
-                });
-                
-                // Convert to array and filter by minimum occurrences
-                const commonPhrases = Object.entries(phraseCount)
-                    .filter(([_, data]) => data.count >= minOccurrences)
-                    .map(([phrase, data]) => ({
-                        suggestion: getMostCommonVariant(data.originalPhrases),
-                        frequency: data.count,
-                        variants: Array.from(data.originalPhrases).length
-                    }))
-                    .sort((a, b) => b.frequency - a.frequency)
-                    .slice(0, 20); // Increased from 15 to 20
-                
-                return commonPhrases;
-                    
-            } catch (error) {
-                console.error('Button suggestion analysis failed:', error);
-                return [];
-            }
-        }
-        
-        // Helper function to normalize phrase variations
-        function normalizePhrase(phrase) {
-            return phrase
-                .replace(/ing\b/g, '') // Remove -ing endings
-                .replace(/ed\b/g, '')  // Remove -ed endings
-                .replace(/s\b/g, '')   // Remove plural s
-                .replace(/\s+/g, ' ')  // Normalize spaces
-                .trim();
-        }
-        
-        // Helper function to get most common variant
-        function getMostCommonVariant(variants) {
-            // Return the shortest variant (usually the base form)
-            return Array.from(variants).sort((a, b) => a.length - b.length)[0];
-        }
-        
-        async function submitUsageReportToGitHub(reportData) {
-            if (!AppState.githubToken || !AppState.githubRepo) {
-                throw new Error('GitHub credentials not available');
-            }
-            
-            // Create a copy without the full notes data for GitHub submission
-            const githubReportData = { ...reportData };
-            delete githubReportData.fullNotesData; // Remove full data to reduce size
-            
-            const issueTitle = `${reportData.isTestReport ? '[TEST] ' : ''}Usage Analytics - ${reportData.reportDate} - ${reportData.userHash}`;
-            const issueBody = `
-## 📊 ${reportData.isTestReport ? 'TEST ' : ''}Weekly Usage Analytics Report
-
-${reportData.isTestReport ? '**⚠️ This is a test report for debugging purposes**\n\n' : ''}**Report Date:** ${reportData.reportDate}
-**User ID:** ${reportData.userHash}
-**Session Duration:** ${reportData.sessionDuration} minutes
-**App Version:** ${reportData.version}
-
-### � Data Quality Summary
-- **Button Data Available:** ${reportData.dataQuality.hasButtonData ? '✅ Yes' : '❌ No'}
-- **Note Patterns Analyzed:** ${reportData.dataQuality.hasNotePatterns ? '✅ Yes' : '❌ No'}
-- **Saved Notes Available:** ${reportData.dataQuality.hasSavedNotes ? '✅ Yes' : '❌ No'}
-
-### �🔥 Most Used Buttons (Top 25)
-${reportData.buttonUsage.length > 0 ? 
-    reportData.buttonUsage.map(([button, clicks]) => `- **${button}**: ${clicks} clicks`).join('\n') :
-    '- No button usage data available this session'
-}
-
-### 📝 Note Statistics
-- **Total Notes Saved:** ${reportData.noteStatistics.totalNotesSaved}
-- **Session Notes Analyzed:** ${reportData.noteStatistics.sessionNotesAnalyzed}
-- **Average Note Length:** ${reportData.noteStatistics.averageLength} characters
-- **Average Word Count:** ${reportData.noteStatistics.averageWordCount} words
-- **Notes with Numbers:** ${reportData.noteStatistics.percentWithNumbers}%
-
-### 💡 Suggested New Buttons (Based on Common User Patterns)
-${reportData.buttonSuggestions.length > 0 ? 
-    reportData.buttonSuggestions.map(item => `- "${item.suggestion}" (used ${item.frequency} times)`).join('\n') :
-    'No new button suggestions this period (requires more usage data)'
-}
-
-### � Raw Notes Analysis Summary
-${reportData.rawDataSummary ? `
-- **Total Notes with Content:** ${reportData.rawDataSummary.notesWithContent}/${reportData.rawDataSummary.totalNotes}
-- **Total Characters:** ${reportData.rawDataSummary.totalCharacters.toLocaleString()}
-- **Total Words:** ${reportData.rawDataSummary.totalWords.toLocaleString()}
-- **Notes with DAE:** ${reportData.rawDataSummary.notesWithDAE}
-- **Date Range:** ${reportData.rawDataSummary.dateRange.earliest} to ${reportData.rawDataSummary.dateRange.latest}
-` : 'No raw notes data available'}
-
-### �🔍 Raw Analytics Data
-<details>
-<summary>Click to expand raw data (condensed for GitHub limits)</summary>
-
-\`\`\`json
-${JSON.stringify(githubReportData, null, 2)}
-\`\`\`
-</details>
-
-### 📝 Sample Notes Content (First 20 Notes - Condensed)
-${reportData.rawNotesData && reportData.rawNotesData.length > 0 ? 
-    reportData.rawNotesData.map((note, index) => `
-**Note ${index + 1}** (${note.date})
-- Store: ${note.storeNumber || 'N/A'} | WO: ${note.workOrder || 'N/A'} | Tech: ${note.techName || 'N/A'}
-- Content Preview: ${note.notesPreview || 'No content'}
-- DAE Preview: ${note.daePreview || 'None'}
-- Stats: ${note.noteLength} chars, ${note.wordCount} words
-`).join('\n') :
-'No notes content available'
-}
-
-### 💾 Complete Data Access
-✅ **Full notes dataset available as linked sub-issues**  
-The complete untruncated dataset with all ${reportData.rawDataSummary?.totalNotes || 0} notes will be organized into linked sub-issues to avoid GitHub's size limitations. Each sub-issue contains detailed note data and is searchable for analysis.
-
----
-*This is an automated analytics report to help improve the Quick Notes system based on real usage patterns.*
-            `;
-            
-            // Step 1: Create the main issue
-            const issueResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${AppState.githubToken}`,
-                    'Accept': 'application/vnd.github+json',
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Frostbyte-Analytics'
-                },
-                body: JSON.stringify({
-                    title: issueTitle,
-                    body: issueBody,
-                    labels: ['usage-analytics', 'auto-generated', 'enhancement', 'data']
-                })
-            });
-            
-            if (!issueResponse.ok) {
-                const errorText = await issueResponse.text();
-                throw new Error(`Failed to create GitHub issue: ${issueResponse.status} - ${errorText}`);
-            }
-            
-            const issueData = await issueResponse.json();
-            const issueNumber = issueData.number;
-            
-            console.log(`📊 Main analytics issue created: #${issueNumber}`);
-            
-            // Step 2: Submit full notes data as sub-issues
-            try {
-                console.log('📊 Starting sub-issue creation process...');
-                console.log('Full notes data:', reportData.fullNotesData?.length || 0, 'notes');
-                
-                await submitFullNotesAsSubIssues(issueNumber, reportData.fullNotesData, reportData.reportDate, reportData.userHash);
-                console.log(`📊 Full notes data submitted as sub-issues linked to main issue #${issueNumber}`);
-            } catch (subIssueError) {
-                console.error('❌ Failed to submit full notes as sub-issues:', subIssueError);
-                console.error('Error details:', subIssueError.message);
-                showNotification(`❌ Sub-issues creation failed: ${subIssueError.message}`, 'error', 5000);
-                // Still save locally as backup
-                saveFullAnalyticsDataLocally(reportData);
-            }
-            
-            console.log(`📊 Complete usage report submitted to GitHub issue #${issueNumber}`);
-            
-            // Add final status notification
-            showNotification(`✅ Analytics report #${issueNumber} created successfully`, 'success', 3000);
-        }
-        
-        async function submitFullNotesAsSubIssues(parentIssueNumber, fullNotesData, reportDate, userHash) {
-            // Validate GitHub credentials
-            if (!AppState.githubToken || !AppState.githubRepo) {
-                throw new Error('GitHub credentials not available for sub-issue creation');
-            }
-            
-            if (!fullNotesData || fullNotesData.length === 0) {
-                console.log('No full notes data to submit as sub-issues');
-                return;
-            }
-            
-            // Split notes into manageable chunks for sub-issues
-            const NOTES_PER_ISSUE = 30; // Optimal chunk size for sub-issues
-            const chunks = [];
-            
-            for (let i = 0; i < fullNotesData.length; i += NOTES_PER_ISSUE) {
-                chunks.push(fullNotesData.slice(i, i + NOTES_PER_ISSUE));
-            }
-            
-            console.log(`📊 Creating ${chunks.length} sub-issues for ${fullNotesData.length} notes...`);
-            
-            const createdSubIssues = [];
-            
-            // Create each chunk as a separate sub-issue
-            for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
-                const chunk = chunks[chunkIndex];
-                const startNote = chunkIndex * NOTES_PER_ISSUE + 1;
-                const endNote = Math.min((chunkIndex + 1) * NOTES_PER_ISSUE, fullNotesData.length);
-                
-                const subIssueTitle = `[DATA] Analytics Notes ${startNote}-${endNote} | ${reportDate} | ${userHash}`;
-                const subIssueBody = `
-## 📝 Full Notes Data - Part ${chunkIndex + 1} of ${chunks.length}
-
-**Parent Issue:** #${parentIssueNumber}  
-**Notes Range:** ${startNote}-${endNote} of ${fullNotesData.length} total  
-**Report Date:** ${reportDate}  
-**User ID:** ${userHash}
-
----
-
-${chunk.map((note, index) => {
-    const noteNumber = startNote + index;
-    return `## Note ${noteNumber} - ${note.date || (note.timestamp ? new Date(note.timestamp).toLocaleDateString() : 'Unknown Date')}
-
-**📍 Store:** ${note.storeNumber || 'N/A'}  
-**🎫 Work Order:** ${note.workOrder || 'N/A'}  
-**👤 Tech Name:** ${note.techName || 'N/A'}  
-**📏 Note Length:** ${note.noteLength || 0} characters  
-**📊 Word Count:** ${note.wordCount || 0} words
-
-### 📄 Full Content
-\`\`\`
-${note.fullContent || 'No content available'}
-\`\`\`
-
-### 🔧 DAE Content
-\`\`\`
-${note.fullDAE || 'No DAE content'}
-\`\`\`
-
----`;
-                }).join('\n\n')}
-
-## 📋 Summary
-- **Total Notes in This Issue:** ${chunk.length}
-- **Date Range:** ${chunk[0]?.date || 'Unknown'} to ${chunk[chunk.length - 1]?.date || 'Unknown'}
-- **Generated:** ${new Date().toISOString()}
-
-*This is part ${chunkIndex + 1} of ${chunks.length} data sub-issues for analytics report #${parentIssueNumber}*
-                `;
-                
-                const subIssueResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${AppState.githubToken}`,
-                        'Accept': 'application/vnd.github+json',
-                        'Content-Type': 'application/json',
-                        'User-Agent': 'Frostbyte-Analytics'
-                    },
-                    body: JSON.stringify({
-                        title: subIssueTitle,
-                        body: subIssueBody,
-                        labels: ['analytics-data', 'auto-generated', 'notes-archive', `parent-${parentIssueNumber}`]
-                    })
-                });
-                
-                if (!subIssueResponse.ok) {
-                    const errorText = await subIssueResponse.text();
-                    console.error(`❌ Sub-issue creation failed:`, {
-                        status: subIssueResponse.status,
-                        error: errorText,
-                        chunkIndex: chunkIndex + 1
-                    });
-                    throw new Error(`Failed to create sub-issue ${chunkIndex + 1}: ${subIssueResponse.status} - ${errorText}`);
-                }
-                
-                const subIssueData = await subIssueResponse.json();
-                createdSubIssues.push(subIssueData.number);
-                
-                console.log(`📊 Created sub-issue #${subIssueData.number} with notes ${startNote}-${endNote}`);
-                
-                // Small delay between sub-issue creation to be respectful to GitHub API
-                if (chunkIndex < chunks.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 750));
-                }
-            }
-            
-            // Update parent issue with links to sub-issues
-            await updateParentIssueWithSubIssueLinks(parentIssueNumber, createdSubIssues, reportDate);
-            
-            return createdSubIssues;
-        }
-        
-        async function updateParentIssueWithSubIssueLinks(parentIssueNumber, subIssueNumbers, reportDate) {
-            const linksSummary = `
-
----
-
-## 🔗 Related Data Issues
-
-${subIssueNumbers.map((num, index) => 
-    `- [📝 Data Part ${index + 1}](#${num}) - Issue #${num}`
-).join('\n')}
-
-**Total Data Issues Created:** ${subIssueNumbers.length}  
-**Generated:** ${reportDate}
-
-*Each linked issue contains complete note data with full content and DAE information.*`;
-            
-            // Add comment to parent issue with links
-            const commentResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues/${parentIssueNumber}/comments`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${AppState.githubToken}`,
-                    'Accept': 'application/vnd.github+json',
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Frostbyte-Analytics'
-                },
-                body: JSON.stringify({
-                    body: linksSummary
-                })
-            });
-            
-            console.log('🔍 DEBUG: Parent issue comment response:', commentResponse.status);
-            
-            if (commentResponse.ok) {
-                console.log(`📊 Added sub-issue links to parent issue #${parentIssueNumber}`);
-            } else {
-                const errorText = await commentResponse.text();
-                console.warn('Failed to add sub-issue links to parent issue:', errorText);
-            }
-        }
-
-        function saveFullAnalyticsDataLocally(reportData) {
-            try {
-                // Save to localStorage with timestamp
-                const fullDataKey = `analytics_full_${reportData.reportDate}_${Date.now()}`;
-                localStorage.setItem(fullDataKey, JSON.stringify(reportData.fullNotesData));
-                
-                // Show notification
-                showNotification(`💾 Full analytics data saved locally (${reportData.fullNotesData?.length || 0} notes)`, 'info', 5000);
-                
-            } catch (error) {
-                console.error('Failed to save full data locally:', error);
-            }
-        }
-        
-        function toggleUsageReporting() {
-            AppState.usageTracking.reportingEnabled = !AppState.usageTracking.reportingEnabled;
-            localStorage.setItem('usageReportingEnabled', AppState.usageTracking.reportingEnabled.toString());
-            
-            const status = AppState.usageTracking.reportingEnabled ? 'enabled' : 'disabled';
-            showNotification(`📊 Anonymous usage reporting ${status}`, 'success', 3000);
-            
-            // Update toggle visual state
-            updateSettingsToggles();
-            
-            console.log(`📊 Usage reporting ${status}`);
-        }
-        
-        async function sendUsageReport() {
-            const sendBtn = document.getElementById('send-report-btn');
-            
-            // Check for 24-hour cooldown (skip on dev branch)
-            if (AppState.currentBranch !== 'dev') {
-                const lastSent = localStorage.getItem('lastUsageReportSent');
-                const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
-                
-                if (lastSent && parseInt(lastSent) > twentyFourHoursAgo) {
-                    const hoursLeft = Math.ceil((parseInt(lastSent) + (24 * 60 * 60 * 1000) - Date.now()) / (60 * 60 * 1000));
-                    showNotification(`⏰ Usage report already sent today. Try again in ${hoursLeft} hours.`, 'error', 5000);
-                    return;
-                }
-            }
-            
-            // Disable button during send
-            sendBtn.disabled = true;
-            sendBtn.textContent = 'Sending...';
-            
-            try {
-                if (!AppState.usageTracking.reportingEnabled) {
-                    showNotification('⚠️ Enable usage analytics first', 'error', 3000);
-                    return;
-                }
-                
-                console.log('📤 Sending usage report...');
-                
-                // Add some button clicks if none exist
-                if (Object.keys(AppState.usageTracking.buttonClicks).length === 0) {
-                    console.log('🔧 No button clicks found, adding usage data...');
-                    trackButtonClick('Send Usage Report', 'settings');
-                    trackButtonClick('Settings Menu', 'settings');
-                }
-                
-                showNotification('📤 Generating usage report...', 'info', 2000);
-                
-                const reportData = generateUsageReportData();
-                
-                // Remove test indicators for production report
-                reportData.isTestReport = false;
-                reportData.reportTimestamp = new Date().toISOString();
-                reportData.debugInfo = {
-                    trackingInitialized: !!AppState.usageTracking.userHash,
-                    sessionStartTime: AppState.usageTracking.sessionStart,
-                    currentTime: Date.now(),
-                    localStorageWorks: typeof localStorage !== 'undefined'
-                };
-                
-                console.log('📤 Sending report data:', reportData);
-                
-                await submitUsageReportToGitHub(reportData);
-                
-                // Set cooldown timestamp
-                localStorage.setItem('lastUsageReportSent', Date.now().toString());
-                
-                showNotification('✅ Usage report sent successfully!', 'success', 5000);
-                console.log('✅ Usage report submitted successfully');
-                
-            } catch (error) {
-                console.error('❌ Usage report failed:', error);
-                showNotification(`❌ Usage report failed: ${error.message}`, 'error', 5000);
-            } finally {
-                // Re-enable button
-                sendBtn.disabled = false;
-                sendBtn.textContent = 'Send Now';
-            }
-        }
-
-        async function testUsageReport() {
-            const testBtn = document.getElementById('test-report-btn');
-            
-            // Disable button during test
-            testBtn.disabled = true;
-            testBtn.textContent = 'Sending...';
-            
-            try {
-                if (!AppState.usageTracking.reportingEnabled) {
-                    showNotification('⚠️ Enable usage analytics first', 'error', 3000);
-                    return;
-                }
-                
-                console.log('🧪 Sending test usage report...');
-                
-                // Debug: Show current tracking state
-                // Add some test button clicks if none exist
-                if (Object.keys(AppState.usageTracking.buttonClicks).length === 0) {
-                    console.log('🔧 No button clicks found, adding test data...');
-                    trackButtonClick('Test Button', 'settings');
-                    trackButtonClick('Settings Menu', 'settings');
-                    trackButtonClick('Test Usage Report', 'settings');
-                }
-                
-                showNotification('🧪 Generating test usage report...', 'info', 2000);
-                
-                const reportData = generateUsageReportData();
-                
-                // Add test indicator to the report
-                reportData.isTestReport = true;
-                reportData.testTimestamp = new Date().toISOString();
-                reportData.debugInfo = {
-                    trackingInitialized: !!AppState.usageTracking.userHash,
-                    sessionStartTime: AppState.usageTracking.sessionStart,
-                    currentTime: Date.now(),
-                    localStorageWorks: typeof localStorage !== 'undefined'
-                };
-                
-                console.log('📤 Sending report data:', reportData);
-                
-                await submitUsageReportToGitHub(reportData);
-                
-                showNotification('✅ Test usage report sent successfully!', 'success', 5000);
-                console.log('✅ Test report submitted successfully');
-                
-            } catch (error) {
-                console.error('❌ Test report failed:', error);
-                showNotification(`❌ Test report failed: ${error.message}`, 'error', 5000);
-            } finally {
-                // Re-enable button
-                testBtn.disabled = false;
-                testBtn.textContent = 'Send Now';
-            }
-        }
-
         // Settings Menu Functions
         function toggleSettingsMenu() {
             const dropdown = document.getElementById('settings-dropdown');
@@ -7050,26 +5164,6 @@ ${subIssueNumbers.map((num, index) =>
         }
         
         function updateSettingsToggles() {
-            // Update analytics toggle
-            const analyticsToggle = document.getElementById('analytics-toggle');
-            if (analyticsToggle) {
-                if (AppState.usageTracking.reportingEnabled) {
-                    analyticsToggle.classList.add('active');
-                } else {
-                    analyticsToggle.classList.remove('active');
-                }
-            }
-            
-            // Update auto-updates toggle
-            const updatesToggle = document.getElementById('updates-toggle');
-            if (updatesToggle) {
-                if (AppState.autoUpdateEnabled) {
-                    updatesToggle.classList.add('active');
-                } else {
-                    updatesToggle.classList.remove('active');
-                }
-            }
-            
             // Update visual warnings toggle
             const visualWarningsToggle = document.getElementById('visual-warnings-toggle');
             if (visualWarningsToggle) {
@@ -7077,6 +5171,16 @@ ${subIssueNumbers.map((num, index) =>
                     visualWarningsToggle.classList.add('active');
                 } else {
                     visualWarningsToggle.classList.remove('active');
+                }
+            }
+            
+            // Update you spoke notifications toggle
+            const youSpokeToggle = document.getElementById('you-spoke-toggle');
+            if (youSpokeToggle) {
+                if (AppState.youSpokeNotifications) {
+                    youSpokeToggle.classList.add('active');
+                } else {
+                    youSpokeToggle.classList.remove('active');
                 }
             }
             
@@ -7095,9 +5199,14 @@ ${subIssueNumbers.map((num, index) =>
             // Update War Room toggle
             const warRoomToggle = document.getElementById('war-room-toggle');
             if (warRoomToggle) {
-                if (WAR_ROOM_SYSTEM.state.isEnabled) {
-                    warRoomToggle.classList.add('active');
-                } else {
+                try {
+                    if (typeof WAR_ROOM_SYSTEM !== 'undefined' && WAR_ROOM_SYSTEM.state.isEnabled) {
+                        warRoomToggle.classList.add('active');
+                    } else {
+                        warRoomToggle.classList.remove('active');
+                    }
+                } catch (e) {
+                    // WAR_ROOM_SYSTEM not yet initialized
                     warRoomToggle.classList.remove('active');
                 }
             }
@@ -7115,11 +5224,20 @@ ${subIssueNumbers.map((num, index) =>
             // Update Database toggle
             const databaseToggle = document.getElementById('database-toggle');
             if (databaseToggle) {
-                const isEnabled = localStorage.getItem('databaseEnabled') === 'true';
-                const isSupported = SQLITE_STORAGE.checkSupport();
-                if (isEnabled && isSupported) {
-                    databaseToggle.classList.add('active');
-                } else {
+                try {
+                    if (typeof SQLITE_STORAGE !== 'undefined') {
+                        const isEnabled = localStorage.getItem('databaseEnabled') === 'true';
+                        const isSupported = SQLITE_STORAGE.checkSupport();
+                        if (isEnabled && isSupported) {
+                            databaseToggle.classList.add('active');
+                        } else {
+                            databaseToggle.classList.remove('active');
+                        }
+                    } else {
+                        databaseToggle.classList.remove('active');
+                    }
+                } catch (e) {
+                    // SQLITE_STORAGE not yet initialized
                     databaseToggle.classList.remove('active');
                 }
             }
@@ -7127,190 +5245,7 @@ ${subIssueNumbers.map((num, index) =>
             // Update Database UI
             updateDatabaseUI();
         }
-        
-        function toggleAutoUpdateFromSettings() {
-            toggleAutoUpdate();
-            updateSettingsToggles();
-        }
 
-        // Suggestion & Feedback Functions
-        async function submitSuggestion() {
-            const suggestionText = document.getElementById('suggestion-text').value.trim();
-            const submitBtn = document.querySelector('.suggestion-submit-btn');
-            
-            if (!suggestionText) {
-                showNotification('💡 Please enter your feedback before submitting', 'error', 3000);
-                return;
-            }
-            
-            // Disable button during submission
-            submitBtn.disabled = true;
-            submitBtn.textContent = '📤 Submitting...';
-            
-            try {
-                showNotification('📊 Generating feedback report...', 'info', 2000);
-                
-                // Generate detailed usage report
-                const usageData = generateUsageReportData();
-                
-                // Create comprehensive feedback report
-                const feedbackReport = {
-                    timestamp: new Date().toISOString(),
-                    userFeedback: suggestionText,
-                    feedbackType: 'user_suggestion',
-                    sessionInfo: {
-                        userAgent: navigator.userAgent,
-                        timestamp: new Date().toLocaleString(),
-                        sessionDuration: Date.now() - AppState.usageTracking.sessionStart,
-                        currentBranch: AppState.currentBranch || 'main'
-                    },
-                    systemInfo: {
-                        screenResolution: `${screen.width}x${screen.height}`,
-                        colorDepth: screen.colorDepth,
-                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                        language: navigator.language,
-                        platform: navigator.platform,
-                        cookieEnabled: navigator.cookieEnabled,
-                        onlineStatus: navigator.onLine
-                    },
-                    featureUsage: {
-                        warRoomEnabled: localStorage.getItem('warRoomEnabled') === 'true',
-                        visualWarningsEnabled: localStorage.getItem('visualDeadAirWarnings') === 'true',
-                        micLevelEnabled: localStorage.getItem('micLevelDisplay') === 'true',
-                        analyticsEnabled: AppState.usageTracking.reportingEnabled,
-                        autoUpdatesEnabled: AppState.autoUpdate.enabled,
-                        currentTheme: document.body.classList.contains('dark-mode') ? 'dark' : 'light'
-                    },
-                    usageStatistics: {
-                        buttonClicks: Object.keys(usageData.buttonClicks || {}).length,
-                        notesCreated: (usageData.notes || []).length,
-                        sessionCount: usageData.sessionCount || 0,
-                        totalTimeSpent: usageData.totalTimeSpent || 0
-                    },
-                    technicalData: usageData
-                };
-                
-                // Submit to GitHub (bypasses 24-hour limit)
-                showNotification('📤 Sending feedback to GitHub...', 'info', 3000);
-                await submitFeedbackToGitHub(feedbackReport);
-                
-                // Clear the suggestion box
-                document.getElementById('suggestion-text').value = '';
-                
-                showNotification('✅ Feedback successfully submitted to GitHub! Thank you for your input.', 'success', 8000);
-                
-            } catch (error) {
-                console.error('Error submitting feedback:', error);
-                showNotification(`❌ Failed to submit feedback: ${error.message}`, 'error', 8000);
-            } finally {
-                // Re-enable button
-                submitBtn.disabled = false;
-                submitBtn.textContent = '📤 Submit Feedback';
-            }
-        }
-
-        async function submitFeedbackToGitHub(feedbackData) {
-            if (!AppState.githubToken || !AppState.githubRepo) {
-                throw new Error('GitHub credentials not available');
-            }
-
-            const issueTitle = `💡 User Feedback - ${new Date().toLocaleDateString()} - ${feedbackData.technicalData.userHash?.substring(0, 8) || 'unknown'}`;
-            
-            const issueBody = `
-## � User Feedback Report
-
-**Submitted:** ${feedbackData.timestamp}
-**User ID:** ${feedbackData.technicalData.userHash?.substring(0, 8) || 'unknown'}...
-**Session Duration:** ${Math.round(feedbackData.sessionInfo.sessionDuration / 60000)} minutes
-**Current Branch:** ${feedbackData.sessionInfo.currentBranch}
-
-### 📝 User Feedback
-${feedbackData.userFeedback}
-
-### 📊 Session Information
-- **Submitted:** ${feedbackData.sessionInfo.timestamp}
-- **Session Duration:** ${Math.round(feedbackData.sessionInfo.sessionDuration / 60000)} minutes
-- **Current Branch:** ${feedbackData.sessionInfo.currentBranch}
-- **User Agent:** ${feedbackData.sessionInfo.userAgent}
-
-### 🖥️ System Information
-- **Screen Resolution:** ${feedbackData.systemInfo.screenResolution}
-- **Platform:** ${feedbackData.systemInfo.platform}
-- **Language:** ${feedbackData.systemInfo.language}
-- **Timezone:** ${feedbackData.systemInfo.timezone}
-- **Online Status:** ${feedbackData.systemInfo.onlineStatus}
-
-### ⚙️ Feature Configuration
-- **War Room:** ${feedbackData.featureUsage.warRoomEnabled ? '✅ Enabled' : '❌ Disabled'}
-- **Visual Warnings:** ${feedbackData.featureUsage.visualWarningsEnabled ? '✅ Enabled' : '❌ Disabled'}
-- **Mic Level Display:** ${feedbackData.featureUsage.micLevelEnabled ? '✅ Enabled' : '❌ Disabled'}
-- **Analytics:** ${feedbackData.featureUsage.analyticsEnabled ? '✅ Enabled' : '❌ Disabled'}
-- **Auto Updates:** ${feedbackData.featureUsage.autoUpdatesEnabled ? '✅ Enabled' : '❌ Disabled'}
-- **Theme:** ${feedbackData.featureUsage.currentTheme === 'dark' ? '🌙 Dark' : '☀️ Light'}
-
-### 📈 Usage Statistics
-- **Button Clicks Tracked:** ${feedbackData.usageStatistics.buttonClicks}
-- **Notes Created:** ${feedbackData.usageStatistics.notesCreated}
-- **Total Sessions:** ${feedbackData.usageStatistics.sessionCount}
-- **Total Time Spent:** ${feedbackData.usageStatistics.totalTimeSpent} minutes
-
-### � Technical Data
-<details>
-<summary>Click to expand full technical data</summary>
-
-\`\`\`json
-${JSON.stringify(feedbackData.technicalData, null, 2)}
-\`\`\`
-</details>
-
----
-*This feedback was submitted directly through the Frostbyte suggestion system and includes comprehensive technical context for debugging and feature development.*
-            `;
-
-            // Create GitHub issue
-            const issueResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${AppState.githubToken}`,
-                    'Accept': 'application/vnd.github+json',
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Frostbyte-Feedback'
-                },
-                body: JSON.stringify({
-                    title: issueTitle,
-                    body: issueBody,
-                    labels: ['feedback', 'user-suggestion', 'enhancement', 'auto-generated']
-                })
-            });
-
-            if (!issueResponse.ok) {
-                const errorText = await issueResponse.text();
-                console.error('GitHub API Error:', errorText);
-                throw new Error(`GitHub submission failed: ${issueResponse.status} ${issueResponse.statusText}`);
-            }
-
-            const issueData = await issueResponse.json();
-            console.log('✅ Feedback submitted to GitHub:', issueData.html_url);
-            
-            return issueData;
-        }
-
-        // Branch Management Functions
-        function initializeBranchSelector() {
-            // Load saved branch preference
-            const savedBranch = localStorage.getItem('selectedBranch') || 'main';
-            AppState.currentBranch = savedBranch;
-            
-            // Update UI
-            const branchSelector = document.getElementById('branch-selector');
-            if (branchSelector) {
-                branchSelector.value = savedBranch;
-            }
-            
-            updateBranchInfo();
-            console.log(`🌿 Current branch: ${savedBranch}`);
-        }
-        
         function initializeVisualWarnings() {
             // Load saved visual warnings preference
             const savedVisualWarnings = localStorage.getItem('visualDeadAirWarnings');
@@ -7318,7 +5253,14 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                 AppState.visualDeadAirWarnings = savedVisualWarnings === 'true';
             }
             
+            // Load saved you spoke notifications preference
+            const savedYouSpoke = localStorage.getItem('youSpokeNotifications');
+            if (savedYouSpoke !== null) {
+                AppState.youSpokeNotifications = savedYouSpoke === 'true';
+            }
+            
             console.log(`⚠️ Visual dead air warnings: ${AppState.visualDeadAirWarnings ? 'enabled' : 'disabled'}`);
+            console.log(`🗣️ "You Spoke" notifications: ${AppState.youSpokeNotifications ? 'enabled' : 'disabled'}`);
         }
         
         function initializeMicrophoneSettings() {
@@ -7402,143 +5344,6 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             }
         }
         
-        function handleBranchChange() {
-            const branchSelector = document.getElementById('branch-selector');
-            const selectedBranch = branchSelector.value;
-            
-            if (selectedBranch === 'main') {
-                // Main branch doesn't need password
-                switchToBranch('main');
-            } else {
-                // Protected branches need password
-                promptForBranchPassword(selectedBranch);
-            }
-        }
-        
-        function promptForBranchPassword(branch) {
-            const branchName = branch === 'beta' ? 'Beta' : 'Development';
-            
-            // Create password prompt overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'password-overlay';
-            
-            const prompt = document.createElement('div');
-            prompt.className = 'password-prompt';
-            prompt.innerHTML = `
-                <h3>🔒 ${branchName} Branch Access</h3>
-                <p>This branch requires a password to access.</p>
-                <input type="password" class="password-input" id="branch-password" placeholder="Enter password..." maxlength="50">
-                <div style="margin-top: 15px;">
-                    <button onclick="verifyBranchPassword('${branch}')" class="primary-button" style="margin-right: 10px;">Unlock</button>
-                    <button onclick="cancelBranchSwitch()" class="danger-button">Cancel</button>
-                </div>
-            `;
-            
-            overlay.appendChild(prompt);
-            document.body.appendChild(overlay);
-            
-            // Focus password input
-            setTimeout(() => {
-                document.getElementById('branch-password').focus();
-            }, 100);
-            
-            // Handle Enter key
-            document.getElementById('branch-password').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    verifyBranchPassword(branch);
-                }
-            });
-        }
-        
-        function verifyBranchPassword(branch) {
-            const passwordInput = document.getElementById('branch-password');
-            const enteredPassword = passwordInput.value;
-            const correctPassword = AppState.branchPasswords[branch];
-            
-            if (enteredPassword === correctPassword) {
-                // Correct password
-                switchToBranch(branch);
-                closeBranchPasswordPrompt();
-                showNotification(`🌿 Switched to ${branch.charAt(0).toUpperCase() + branch.slice(1)} branch`, 'success', 3000);
-            } else {
-                // Wrong password
-                passwordInput.value = '';
-                passwordInput.style.borderColor = '#dc3545';
-                passwordInput.placeholder = 'Incorrect password. Try again...';
-                showNotification('❌ Incorrect password', 'error', 2000);
-                
-                // Reset border color after 2 seconds
-                setTimeout(() => {
-                    passwordInput.style.borderColor = '';
-                    passwordInput.placeholder = 'Enter password...';
-                }, 2000);
-            }
-        }
-        
-        function cancelBranchSwitch() {
-            // Reset selector to current branch
-            const branchSelector = document.getElementById('branch-selector');
-            branchSelector.value = AppState.currentBranch;
-            
-            closeBranchPasswordPrompt();
-        }
-        
-        function closeBranchPasswordPrompt() {
-            const overlay = document.querySelector('.password-overlay');
-            if (overlay) {
-                overlay.remove();
-            }
-        }
-        
-        function switchToBranch(branch) {
-            AppState.currentBranch = branch;
-            localStorage.setItem('selectedBranch', branch);
-            
-            // Update GitHub repo reference based on branch
-            if (branch === 'main') {
-                AppState.githubRepo = 'shadow11001/Frostbyte';
-            } else if (branch === 'beta') {
-                AppState.githubRepo = 'shadow11001/Frostbyte'; // Same repo, beta branch
-            } else if (branch === 'dev') {
-                AppState.githubRepo = 'shadow11001/Frostbyte'; // Same repo, dev branch
-            }
-            
-            // Control dev-only features visibility
-            const devButton = document.getElementById('dev-email-analysis-btn');
-            if (devButton) {
-                if (branch === 'dev') {
-                    devButton.style.display = 'inline-block';
-                    console.log('🧪 Dev features enabled - Email analysis button visible');
-                } else {
-                    devButton.style.display = 'none';
-                    console.log('🚫 Dev features hidden - Not on dev branch');
-                }
-            }
-            
-            updateBranchInfo();
-            
-            console.log(`🌿 Switched to ${branch} branch`);
-        }
-        
-        function updateBranchInfo() {
-            const branchInfo = document.getElementById('branch-info');
-            if (branchInfo) {
-                let branchDisplay = '';
-                switch(AppState.currentBranch) {
-                    case 'main':
-                        branchDisplay = 'Stable (Recommended)';
-                        break;
-                    case 'beta':
-                        branchDisplay = 'Beta (Testing Features)';
-                        break;
-                    case 'dev':
-                        branchDisplay = 'Development (Experimental)';
-                        break;
-                }
-                branchInfo.textContent = `Currently using: ${branchDisplay}`;
-            }
-        }
-        
         // Visual Dead Air Warnings Toggle
         function toggleVisualDeadAirWarnings() {
             AppState.visualDeadAirWarnings = !AppState.visualDeadAirWarnings;
@@ -7562,6 +5367,20 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
             }
             
             console.log(`⚠️ Visual dead air warnings ${status}`);
+        }
+        
+        // You Spoke Notifications Toggle
+        function toggleYouSpokeNotifications() {
+            AppState.youSpokeNotifications = !AppState.youSpokeNotifications;
+            localStorage.setItem('youSpokeNotifications', AppState.youSpokeNotifications.toString());
+            
+            const status = AppState.youSpokeNotifications ? 'enabled' : 'disabled';
+            showNotification(`🗣️ "You Spoke" notifications ${status}`, 'success', 3000);
+            
+            // Update toggle visual state
+            updateSettingsToggles();
+            
+            console.log(`🗣️ "You Spoke" notifications ${status}`);
         }
         
         // ============= War Room Schedule Functions =============
@@ -8366,7 +6185,6 @@ ${JSON.stringify(feedbackData.technicalData, null, 2)}
                     
 Notes: ${stats.totalNotes}
 Settings: ${stats.totalSettings}
-Analytics: ${stats.totalAnalytics}
 Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                     
                     alert(statsMessage);
@@ -8472,75 +6290,6 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             }
         }
 
-        function applyUpdate(newContent, newVersion) {
-            const updateChoice = confirm(`Update to version ${newVersion}?\n\nThis will download the new version. You'll need to replace your current file manually.`);
-            if (!updateChoice) {
-                return;
-            }
-            
-            try {
-                // Get the current file name
-                const currentFileName = window.location.pathname.split('/').pop() || 'Frostbyte.html';
-                
-                // Add UTF-8 BOM and create blob with explicit UTF-8 encoding
-                const utf8BOM = '\uFEFF';
-                const contentWithBOM = utf8BOM + newContent;
-                const blob = new Blob([contentWithBOM], { 
-                    type: 'text/html;charset=utf-8' 
-                });
-                const url = URL.createObjectURL(blob);
-                
-                // Create a download link
-                const downloadLink = document.createElement('a');
-                downloadLink.href = url;
-                downloadLink.download = currentFileName;
-                downloadLink.style.display = 'none';
-                
-                // Add to page, click, and remove
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-                
-                // Clean up the URL object
-                URL.revokeObjectURL(url);
-                
-                // Show simple success notification
-                showNotification(`💾 v${newVersion} downloaded successfully!`, 'success', 5000);
-                
-                // Remove the update button since update is "applied"
-                const dynamicBtn = document.getElementById('dynamic-update-btn');
-                if (dynamicBtn) dynamicBtn.remove();
-                
-                // Remove instructions too
-                const instructions = document.querySelector('.update-instructions');
-                if (instructions) instructions.remove();
-                
-            } catch (error) {
-                console.error('Update download failed:', error);
-                showNotification('❌ Update download failed - Please try again', 'error', 5000);
-            }
-        }
-
-
-
-        function setGitHubToken() {
-            const token = prompt('Enter your GitHub Personal Access Token for private repo access:\n\n(Leave blank to cancel)');
-            if (token && token.trim()) {
-                AppState.githubToken = token.trim();
-                localStorage.setItem('githubToken', AppState.githubToken);
-                showNotification('🔑 GitHub token saved - Updates enabled', 'success', 3000);
-                checkForUpdates();
-            }
-        }
-
-        function toggleAutoUpdate() {
-            AppState.autoUpdateEnabled = !AppState.autoUpdateEnabled;
-            localStorage.setItem('autoUpdateEnabled', AppState.autoUpdateEnabled.toString());
-            
-            const status = AppState.autoUpdateEnabled ? 'enabled' : 'disabled';
-            showNotification(`🔄 Auto-updates ${status}`, 'success', 2000);
-        }
-
         // VCC Integration Methods
         function initializeVCCIntegration() {
             console.log('VCC Integration: Browser audio capture requires Google sign-in');
@@ -8553,11 +6302,6 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             setTimeout(() => {
                 showNotification('💡 VCC Tips: Use VCC button or Spacebar for manual control', 'success', 4000);
             }, 2000);
-            
-            // Add info about Google sign-in requirement
-            setTimeout(() => {
-                showNotification('ℹ️ Auto-detection needs Google sign-in for audio access', 'error', 5000);
-            }, 7000);
             
             console.log('VCC manual integration ready');
         }
@@ -8680,7 +6424,7 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                     consecutiveHighAudio++;
                     console.log(`HIGH audio detected: ${Math.round(average)}, consecutive: ${consecutiveHighAudio}`);
                     
-                    if (consecutiveHighAudio >= 3 && !AppState.timerRunning && AppState.autoStartEnabled) {
+                    if (consecutiveHighAudio >= 3 && !AppState.timerRunning) {
                         console.log('🎯 VCC CALL DETECTED - Starting timer!');
                         showNotification('📞 VCC audio spike detected - Starting timer!', 'success', 3000);
                         startTimer();
@@ -8742,7 +6486,7 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             }
             
             // Special handling for war room tab
-            if (tabName === 'war-room' && !WAR_ROOM_SYSTEM.state.isEnabled) {
+            if (tabName === 'war-room' && typeof WAR_ROOM_SYSTEM !== 'undefined' && !WAR_ROOM_SYSTEM.state.isEnabled) {
                 showNotification('🎯 War Room is disabled. Enable it in settings first.', 'info', 3000);
                 setTimeout(() => switchTab('quick-notes'), 100);
                 return;
@@ -9329,9 +7073,6 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
                 return;
             }
             
-            // Track email processing usage
-            trackButtonClick('Extract Email Info', 'email-processing');
-            
             showNotification('🔍 Extracting information...', 'info', 2000);
             
             // Combine subject and body for processing
@@ -9525,200 +7266,6 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
             showNotification('🗑️ Email extractor cleared', 'success', 2000);
         }
 
-        // Dev-only email analysis function
-        async function submitEmailForAnalysis() {
-            // Track developer email analysis usage
-            trackButtonClick('Email Analysis (Dev)', 'email-processing');
-            
-            const emailSubject = document.getElementById('email-subject').value.trim();
-            const emailBody = document.getElementById('email-body').value.trim();
-            const analysisBtn = document.getElementById('dev-email-analysis-btn');
-            
-            if (!emailSubject && !emailBody) {
-                showNotification('📧 Please enter email content to analyze', 'error', 3000);
-                return;
-            }
-            
-            // Disable button during submission
-            analysisBtn.disabled = true;
-            analysisBtn.textContent = '🧪 Analyzing...';
-            
-            try {
-                showNotification('📊 Processing email for analysis...', 'info', 2000);
-                
-                // Combine subject and body for processing
-                const emailContent = (emailSubject ? 'Subject: ' + emailSubject + '\n\n' : '') + emailBody;
-                
-                // Extract information using EMAIL_PROCESSOR methods
-                const emailData = {
-                    subject: emailSubject,
-                    body: emailBody,
-                    workOrder: EMAIL_PROCESSOR.extractWorkOrder(emailContent),
-                    workOrders: EMAIL_PROCESSOR.extractWorkOrder(emailContent) ? [EMAIL_PROCESSOR.extractWorkOrder(emailContent)] : [],
-                    storeNumber: EMAIL_PROCESSOR.extractStoreNumber(emailContent),
-                    storeNumbers: EMAIL_PROCESSOR.extractAllStoreNumbers(emailContent),
-                    caseNumber: EMAIL_PROCESSOR.extractCaseNumber(emailContent),
-                    caseNumbers: EMAIL_PROCESSOR.extractAllCaseNumbers(emailContent),
-                    rackName: EMAIL_PROCESSOR.extractRackName(emailContent),
-                    rackNames: EMAIL_PROCESSOR.extractRackName(emailContent) ? [EMAIL_PROCESSOR.extractRackName(emailContent)] : [],
-                    techName: EMAIL_PROCESSOR.extractTechName(emailContent),
-                    techNames: EMAIL_PROCESSOR.extractTechName(emailContent) ? [EMAIL_PROCESSOR.extractTechName(emailContent)] : [],
-                    techPhone: EMAIL_PROCESSOR.extractTechPhone(emailContent),
-                    techPhones: EMAIL_PROCESSOR.extractTechPhone(emailContent) ? [EMAIL_PROCESSOR.extractTechPhone(emailContent)] : [],
-                    techEmail: EMAIL_PROCESSOR.extractTechEmail(emailContent),
-                    techEmails: EMAIL_PROCESSOR.extractTechEmail(emailContent) ? [EMAIL_PROCESSOR.extractTechEmail(emailContent)] : [],
-                    emailType: EMAIL_PROCESSOR.classifyEmail(emailContent),
-                    rawContent: emailContent
-                };
-                
-                // Create comprehensive analysis report
-                const analysisReport = {
-                    timestamp: new Date().toISOString(),
-                    emailSubject: emailSubject,
-                    emailBody: emailBody,
-                    originalEmail: emailContent,
-                    extractedData: emailData,
-                    systemInfo: {
-                        userAgent: navigator.userAgent,
-                        currentBranch: AppState.currentBranch || 'dev',
-                        timestamp: new Date().toLocaleString(),
-                        sessionId: AppState.usageTracking.userHash?.substring(0, 8) || 'unknown'
-                    },
-                    analysisMetrics: {
-                        emailLength: emailContent.length,
-                        wordCount: emailContent.split(/\s+/).length,
-                        lineCount: emailContent.split('\n').length,
-                        workOrdersFound: emailData.workOrders?.length || 0,
-                        storeNumbersFound: emailData.storeNumbers?.length || 0,
-                        caseNumbersFound: emailData.caseNumbers?.length || 0,
-                        rackNamesFound: emailData.rackNames?.length || 0,
-                        techNamesFound: emailData.techNames?.length || 0,
-                        techPhonesFound: emailData.techPhones?.length || 0,
-                        techEmailsFound: emailData.techEmails?.length || 0,
-                        emailType: emailData.emailType || 'unknown'
-                    }
-                };
-                
-                // Submit to GitHub for analysis
-                showNotification('📤 Sending email analysis to GitHub...', 'info', 3000);
-                await submitEmailAnalysisToGitHub(analysisReport);
-                
-                showNotification('✅ Email analysis submitted successfully! (Dev branch only)', 'success', 5000);
-                
-            } catch (error) {
-                console.error('Error submitting email analysis:', error);
-                showNotification(`❌ Failed to submit analysis: ${error.message}`, 'error', 8000);
-            } finally {
-                // Re-enable button
-                analysisBtn.disabled = false;
-                analysisBtn.textContent = '🧪 Analyze Email (Dev)';
-            }
-        }
-
-        async function submitEmailAnalysisToGitHub(analysisData) {
-            if (!AppState.githubToken || !AppState.githubRepo) {
-                throw new Error('GitHub credentials not available');
-            }
-
-            const issueTitle = `📧 Email Analysis - ${new Date().toLocaleDateString()} - ${analysisData.systemInfo.sessionId}`;
-            
-            const issueBody = `
-## 📧 Email Processing Analysis Report
-
-**Submitted:** ${analysisData.timestamp}
-**Session ID:** ${analysisData.systemInfo.sessionId}
-**Current Branch:** ${analysisData.systemInfo.currentBranch}
-**Analysis Type:** Development Email Processing
-
-### 📊 Email Metrics
-- **Email Length:** ${analysisData.analysisMetrics.emailLength} characters
-- **Word Count:** ${analysisData.analysisMetrics.wordCount} words
-- **Line Count:** ${analysisData.analysisMetrics.lineCount} lines
-- **Detected Email Type:** ${analysisData.analysisMetrics.emailType}
-
-### 🔍 Extraction Results
-- **Work Orders Found:** ${analysisData.analysisMetrics.workOrdersFound}
-- **Store Numbers Found:** ${analysisData.analysisMetrics.storeNumbersFound}
-- **Case Numbers Found:** ${analysisData.analysisMetrics.caseNumbersFound}
-- **Rack Names Found:** ${analysisData.analysisMetrics.rackNamesFound}
-- **Tech Names Found:** ${analysisData.analysisMetrics.techNamesFound}
-
-### 📋 Extracted Data
-<details>
-<summary>Click to expand extracted information</summary>
-
-\`\`\`json
-${JSON.stringify(analysisData.extractedData, null, 2)}
-\`\`\`
-</details>
-
-### 📧 Original Email Content
-
-**Subject:**
-\`\`\`
-${analysisData.emailSubject || 'No subject provided'}
-\`\`\`
-
-**Body:**
-<details>
-<summary>Click to expand email body</summary>
-
-\`\`\`
-${analysisData.emailBody || 'No body provided'}
-\`\`\`
-</details>
-
-### 🔧 System Information
-- **User Agent:** ${analysisData.systemInfo.userAgent}
-- **Submission Time:** ${analysisData.systemInfo.timestamp}
-- **Current Branch:** ${analysisData.systemInfo.currentBranch}
-
----
-*This email analysis was submitted from the development branch for improving email processing accuracy and debugging extraction algorithms.*
-            `;
-
-            // Create GitHub issue
-            const issueResponse = await fetch(`https://api.github.com/repos/${AppState.githubRepo}/issues`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${AppState.githubToken}`,
-                    'Accept': 'application/vnd.github+json',
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Frostbyte-Email-Analysis'
-                },
-                body: JSON.stringify({
-                    title: issueTitle,
-                    body: issueBody,
-                    labels: ['email-analysis', 'development', 'auto-generated', 'enhancement']
-                })
-            });
-
-            if (!issueResponse.ok) {
-                const errorText = await issueResponse.text();
-                console.error('GitHub API Error:', errorText);
-                throw new Error(`GitHub submission failed: ${issueResponse.status} ${issueResponse.statusText}`);
-            }
-
-            const issueData = await issueResponse.json();
-            console.log('✅ Email analysis submitted to GitHub:', issueData.html_url);
-            
-            return issueData;
-        }
-
-        // Initialize dev button visibility on page load
-        function initializeDevFeatures() {
-            const currentBranch = AppState.currentBranch || localStorage.getItem('selectedBranch') || 'main';
-            const devButton = document.getElementById('dev-email-analysis-btn');
-            
-            if (currentBranch === 'dev') {
-                devButton.style.display = 'inline-block';
-                console.log('🧪 Dev features enabled - Email analysis button visible');
-            } else {
-                devButton.style.display = 'none';
-                console.log('🚫 Dev features hidden - Not on dev branch');
-            }
-        }
-
         // War Room System
         const WAR_ROOM_SYSTEM = {
             state: {
@@ -9740,6 +7287,7 @@ ${analysisData.emailBody || 'No body provided'}
                         systemFormat: "Verified in {SYSTEM}:",
                         rackFormat: "detailed",
                         includeWorkOrders: true,
+                        includeSummary: true,
                         customTemplate: `*Site {STORE}
 Verified in {SYSTEM}:
 {RACKS}
@@ -9756,6 +7304,7 @@ Site {STORE}:
                         systemFormat: "Verified in {SYSTEM}:",
                         rackFormat: "condensed",
                         includeWorkOrders: false,
+                        includeSummary: true,
                         customTemplate: `Site {STORE}
 Verified in {SYSTEM}:
 {RACKS}`
@@ -9767,6 +7316,7 @@ Verified in {SYSTEM}:
                         systemFormat: "verified in {SYSTEM}",
                         rackFormat: "simple",
                         includeWorkOrders: false,
+                        includeSummary: true,
                         customTemplate: `Site {STORE}
 verified in {SYSTEM}
 {RACKS}`
@@ -9775,9 +7325,13 @@ verified in {SYSTEM}
             },
             
             systemRacks: {
-                'Carel Boss': ['LTA', 'LTB', 'MTC', 'MTD', 'RCU'],
-                'Danfoss': ['LTA', 'LTB', 'MTC', 'MTD'],
+                'Novar': [],
+                'Opus Arch': [],
+                'Opus Mag': [],
                 'CPC': ['CKTS'],
+                'AKA65': ['HVAC'],
+                'Danfoss': ['LTA', 'LTB', 'MTC', 'MTD'],
+                'Carel Boss': ['LTA', 'LTB', 'MTC', 'MTD', 'RCU'],
                 'Other': []
             },
             
@@ -9883,8 +7437,10 @@ verified in {SYSTEM}
 
         // War Room Functions
         function toggleWarRoom() {
-            // Track war room toggle
-            trackButtonClick('Toggle War Room', 'war-room');
+            if (typeof WAR_ROOM_SYSTEM === 'undefined') {
+                console.error('WAR_ROOM_SYSTEM not yet initialized');
+                return;
+            }
             
             WAR_ROOM_SYSTEM.state.isEnabled = !WAR_ROOM_SYSTEM.state.isEnabled;
             localStorage.setItem('warRoomEnabled', WAR_ROOM_SYSTEM.state.isEnabled.toString());
@@ -9955,6 +7511,7 @@ verified in {SYSTEM}
                 systemFormat: document.getElementById('system-format').value,
                 rackFormat: document.getElementById('rack-format').value,
                 includeWorkOrders: document.getElementById('include-wo-section').checked,
+                includeSummary: document.getElementById('include-summary-section').checked,
                 customTemplate: document.getElementById('custom-template').value
             };
             
@@ -9983,6 +7540,7 @@ verified in {SYSTEM}
                 systemFormat: document.getElementById('system-format').value,
                 rackFormat: document.getElementById('rack-format').value,
                 includeWorkOrders: document.getElementById('include-wo-section').checked,
+                includeSummary: document.getElementById('include-summary-section').checked,
                 customTemplate: document.getElementById('custom-template').value
             };
             
@@ -10006,6 +7564,7 @@ verified in {SYSTEM}
                 document.getElementById('system-format').value = preset.systemFormat;
                 document.getElementById('rack-format').value = preset.rackFormat;
                 document.getElementById('include-wo-section').checked = preset.includeWorkOrders;
+                document.getElementById('include-summary-section').checked = preset.includeSummary !== false;
                 document.getElementById('custom-template').value = preset.customTemplate;
                 
                 updateTemplatePreview();
@@ -10022,6 +7581,7 @@ verified in {SYSTEM}
                 document.getElementById('system-format').value = defaultTemplate.systemFormat;
                 document.getElementById('rack-format').value = defaultTemplate.rackFormat;
                 document.getElementById('include-wo-section').checked = defaultTemplate.includeWorkOrders;
+                document.getElementById('include-summary-section').checked = defaultTemplate.includeSummary !== false;
                 document.getElementById('custom-template').value = defaultTemplate.customTemplate;
                 
                 updateTemplatePreview();
@@ -10031,8 +7591,6 @@ verified in {SYSTEM}
         
         function startWarRoomCheck() {
             // Track war room check start
-            trackButtonClick('Start War Room Check', 'war-room');
-            
             const storesText = document.getElementById('assigned-stores').value.trim();
             if (!storesText) {
                 showNotification('❌ Please enter store numbers first', 'error', 3000);
@@ -10146,6 +7704,7 @@ verified in {SYSTEM}
                 // Restore previously saved data
                 systemSelect.value = savedStoreData.system;
                 generateRackInterface(savedStoreData.system);
+                
                 const source = dataSource === 'localStorage' ? ' (from previous check)' : '';
                 showNotification(`📋 Loaded saved data for Store ${currentStore}${source}`, 'info', 3000);
             } else {
@@ -10172,11 +7731,6 @@ verified in {SYSTEM}
             const rackListElement = document.getElementById('rack-list');
             const currentStore = WAR_ROOM_SYSTEM.state.assignedStores[WAR_ROOM_SYSTEM.state.currentStoreIndex];
             
-            if (racks.length === 0) {
-                rackListElement.innerHTML = '<p>No predefined racks for this system. Use "Add Custom Rack" button.</p>';
-                return;
-            }
-            
             // Check for saved data: First check current session, then localStorage
             let savedStoreData = WAR_ROOM_SYSTEM.state.storeResults.find(s => s.store === currentStore);
             
@@ -10189,10 +7743,44 @@ verified in {SYSTEM}
                 }
             }
             
+            // Determine which custom racks to use: saved data takes precedence over DOM
+            let customRacksToUse = [];
+            
+            if (savedStoreData?.racks) {
+                // Use custom racks from saved data
+                customRacksToUse = savedStoreData.racks.filter(r => !racks.includes(r.name));
+                console.log('🔧 Using saved custom racks:', customRacksToUse.map(r => r.name));
+            } else {
+                // No saved data, preserve what's currently in the DOM
+                const existingRackItems = rackListElement.querySelectorAll('.rack-item');
+                existingRackItems.forEach(item => {
+                    const select = item.querySelector('select[name^="rack-"]');
+                    if (select) {
+                        const rackName = select.name.replace('rack-', '');
+                        // Check if this is a custom rack (not in predefined list)
+                        if (!racks.includes(rackName)) {
+                            const textarea = item.querySelector('textarea');
+                            customRacksToUse.push({
+                                name: rackName,
+                                status: select.value,
+                                details: textarea ? textarea.value : ''
+                            });
+                        }
+                    }
+                });
+                console.log('🔧 Preserving DOM custom racks:', customRacksToUse.map(r => r.name));
+            }
+            
+            if (racks.length === 0 && customRacksToUse.length === 0) {
+                rackListElement.innerHTML = '<p>No predefined racks for this system. Use "Add Custom Rack" button.</p>';
+                return;
+            }
+            
             console.log('🔍 Generating rack interface for store:', currentStore);
             console.log('📦 Saved store data:', savedStoreData);
             
-            rackListElement.innerHTML = racks.map(rack => {
+            // Generate predefined racks
+            let rackHTML = racks.map(rack => {
                 // Find saved rack data if it exists
                 const savedRack = savedStoreData?.racks?.find(r => r.name === rack);
                 const savedStatus = savedRack?.status || 'No Alarms';
@@ -10216,6 +7804,28 @@ verified in {SYSTEM}
                 </div>
             `;
             }).join('');
+            
+            // Add custom racks back
+            customRacksToUse.forEach(customRack => {
+                rackHTML += `
+                <div class="rack-item">
+                    <label>${customRack.name}:</label>
+                    <select name="rack-${customRack.name}" onchange="toggleRackDetails('${customRack.name}', this.value)">
+                        <option value="No Alarms" ${customRack.status === 'No Alarms' ? 'selected' : ''}>No Alarms</option>
+                        <option value="Alarm Found" ${customRack.status === 'Alarm Found' ? 'selected' : ''}>Alarm Found</option>
+                        <option value="Not Monitored" ${customRack.status === 'Not Monitored' ? 'selected' : ''}>Not Monitored</option>
+                        <option value="System Down" ${customRack.status === 'System Down' ? 'selected' : ''}>System Down</option>
+                    </select>
+                    <textarea placeholder="Describe alarm details here..." 
+                              name="rack-${customRack.name}-details" 
+                              style="display: ${customRack.status === 'Alarm Found' ? 'block' : 'none'};"
+                              rows="5">${customRack.details || ''}</textarea>
+                    <button onclick="this.parentElement.remove()" class="danger-button" style="padding: 2px 6px; font-size: 12px;">✕</button>
+                </div>
+            `;
+            });
+            
+            rackListElement.innerHTML = rackHTML || '<p>No racks defined. Use "Add Custom Rack" button.</p>';
         }
         
         function toggleRackDetails(rackName, status) {
@@ -10321,12 +7931,14 @@ verified in {SYSTEM}
             renderWorkOrders();
         }
         
-        function saveStoreData() {
+        function saveStoreData(autoSave = false) {
             const currentStore = WAR_ROOM_SYSTEM.state.assignedStores[WAR_ROOM_SYSTEM.state.currentStoreIndex];
             const system = document.getElementById('control-system').value;
             
             if (!system) {
-                showNotification('❌ Please select a control system', 'error', 3000);
+                if (!autoSave) {
+                    showNotification('❌ Please select a control system', 'error', 3000);
+                }
                 return;
             }
             
@@ -10379,8 +7991,9 @@ verified in {SYSTEM}
             
             console.log('✅ Updated storeResults:', WAR_ROOM_SYSTEM.state.storeResults);
             
-            showNotification(`✅ Store ${currentStore} data saved`, 'success', 2000);
-            nextStore();
+            if (!autoSave) {
+                showNotification(`✅ Store ${currentStore} data saved`, 'success', 2000);
+            }
         }
         
         // Save rack data to localStorage for persistence across War Room sessions
@@ -10422,8 +8035,18 @@ verified in {SYSTEM}
             }
         }
         
+        function saveAndContinue() {
+            const currentStore = WAR_ROOM_SYSTEM.state.assignedStores[WAR_ROOM_SYSTEM.state.currentStoreIndex];
+            saveStoreData();
+            showNotification(`✅ Store ${currentStore} data saved`, 'success', 2000);
+            nextStore();
+        }
+        
         function previousStore() {
             if (WAR_ROOM_SYSTEM.state.currentStoreIndex > 0) {
+                // Auto-save current store data before navigating
+                saveStoreData(true);
+                
                 WAR_ROOM_SYSTEM.state.currentStoreIndex--;
                 updateProgress();
                 loadCurrentStore();
@@ -10432,6 +8055,9 @@ verified in {SYSTEM}
         }
         
         function nextStore() {
+            // Auto-save current store data before navigating
+            saveStoreData(true);
+            
             WAR_ROOM_SYSTEM.state.currentStoreIndex++;
             
             if (WAR_ROOM_SYSTEM.state.currentStoreIndex >= WAR_ROOM_SYSTEM.state.assignedStores.length) {
@@ -10510,8 +8136,6 @@ verified in {SYSTEM}
         
         function completeWarRoomCheck() {
             // Track war room completion
-            trackButtonClick('Complete War Room Check', 'war-room');
-            
             // Clear the completion deadline
             AppState.warRoomSchedule.completionDeadline = null;
             
@@ -10552,16 +8176,19 @@ verified in {SYSTEM}
                 finalReport += WAR_ROOM_SYSTEM.applyTemplate(storeData, template) + '\\n\\n';
             });
             
-            // Add summary
-            finalReport += `\\n--- WAR ROOM SUMMARY ---\\n`;
-            finalReport += `Session ID: ${WAR_ROOM_SYSTEM.state.sessionId}\\n`;
-            finalReport += `Agent: ${localStorage.getItem('agentName') || 'Unknown'}\\n`;
-            finalReport += `Total Stores Checked: ${WAR_ROOM_SYSTEM.state.storeResults.length}\\n`;
-            finalReport += `Stores with Alarms: ${WAR_ROOM_SYSTEM.state.storeResults.filter(s => s.hasAlarms).length}\\n`;
-            finalReport += `Work Orders Monitored: ${WAR_ROOM_SYSTEM.state.storeResults.reduce((total, s) => total + s.workOrders.length, 0)}\\n`;
-            finalReport += `Check Started: ${WAR_ROOM_SYSTEM.state.sessionStartTime.toLocaleString()}\\n`;
-            finalReport += `Check Completed: ${new Date().toLocaleString()}\\n`;
-            finalReport += `Verification Code: ${WAR_ROOM_SYSTEM.generateVerificationCode()}\\n`;
+            // Add summary if enabled in template
+            const includeSummary = template.includeSummary !== false;
+            if (includeSummary) {
+                finalReport += `\\n--- WAR ROOM SUMMARY ---\\n`;
+                finalReport += `Session ID: ${WAR_ROOM_SYSTEM.state.sessionId}\\n`;
+                finalReport += `Agent: ${localStorage.getItem('agentName') || 'Unknown'}\\n`;
+                finalReport += `Total Stores Checked: ${WAR_ROOM_SYSTEM.state.storeResults.length}\\n`;
+                finalReport += `Stores with Alarms: ${WAR_ROOM_SYSTEM.state.storeResults.filter(s => s.hasAlarms).length}\\n`;
+                finalReport += `Work Orders Monitored: ${WAR_ROOM_SYSTEM.state.storeResults.reduce((total, s) => total + s.workOrders.length, 0)}\\n`;
+                finalReport += `Check Started: ${WAR_ROOM_SYSTEM.state.sessionStartTime.toLocaleString()}\\n`;
+                finalReport += `Check Completed: ${new Date().toLocaleString()}\\n`;
+                finalReport += `Verification Code: ${WAR_ROOM_SYSTEM.generateVerificationCode()}\\n`;
+            }
             
             // Convert newlines to <br> tags for HTML display
             const displayReport = finalReport.replace(/\\n/g, '<br>');
@@ -10569,9 +8196,6 @@ verified in {SYSTEM}
         }
         
         function copyWarRoomResults() {
-            // Track war room copy action
-            trackButtonClick('Copy War Room Results', 'war-room');
-            
             // Get the HTML content and convert <br> tags back to newlines
             let resultsText = document.getElementById('results-content').innerHTML;
             resultsText = resultsText.replace(/<br>/g, '\n');
@@ -10767,10 +8391,6 @@ verified in {SYSTEM}
             } else {
                 notesTextarea.value = noteText;
             }
-            
-            // Track button usage for analytics
-            trackButtonClick(noteText, 'quick-note');
-            trackNotePattern(notesTextarea.value);
             
             // Trigger auto-save
             scheduleAutoSave();
@@ -11984,9 +9604,6 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                     notesBox.value = templateContent;
                     notesBox.dataset.userEdited = 'false';
                     
-                    // Track DAE template usage
-                    trackButtonClick(selectedOption, 'dae-template');
-                    
                     showNotification('Template loaded with store/WO info', 'success', 1500);
                     
                     // Update tag recommendations after loading template
@@ -12044,13 +9661,17 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 const button = event.target;
                 const formData = getFormData();
                 
-                const copiedText = [];
-                if (formData.techName) copiedText.push(`Technician Name: ${formData.techName}`);
-                if (formData.storeNumber) copiedText.push(`Store Number: ${formData.storeNumber}`);
-                if (formData.workOrder) copiedText.push(`Work Order Number: ${formData.workOrder}`);
-                if (formData.notes) copiedText.push(formData.notes);
+                // Build the new format: "Tech_name | EMS | Store_Number | WO: Work_Order_Number - Rest of notes"
+                const techName = formData.techName || 'N/A';
+                const selectedSystem = AppState.selectedSystem || 'N/A';
+                const storeNumber = formData.storeNumber || 'N/A';
+                const workOrder = formData.workOrder || 'N/A';
+                const notes = formData.notes || '';
+                
+                // Format: Tech | EMS | Store | WO: Number - Notes
+                const formattedNote = `${techName} | ${selectedSystem} | ${storeNumber} | WO: ${workOrder}${notes ? ' - ' + notes : ''}`;
 
-                if (copiedText.length === 0) {
+                if (!techName && !storeNumber && !workOrder && !notes) {
                     showNotification('No data to copy', 'error');
                     button.disabled = false;
                     button.classList.remove('loading');
@@ -12071,11 +9692,11 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 const success = true; // saveNotesHistory already called above
                 
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(copiedText.join('\n'));
+                    await navigator.clipboard.writeText(formattedNote);
                 } else {
                     // Fallback
                     const tempTextarea = document.createElement('textarea');
-                    tempTextarea.value = copiedText.join('\n');
+                    tempTextarea.value = formattedNote;
                     document.body.appendChild(tempTextarea);
                     tempTextarea.select();
                     document.execCommand('copy');
@@ -12114,6 +9735,29 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             hiddenGroups.forEach(group => {
                 group.style.display = 'block';
             });
+            
+            // Special handling for AKA65: Only show HVAC and Lighting sub-categories
+            if (system === 'AKA65') {
+                // Hide Refrigeration tab in Actions
+                const refrigerationTab = document.querySelector('.sub-category-tabs button[data-tag="Refrigeration"]');
+                const refrigerationContent = document.querySelector('.sub-category-content[data-subcategory="refrigeration"]');
+                
+                if (refrigerationTab) {
+                    refrigerationTab.style.display = 'none';
+                }
+                if (refrigerationContent) {
+                    refrigerationContent.style.display = 'none';
+                }
+                
+                // Ensure HVAC tab is active for AKA65
+                switchSubCategory('actions', 'hvac');
+            } else {
+                // Show all tabs for other systems
+                const refrigerationTab = document.querySelector('.sub-category-tabs button[data-tag="Refrigeration"]');
+                if (refrigerationTab) {
+                    refrigerationTab.style.display = 'inline-block';
+                }
+            }
             
             // Hide ping buttons when switching systems
             hidePingButtons();
@@ -12438,12 +10082,6 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 // Update history dropdown
                 updateHistoryDropdown();
 
-                // Hide static update button initially (only show when update available)
-                const staticUpdateBtn = document.getElementById('update-btn');
-                if (staticUpdateBtn) {
-                    staticUpdateBtn.style.display = 'none';
-                }
-
                 // Setup enhanced functionality
                 setupInputValidation();
                 setupKeyboardNavigation();
@@ -12468,15 +10106,6 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 // Load saved infractions and update display
                 loadTotalInfractions();
                 updateInfractionDisplay();
-                
-                // Load saved settings and initialize GitHub token
-                initializeGitHubToken();
-                
-            // Initialize usage tracking and analytics
-            await initializeUsageTracking();
-            
-            // Initialize branch selector
-            initializeBranchSelector();
             
             // Initialize visual warnings
             initializeVisualWarnings();
@@ -12493,9 +10122,6 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             // Initialize SQLite storage system
             initializeDatabaseOnStartup();
             
-            // Initialize dev-only features
-            initializeDevFeatures();
-            
             // Add War Room template preview event listeners
             setTimeout(() => {
                 const templateFields = ['site-header', 'system-format', 'rack-format', 'include-wo-section', 'custom-template'];
@@ -12507,19 +10133,6 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                     }
                 });
             }, 100);
-            
-            // Initialize auto-update setting
-            const savedAutoUpdate = localStorage.getItem('autoUpdateEnabled');
-                if (savedAutoUpdate !== null) {
-                    AppState.autoUpdateEnabled = savedAutoUpdate === 'true';
-                }
-                
-                // Check for updates on startup (after 5 seconds)
-                if (AppState.autoUpdateEnabled) {
-                    setTimeout(() => {
-                        checkForUpdates();
-                    }, 5000);
-                }
                 
                 // Load QA checklist state
                 loadChecklistState();
