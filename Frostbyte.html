@@ -4059,6 +4059,9 @@
                 <option value="Help Desk Post">Help Desk Post</option>
                 <option value="Condenser and Compressor Staging Changes">Condenser and Compressor Staging Changes</option>
                 <option value="Changes to Rack Suction Settings">Changes to Rack Suction Settings</option>
+                <option value="Changes to Chiller Settings">Changes to Chiller Settings</option>
+                <option value="Changes to Sub cooler Settings">Changes to Sub cooler Settings</option>
+                <option value="Heat Checks">Heat Checks</option>
                 <option value="Reporting Issues with IoT">Reporting Issues with IoT</option>
                 <option value="Setting MAC Addresses">Setting MAC Addresses for Controller Replacements</option>
                 <option value="Controller COMM Loss">Controller COMM Loss Related to Network & Cabling</option>
@@ -4068,7 +4071,7 @@
                 <option value="Danfoss Downloads">Downloads for any Danfoss controller</option>
                 <option value="Manager Escalations">Manager Escalations</option>
                 <option value="Program Change Request">Program Change Request</option>
-                <option value="RTU Fans Mode">Taking RTU Fans Out Of Continuous Mode</option>
+                <option value="Taking RTU Fans Out of Continuous Mode">Taking RTU Fans Out Of Continuous Mode</option>
                 <option value="Parameter Deviation">Parameter Deviation Request</option>
                 <option value="Swap Work Order">Swap Work Order</option>
                 <option value="Mastermind Work Order">Mastermind Work Order</option>
@@ -8724,85 +8727,143 @@ Technician cell phone number:
 Technician email address:
 Store number:
 WO:
-Rack (LTA, MTB etc.):
-EMS system (Novar, Opus, CPC, Danfoss etc.):
-What the technician has requested and the reason for the request:`,
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What the technician has requested and the reason for the request:
+Additional notes:`,
 
             "Changes to Rack Suction Settings": `Technician first and last name:
 Technician cell phone number:
 Technician email address:
 Store number:
 WO:
-Rack (LTA, MTB etc.):
-EMS system (Novar, Opus, CPC, Danfoss etc.):
-What the technician has requested and the reason for the request:`,
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What the technician has requested and the reason for the request:
+Additional notes:`,
+
+            "Changes to Chiller Settings": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What the technician has requested and the reason for the request:
+Additional notes:`,
+
+            "Changes to Sub cooler Settings": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What the technician has requested and the reason for the request:
+Additional notes:`,
+
+            "Heat Checks": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+Detailed description of heat check request:
+Additional notes:`,
 
             "Reporting Issues with IoT": `Technician first and last name:
 Technician cell phone number:
 Technician email address:
 Store number:
 WO:
+Reason for escalation:
 Detailed error description:
-Screenshots of the error in IoT as well as any supporting screenshots from the EMS system. Paste them into a Word doc and attach it to the work order when you create it.:`,
+Screenshots of the error in IoT as well as any supporting screenshots from the EMS system. Paste them into a Word doc and attach it to the work order when you create it.:
+Additional notes:`,
 
             "Setting MAC Addresses": `Technician first and last name:
 Technician cell phone number:
 Technician email address:
 Store number:
 WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
 New device type and position (For example, Novar ES1 on rack LTB or Emerson E2E on HVAC):
 MAC address of the new device (must be 12 characters):
-Old MAC address:`,
+Old MAC address:
+Additional notes:`,
 
             "Controller COMM Loss": `Technician first and last name:
 Technician cell phone number:
 Technician email address:
 Store number:
 WO:
-EMS system (Novar, Opus, CPC, Danfoss etc.):
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
 Is the ethernet cable plugged into the device, yes or no?:
 Controller type (Novar EP2, Emerson E2E, Danfoss AK255 etc.):
 What system it controls (HVAC, Rack A, Rack B…etc.):
 Has the controller been power cycled, yes or no?:
 Is the controller functioning normally per the technician? If not, please provide details.: 
 MAC address (must be 12 characters):
-The switch and Port controller goes to (if tech can provide):`,
+The switch and Port controller goes to (if tech can provide):
+Additional notes:`,
 
             "Changing Board Points": `Technician first and last name:
 Technician cell phone number:
 Technician email address:
 Store number:
 WO:
-Rack (LTA, MTB etc.):
-Current module address and point number.:
-New module address and point number.:`,
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+Current module address and point number:
+New module address and point number:
+Additional notes:`,
 
             "Carel BOSS Support": `Technician first and last name:
 Technician cell phone number:
 Technician email address:
 Store number:
 WO:
-Rack (LTA, MTB etc.):
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
 Detailed description of technician request OR
-If an alarm, include a screenshot of the alarm in IoT.:`,
+If an alarm, include a screenshot of the alarm in IoT.:
+Additional notes:`,
 
             "Novar Download Failures": `Technician first and last name:
 Technician cell phone number:
 Technician email address:
 Store number:
 WO:
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
 Type of download needed (version, main, comm, etc.):
 What system it controls (HVAC, Rack A, Rack B…etc.):
-Description of controller behavior or error messages received. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:`,
+Description of controller behavior or error messages received. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:
+Additional notes:`,
 
             "Danfoss Downloads": `Technician first and last name:
 Technician cell phone number:
 Technician email address:
 Store number:
 WO:
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
 What system it controls (HVAC, Rack A, Rack B…etc.):
 Description of what prompted the download request (Controller change out, controller software failure, etc.):
-MAC address (must be 12 characters):`,
+MAC address (must be 12 characters):
+Additional notes:`,
 
             "Manager Escalations": `Name of the manager or team lead authorizing the escalation:
 Technician first and last name:
@@ -8810,26 +8871,33 @@ Technician cell phone number:
 Technician email address:
 Store number:
 WO:
+Reason for escalation:
 Detailed description of the issue:
 What actions Contact Center agents have taken so far:
-Any supporting screenshots of EMS systems or other documentation. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:`,
+Any supporting screenshots of EMS systems or other documentation. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:
+Additional notes:`,
 
             "Program Change Request": `Technician first and last name:
 Technician cell phone number:
 Technician email address:
 Store number:
 WO:
-EMS system (Novar, Opus, CPC, Danfoss etc.):
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
 What the technician has requested and the reason for the request:
-A screenshot of the module in the EMS system.:`,
+A screenshot of the module in the EMS system.:
+Additional notes:`,
 
-            "RTU Fans Mode": `Technician first and last name:
+            "Taking RTU Fans Out of Continuous Mode": `Technician first and last name:
 Technician cell phone number:
 Technician email address:
 Store number:
 WO:
-EMS system (Novar, Opus, CPC, Danfoss etc.):
-What RTU fan(s) the technician has requested to turn off and the reason for the request.:`,
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What RTU fan(s) the technician has requested to turn off and the reason for the request.:
+Additional notes:`,
 
             "Parameter Deviation": `Name of the manager or team lead authorizing the escalation:
 Technician first and last name:
@@ -8837,9 +8905,13 @@ Technician cell phone number:
 Technician email address:
 Store number:
 WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
 Detailed description of request:
 Current setpoint and requested setpoint:
-Screenshots of setpoint in EMS system and of the Parameter Cutsheet.:`,
+Screenshots of setpoint in EMS system and of the Parameter Cutsheet.:
+Additional notes:`,
 
             "Swap Work Order": `Swap Workorder Notes Show: (Enter the notes from the email).
 Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`,
