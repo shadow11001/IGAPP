@@ -8974,7 +8974,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 // Create modal content
                 const modalContent = document.createElement('div');
                 modalContent.className = 'modal-content';
-                modalContent.style.maxWidth = '500px';
+                modalContent.style.maxWidth = '600px';
                 
                 // Header
                 const modalHeader = document.createElement('div');
@@ -8991,79 +8991,115 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 builderSection.style.padding = '15px';
                 builderSection.style.backgroundColor = 'var(--bg-secondary)';
                 builderSection.style.borderRadius = '8px';
-                builderSection.innerHTML = '<h4 style="margin-top:0">Quick Select</h4>';
+                builderSection.innerHTML = '<h4 style="margin-top:0">Quick Builder</h4>';
                 
-                const flexContainer = document.createElement('div');
-                flexContainer.style.display = 'flex';
-                flexContainer.style.gap = '10px';
-                flexContainer.style.marginBottom = '10px';
-                
-                // Type Select
-                const typeSelect = document.createElement('select');
-                typeSelect.className = 'form-control';
-                typeSelect.style.flex = '2';
-                const types = [
-                    {val: '', text: 'Select Type...'},
-                    {val: 'Low Temp', text: 'Low Temp'},
-                    {val: 'Medium Temp', text: 'Medium Temp'},
-                    {val: 'Dual Temp', text: 'Dual Temp'},
-                    {val: 'High Temp', text: 'High Temp'}
-                ];
-                types.forEach(t => {
-                    const opt = document.createElement('option');
-                    opt.value = t.val;
-                    opt.textContent = t.text;
-                    typeSelect.appendChild(opt);
-                });
-                
-                // Letter Select
-                const letterSelect = document.createElement('select');
-                letterSelect.className = 'form-control';
-                letterSelect.style.flex = '1';
-                const letters = [
-                    {val: '', text: 'Letter...'},
-                    {val: 'A', text: 'A'},
-                    {val: 'B', text: 'B'},
-                    {val: 'C', text: 'C'},
-                    {val: 'D', text: 'D'},
-                    {val: 'E', text: 'E'},
-                    {val: 'F', text: 'F'}
-                ];
-                letters.forEach(l => {
-                    const opt = document.createElement('option');
-                    opt.value = l.val;
-                    opt.textContent = l.text;
-                    letterSelect.appendChild(opt);
-                });
-                
-                flexContainer.appendChild(typeSelect);
-                flexContainer.appendChild(letterSelect);
-                builderSection.appendChild(flexContainer);
-                
-                // Manual Entry Section
+                // Builder State
+                let builderState = {
+                    prefix: '',
+                    type: '',
+                    letters: []
+                };
+
+                // Helper to create button groups
+                const createButtonGroup = (label, items, key, multi = false) => {
+                    const container = document.createElement('div');
+                    container.style.marginBottom = '10px';
+                    
+                    const labelEl = document.createElement('div');
+                    labelEl.textContent = label;
+                    labelEl.style.fontSize = '0.9em';
+                    labelEl.style.marginBottom = '5px';
+                    labelEl.style.color = 'var(--text-secondary)';
+                    container.appendChild(labelEl);
+                    
+                    const btnContainer = document.createElement('div');
+                    btnContainer.style.display = 'flex';
+                    btnContainer.style.gap = '5px';
+                    btnContainer.style.flexWrap = 'wrap';
+                    
+                    items.forEach(item => {
+                        const btn = document.createElement('button');
+                        btn.className = 'secondary-button';
+                        btn.style.padding = '5px 10px';
+                        btn.style.minWidth = '40px';
+                        btn.textContent = item;
+                        btn.dataset.value = item;
+                        
+                        btn.onclick = () => {
+                            if (multi) {
+                                // Toggle letter
+                                const idx = builderState[key].indexOf(item);
+                                if (idx > -1) {
+                                    builderState[key].splice(idx, 1);
+                                    btn.classList.remove('active-rack-btn');
+                                    btn.style.backgroundColor = '';
+                                    btn.style.color = '';
+                                } else {
+                                    builderState[key].push(item);
+                                    // Sort letters alphabetically
+                                    builderState[key].sort();
+                                    btn.classList.add('active-rack-btn');
+                                    btn.style.backgroundColor = 'var(--primary-color)';
+                                    btn.style.color = 'white';
+                                }
+                            } else {
+                                // Single select (toggle off if same clicked)
+                                if (builderState[key] === item) {
+                                    builderState[key] = '';
+                                    btn.classList.remove('active-rack-btn');
+                                    btn.style.backgroundColor = '';
+                                    btn.style.color = '';
+                                } else {
+                                    builderState[key] = item;
+                                    // Reset other buttons in group
+                                    Array.from(btnContainer.children).forEach(b => {
+                                        b.classList.remove('active-rack-btn');
+                                        b.style.backgroundColor = '';
+                                        b.style.color = '';
+                                    });
+                                    btn.classList.add('active-rack-btn');
+                                    btn.style.backgroundColor = 'var(--primary-color)';
+                                    btn.style.color = 'white';
+                                }
+                            }
+                            updateManualInputFromBuilder();
+                        };
+                        
+                        btnContainer.appendChild(btn);
+                    });
+                    
+                    container.appendChild(btnContainer);
+                    return container;
+                };
+
+                // Create Groups
+                builderSection.appendChild(createButtonGroup('Prefix', ['C', 'R'], 'prefix'));
+                builderSection.appendChild(createButtonGroup('Type', ['LT', 'MT', 'DT', 'HT'], 'type'));
+                builderSection.appendChild(createButtonGroup('Letters', ['A', 'B', 'C', 'D', 'E', 'F'], 'letters', true));
+
+                // Manual Entry Section (Result)
                 const manualSection = document.createElement('div');
-                manualSection.innerHTML = '<h4>Or Manual Entry</h4>';
+                manualSection.innerHTML = '<h4>Result / Manual Entry</h4>';
                 
                 const manualInput = document.createElement('input');
                 manualInput.type = 'text';
                 manualInput.className = 'form-control';
-                manualInput.placeholder = 'e.g. Rack 1, HVACL...';
+                manualInput.placeholder = 'e.g. Rack 1, HVACL, LTA...';
                 manualInput.value = AppState.currentRack || '';
+                manualInput.style.fontSize = '1.2em';
+                manualInput.style.fontWeight = 'bold';
                 manualSection.appendChild(manualInput);
                 
                 modalBody.appendChild(builderSection);
                 modalBody.appendChild(manualSection);
                 
                 // Logic to update manual input
-                const updateManualInput = () => {
-                    if (typeSelect.value && letterSelect.value) {
-                        const builtName = `${typeSelect.value} ${letterSelect.value}`;
+                const updateManualInputFromBuilder = () => {
+                    const builtName = `${builderState.prefix}${builderState.type}${builderState.letters.join('')}`;
+                    if (builtName) {
                         manualInput.value = builtName;
                     }
                 };
-                
-                typeSelect.onchange = updateManualInput;
-                letterSelect.onchange = updateManualInput;
                 
                 // Buttons
                 const modalButtons = document.createElement('div');
