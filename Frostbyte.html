@@ -8964,38 +8964,163 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             return null;
         }
         
-        // Set current rack for multiple operations
-        async function setCurrentRack() {
-            const rackName = await customPrompt('Enter rack name (e.g., LTA, MTB, HTA):', AppState.currentRack || '', 'Set Current Rack');
-            
-            if (rackName && rackName.trim() !== '') {
-                let formattedRack = rackName.trim().toUpperCase();
+        // Specialized modal for rack selection
+        function showRackSelectionModal() {
+            return new Promise((resolve) => {
+                // Create modal overlay
+                const modalOverlay = document.createElement('div');
+                modalOverlay.className = 'modal-overlay';
                 
-                // Modular rack naming mapping
-                const rackMappings = {
-                    'LTA': 'Low Temp A',
-                    'LTB': 'Low Temp B',
-                    'LTC': 'Low Temp C',
-                    'LTD': 'Low Temp D',
-                    'MTA': 'Medium Temp A',
-                    'MTB': 'Medium Temp B',
-                    'MTC': 'Medium Temp C',
-                    'MTD': 'Medium Temp D',
-                    'DTA': 'Dual Temp A',
-                    'DTB': 'Dual Temp B',
-                    'DTC': 'Dual Temp C',
-                    'DTD': 'Dual Temp D',
-                    'HTA': 'High Temp A',
-                    'HTB': 'High Temp B',
-                    'HTC': 'High Temp C'
+                // Create modal content
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                modalContent.style.maxWidth = '500px';
+                
+                // Header
+                const modalHeader = document.createElement('div');
+                modalHeader.className = 'modal-header';
+                modalHeader.innerHTML = '<h3>Set Current Rack</h3>';
+                
+                // Body
+                const modalBody = document.createElement('div');
+                modalBody.className = 'modal-body';
+                
+                // Rack Builder Section
+                const builderSection = document.createElement('div');
+                builderSection.style.marginBottom = '20px';
+                builderSection.style.padding = '15px';
+                builderSection.style.backgroundColor = 'var(--bg-secondary)';
+                builderSection.style.borderRadius = '8px';
+                builderSection.innerHTML = '<h4 style="margin-top:0">Quick Select</h4>';
+                
+                const flexContainer = document.createElement('div');
+                flexContainer.style.display = 'flex';
+                flexContainer.style.gap = '10px';
+                flexContainer.style.marginBottom = '10px';
+                
+                // Type Select
+                const typeSelect = document.createElement('select');
+                typeSelect.className = 'form-control';
+                typeSelect.style.flex = '2';
+                const types = [
+                    {val: '', text: 'Select Type...'},
+                    {val: 'Low Temp', text: 'Low Temp'},
+                    {val: 'Medium Temp', text: 'Medium Temp'},
+                    {val: 'Dual Temp', text: 'Dual Temp'},
+                    {val: 'High Temp', text: 'High Temp'}
+                ];
+                types.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t.val;
+                    opt.textContent = t.text;
+                    typeSelect.appendChild(opt);
+                });
+                
+                // Letter Select
+                const letterSelect = document.createElement('select');
+                letterSelect.className = 'form-control';
+                letterSelect.style.flex = '1';
+                const letters = [
+                    {val: '', text: 'Letter...'},
+                    {val: 'A', text: 'A'},
+                    {val: 'B', text: 'B'},
+                    {val: 'C', text: 'C'},
+                    {val: 'D', text: 'D'},
+                    {val: 'E', text: 'E'},
+                    {val: 'F', text: 'F'}
+                ];
+                letters.forEach(l => {
+                    const opt = document.createElement('option');
+                    opt.value = l.val;
+                    opt.textContent = l.text;
+                    letterSelect.appendChild(opt);
+                });
+                
+                flexContainer.appendChild(typeSelect);
+                flexContainer.appendChild(letterSelect);
+                builderSection.appendChild(flexContainer);
+                
+                // Manual Entry Section
+                const manualSection = document.createElement('div');
+                manualSection.innerHTML = '<h4>Or Manual Entry</h4>';
+                
+                const manualInput = document.createElement('input');
+                manualInput.type = 'text';
+                manualInput.className = 'form-control';
+                manualInput.placeholder = 'e.g. Rack 1, HVACL...';
+                manualInput.value = AppState.currentRack || '';
+                manualSection.appendChild(manualInput);
+                
+                modalBody.appendChild(builderSection);
+                modalBody.appendChild(manualSection);
+                
+                // Logic to update manual input
+                const updateManualInput = () => {
+                    if (typeSelect.value && letterSelect.value) {
+                        const builtName = `${typeSelect.value} ${letterSelect.value}`;
+                        manualInput.value = builtName;
+                    }
                 };
                 
-                // Check if input matches a key in mappings
-                if (rackMappings[formattedRack]) {
-                    formattedRack = rackMappings[formattedRack];
-                }
+                typeSelect.onchange = updateManualInput;
+                letterSelect.onchange = updateManualInput;
                 
-                AppState.currentRack = formattedRack;
+                // Buttons
+                const modalButtons = document.createElement('div');
+                modalButtons.className = 'modal-buttons';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'modal-btn modal-btn-secondary';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.onclick = () => {
+                    modalOverlay.classList.remove('show');
+                    setTimeout(() => modalOverlay.remove(), 200);
+                    resolve(null);
+                };
+                
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = 'modal-btn modal-btn-primary';
+                confirmBtn.textContent = 'Set Rack';
+                confirmBtn.onclick = () => {
+                    const result = manualInput.value.trim();
+                    modalOverlay.classList.remove('show');
+                    setTimeout(() => modalOverlay.remove(), 200);
+                    resolve(result);
+                };
+                
+                modalButtons.appendChild(cancelBtn);
+                modalButtons.appendChild(confirmBtn);
+                
+                modalContent.appendChild(modalHeader);
+                modalContent.appendChild(modalBody);
+                modalContent.appendChild(modalButtons);
+                
+                modalOverlay.appendChild(modalContent);
+                document.body.appendChild(modalOverlay);
+                
+                // Show
+                setTimeout(() => modalOverlay.classList.add('show'), 10);
+                
+                // Focus
+                manualInput.focus();
+                
+                // Close on overlay click
+                modalOverlay.onclick = (e) => {
+                    if (e.target === modalOverlay) {
+                        modalOverlay.classList.remove('show');
+                        setTimeout(() => modalOverlay.remove(), 200);
+                        resolve(null);
+                    }
+                };
+            });
+        }
+
+        // Set current rack for multiple operations
+        async function setCurrentRack() {
+            const rackName = await showRackSelectionModal();
+            
+            if (rackName && rackName.trim() !== '') {
+                AppState.currentRack = rackName.trim();
                 updateRackDisplay();
                 showNotification(`✓ Rack set to: ${AppState.currentRack}`, 'success', 2000);
                 
@@ -10096,6 +10221,10 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 
                 // Clear infraction display
                 clearInfractionDisplay();
+
+                // Clear current rack
+                AppState.currentRack = null;
+                updateRackDisplay();
                 
                 // Hide Downloads section
                 hideDownloadsSection();
