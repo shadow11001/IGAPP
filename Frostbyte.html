@@ -9074,8 +9074,9 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
 
                 // Create Groups
                 builderSection.appendChild(createButtonGroup('Prefix', ['C', 'R'], 'prefix'));
-                builderSection.appendChild(createButtonGroup('Type', ['LT', 'MT', 'DT', 'HT'], 'type'));
-                builderSection.appendChild(createButtonGroup('Letters', ['A', 'B', 'C', 'D', 'E', 'F'], 'letters', true));
+                builderSection.appendChild(createButtonGroup('Type', ['LT', 'MT', 'DT'], 'type'));
+                const alphabet = Array.from({length: 26}, (_, i) => String.fromCharCode(65 + i));
+                builderSection.appendChild(createButtonGroup('Letters', alphabet, 'letters', true));
 
                 // Manual Entry Section (Result)
                 const manualSection = document.createElement('div');
@@ -9095,7 +9096,14 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 
                 // Logic to update manual input
                 const updateManualInputFromBuilder = () => {
-                    const builtName = `${builderState.prefix}${builderState.type}${builderState.letters.join('')}`;
+                    let builtName = '';
+                    // If only letters are selected (no prefix, no type), default to "Rack X"
+                    if (!builderState.prefix && !builderState.type && builderState.letters.length > 0) {
+                        builtName = `Rack ${builderState.letters.join('')}`;
+                    } else {
+                        builtName = `${builderState.prefix}${builderState.type}${builderState.letters.join('')}`;
+                    }
+                    
                     if (builtName) {
                         manualInput.value = builtName;
                     }
