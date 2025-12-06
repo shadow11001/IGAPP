@@ -8967,8 +8967,35 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         // Set current rack for multiple operations
         async function setCurrentRack() {
             const rackName = await customPrompt('Enter rack name (e.g., LTA, MTB, HTA):', AppState.currentRack || '', 'Set Current Rack');
+            
             if (rackName && rackName.trim() !== '') {
-                AppState.currentRack = rackName.trim().toUpperCase();
+                let formattedRack = rackName.trim().toUpperCase();
+                
+                // Modular rack naming mapping
+                const rackMappings = {
+                    'LTA': 'Low Temp A',
+                    'LTB': 'Low Temp B',
+                    'LTC': 'Low Temp C',
+                    'LTD': 'Low Temp D',
+                    'MTA': 'Medium Temp A',
+                    'MTB': 'Medium Temp B',
+                    'MTC': 'Medium Temp C',
+                    'MTD': 'Medium Temp D',
+                    'DTA': 'Dual Temp A',
+                    'DTB': 'Dual Temp B',
+                    'DTC': 'Dual Temp C',
+                    'DTD': 'Dual Temp D',
+                    'HTA': 'High Temp A',
+                    'HTB': 'High Temp B',
+                    'HTC': 'High Temp C'
+                };
+                
+                // Check if input matches a key in mappings
+                if (rackMappings[formattedRack]) {
+                    formattedRack = rackMappings[formattedRack];
+                }
+                
+                AppState.currentRack = formattedRack;
                 updateRackDisplay();
                 showNotification(`✓ Rack set to: ${AppState.currentRack}`, 'success', 2000);
                 
