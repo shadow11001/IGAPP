@@ -3500,6 +3500,7 @@
                         </div>
                         <div class="accordion-content">
                             <div class="button-group">
+                                <!-- BUTTONS: SYSTEM_LOGIN_START -->
                                 <button onclick="selectSystem('Novar');" class="quick-note-btn" title="Novar Login" data-search="novar login system">Novar</button>
                                 <button onclick="selectSystem('Opus Arch');" class="quick-note-btn" title="Opus Arch Login" data-search="opus arch login system">Opus Arch</button>
                                 <button onclick="selectSystem('Opus Mag');" class="quick-note-btn" title="Opus Mag Login" data-search="opus mag login system">Opus Mag</button>
@@ -3507,6 +3508,7 @@
                                 <button onclick="selectSystem('AKA65');" class="quick-note-btn" title="Danfoss AKA65 Login" data-search="danfoss aka65 aka login system">AKA65</button>
                                 <button onclick="selectSystem('Storeview');" class="quick-note-btn" title="Danfoss Storeview Login" data-search="danfoss storeview login system">Storeview</button>
                                 <button onclick="selectSystem('None');" class="quick-note-btn" title="No EMS Login" data-search="none no login ems">None</button>
+                                <!-- BUTTONS: SYSTEM_LOGIN_END -->
                             </div>
                         </div>
                     </div>
@@ -3528,6 +3530,7 @@
                             <!-- HVAC Sub-Category -->
                             <div class="sub-category-content active" data-subcategory="hvac">
                                 <div class="button-group">
+                                    <!-- BUTTONS: DIAGNOSTICS_HVAC_START -->
                                     <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
                                     <button onclick="addQuickNote('Checked comms. Still in comm loss.'); showPingButtons()" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
                                     <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn ping-button" title="Ping Controller" style="display: none;">Ping</button>
@@ -3539,12 +3542,14 @@
                                     <button onclick="addQuickNote('Checked Module Comms.')" class="quick-note-btn success-quick" title="Modulating Communication Check">Mod Comm</button>
                                     <button onclick="addModCommLossNote()" class="quick-note-btn error-quick" title="Modulating Communication Loss">Mod Comm Loss</button>
                                     <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Tested</button>
+                                    <!-- BUTTONS: DIAGNOSTICS_HVAC_END -->
                                 </div>
                             </div>
 
                             <!-- Lighting Sub-Category -->
                             <div class="sub-category-content" data-subcategory="lighting">
                                 <div class="button-group">
+                                    <!-- BUTTONS: DIAGNOSTICS_LIGHTING_START -->
                                     <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
                                     <button onclick="addQuickNote('Checked comms. Still in comm loss.'); showPingButtons()" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
                                     <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn ping-button" title="Ping Controller" style="display: none;">Ping</button>
@@ -3556,6 +3561,7 @@
                                     <button onclick="addModCommLossNote()" class="quick-note-btn error-quick" title="Modulating Communication Loss">Mod Comm Loss</button>
                                     <button onclick="addCheckBreakersNote()" class="quick-note-btn" title="Check Breakers">Breakers</button>
                                     <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Tested</button>
+                                    <!-- BUTTONS: DIAGNOSTICS_LIGHTING_END -->
                                 </div>
                             </div>
 
@@ -3580,6 +3586,7 @@
                                 </div>
                                 
                                 <div class="button-group">
+                                    <!-- BUTTONS: DIAGNOSTICS_REFRIGERATION_START -->
                                     <button onclick="addQuickNote('Checked comms.')" class="quick-note-btn success-quick" title="Communications Check">Comms ✓</button>
                                     <button onclick="addQuickNote('Checked comms. Still in comm loss.'); showPingButtons()" class="quick-note-btn error-quick" title="Communications Loss">Comms ✗</button>
                                     <button onclick="addQuickNote('Pinged controller.')" class="quick-note-btn ping-button" title="Ping Controller" style="display: none;">Ping</button>
@@ -3595,6 +3602,7 @@
                                     <button onclick="addTestNote()" class="quick-note-btn" title="Test Component">Tested</button>
                                     <button onclick="addStagingNote()" class="quick-note-btn" title="Check Staging">Staging</button>
                                     <button onclick="addQuickNote('Unable to Defrost.')" class="quick-note-btn error-quick" title="Defrost Unavailable">Defrost Unavailable</button>
+                                    <!-- BUTTONS: DIAGNOSTICS_REFRIGERATION_END -->
                                 </div>
                             </div>
                         </div>
@@ -3617,38 +3625,44 @@
                             <!-- HVAC Sub-Category -->
                             <div class="sub-category-content active" data-subcategory="hvac">
                                 <div class="button-group">
-                                    <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
+                                    <!-- BUTTONS: ACTIONS_HVAC_START -->
+                                    <button onclick="addQuickNoteWithInput('Forced on ', 'ENTER_EQUIPMENT')" class="quick-note-btn" title="Force Equipment On">Force On</button>
                                     <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
                                     <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
                                     <button onclick="addSetpointNote()" class="quick-note-btn" title="Change Temperature Setpoint">RTU Setpoint</button>
                                     <button onclick="addForcedFanNote()" class="quick-note-btn" title="Force Fan On">Forced Fan</button>
                                     <button onclick="addSetbackNote()" class="quick-note-btn" title="Change Setback">Setback</button>
+                                    <!-- BUTTONS: ACTIONS_HVAC_END -->
                                 </div>
                             </div>
 
                             <!-- Lighting Sub-Category -->
                             <div class="sub-category-content" data-subcategory="lighting">
                                 <div class="button-group">
-                                    <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
+                                    <!-- BUTTONS: ACTIONS_LIGHTING_START -->
+                                    <button onclick="addQuickNoteWithInput('Forced on ', 'ENTER_EQUIPMENT')" class="quick-note-btn" title="Force Equipment On">Force On</button>
                                     <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
                                     <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
                                     <button onclick="addQuickNote('Forced on lights.')" class="quick-note-btn" title="Force Lights On">Lights On</button>
                                     <button onclick="addQuickNote('Changed Lighting schedule.')" class="quick-note-btn" title="Change Lighting Schedule">Light Schedule</button>
                                     <button onclick="addQuickNote('Reset clocks.')" class="quick-note-btn system-novar" title="Reset System Clocks" style="display: none;">Reset Clocks</button>
+                                    <!-- BUTTONS: ACTIONS_LIGHTING_END -->
                                 </div>
                             </div>
 
                             <!-- Refrigeration Sub-Category -->
                             <div class="sub-category-content" data-subcategory="refrigeration">
                                 <div class="button-group">
-                                    <button onclick="addQuickNoteWithInput('Forced on ', 'Enter equipment:')" class="quick-note-btn" title="Force Equipment On">Force On</button>
+                                    <!-- BUTTONS: ACTIONS_REFRIGERATION_START -->
+                                    <button onclick="addQuickNoteWithInput('Forced on ', 'ENTER_EQUIPMENT')" class="quick-note-btn" title="Force Equipment On">Force On</button>
                                     <button onclick="addForcedNote()" class="quick-note-btn" title="Force Parameter">Forced</button>
                                     <button onclick="addForcedOffNote()" class="quick-note-btn" title="Force Off Previously Forced Item">Forced Off</button>
-                                    <button onclick="addQuickNoteWithInput('Forced defrost on ', 'Enter circuit:')" class="quick-note-btn" title="Force Defrost">Defrost</button>
+                                    <button onclick="addQuickNoteWithInput('Forced defrost on ', 'ENTER_CIRCUIT')" class="quick-note-btn" title="Force Defrost">Defrost</button>
                                     <button onclick="addQuickNote('Terminated Defrost.')" class="quick-note-btn" title="Stop Defrost">Stop Defrost</button>
                                     <button onclick="addShutdownCircuitNote()" class="quick-note-btn" title="Shutdown Circuit">Shutdown Circuit</button>
                                     <button onclick="addRackSettingsNote()" class="quick-note-btn" title="Change Rack Settings">Rack Settings</button>
                                     <button onclick="addCaseSettingsNote()" class="quick-note-btn" title="Change Case Settings">Case Settings</button>
+                                    <!-- BUTTONS: ACTIONS_REFRIGERATION_END -->
                                 </div>
                             </div>
                         </div>
@@ -3662,11 +3676,13 @@
                         </div>
                         <div class="accordion-content">
                             <div class="button-group">
+                                <!-- BUTTONS: DOWNLOADS_START -->
                                 <button onclick="addDownloadNote('Performed Version Download.')" class="quick-note-btn" title="Version Download" data-search="version download novar">Version</button>
                                 <button onclick="addDownloadNote('Performed Load Change Download.')" class="quick-note-btn" title="Load Change Download" data-search="load change download lc novar">Load Change</button>
                                 <button onclick="addDownloadNote('Performed Comms and Load Change Download.')" class="quick-note-btn" title="Comms + Load Change" data-search="comms load change download novar">Comms+LC</button>
                                 <button onclick="addDownloadNote('Performed Main and Load Change Download.')" class="quick-note-btn" title="Main + Load Change" data-search="main load change download novar">Main+LC</button>
                                 <button onclick="addDownloadNote('Performed Main, Comms, and Load Change Download.')" class="quick-note-btn" title="Full Download" data-search="full main comms load change download novar">Full DL</button>
+                                <!-- BUTTONS: DOWNLOADS_END -->
                             </div>
                         </div>
                     </div>
@@ -3679,9 +3695,11 @@
                         </div>
                         <div class="accordion-content">
                             <div class="button-group">
+                                <!-- BUTTONS: ESCALATIONS_START -->
                                 <button onclick="addEscalateNote()" class="quick-note-btn" title="Escalate with DAE and WO" data-search="escalate escalation workorder">Escalate</button>
                                 <button onclick="addQuickNote('Submitted PCR.')" class="quick-note-btn success-quick" title="Point Change Request Submitted" data-search="pcr point change request submitted">Submitted PCR</button>
                                 <button onclick="addQuickNote('Submitted PDR.')" class="quick-note-btn success-quick" title="Parameter Deviation Request Submitted" data-search="pdr parameter deviation request submitted">Submitted PDR</button>
+                                <!-- BUTTONS: ESCALATIONS_END -->
                             </div>
                         </div>
                     </div>
@@ -3694,11 +3712,13 @@
                         </div>
                         <div class="accordion-content">
                             <div class="button-group">
+                                <!-- BUTTONS: CALL_STATUS_START -->
                                 <button onclick="addQuickNote('All good.')" class="quick-note-btn success-quick" title="Everything Working" data-search="all good success working fixed">All Good</button>
                                 <button onclick="addQuickNote('No good.')" class="quick-note-btn error-quick" title="Issue Persists" data-search="no good bad fail issue">No Good</button>
                                 <button onclick="addQuickNote('Tech will troubleshoot.')" class="quick-note-btn" title="Tech Troubleshooting" data-search="tech troubleshoot ts">Tech T/S</button>
                                 <button onclick="addQuickNote('Tech no longer needed assistance.')" class="quick-note-btn success-quick" title="Call Complete" data-search="call done complete finished">Call Done</button>
                                 <button onclick="addQuickNote('Call dropped.')" class="quick-note-btn error-quick" title="Call Disconnected" data-search="call dropped disconnected">Call Dropped</button>
+                                <!-- BUTTONS: CALL_STATUS_END -->
                             </div>
                         </div>
                     </div>
@@ -3711,12 +3731,14 @@
                         </div>
                         <div class="accordion-content">
                             <div class="button-group">
+                                <!-- BUTTONS: SPECIAL_CASES_START -->
                                 <button onclick="addPowerCycleNote()" class="quick-note-btn" title="Power Cycle Recommendation" data-search="power cycle restart reboot">Power Cycle</button>
                                 <button onclick="addQuickNote('Store is in remodel.')" class="quick-note-btn" title="Store Remodel Status" data-search="remodel construction">Remodel</button>
                                 <button onclick="addQuickNote('This is a Sams store.')" class="quick-note-btn" title="Sam's Club Store" data-search="sams club">Sams</button>
                                 <button onclick="addQuickNote('Adv tech to restart the Sporlan case controllers and the Sporlan Gateway and adv tech that if it continues, they will need to contact Sporlan.')" class="quick-note-btn system-opus-cpc" title="Sporlan Controller Restart" data-search="sporlan restart gateway controller" style="display: none;">Sporlan</button>
                                 <button onclick="addAdvisoryNote()" class="quick-note-btn" title="Advise Tech of Issue" data-search="advisory advise note">Advisory</button>
                                 <button onclick="addQuickNote('Tech requested a defrost and is not onsite. Defrost denied.')" class="quick-note-btn error-quick" title="Tech Not Onsite - Defrost Denied" data-search="not onsite defrost denied offsite">Not Onsite</button>
+                                <!-- BUTTONS: SPECIAL_CASES_END -->
                             </div>
                         </div>
                     </div>
@@ -3729,10 +3751,12 @@
                         </div>
                         <div class="accordion-content">
                             <div class="button-group">
+                                <!-- BUTTONS: RECOMMENDATIONS_START -->
                                 <button onclick="addQuickNote('Advised to monitor and call back if issues persist.')" class="quick-note-btn" title="Monitor Instruction" data-search="monitor watch observe">Monitor</button>
                                 <button onclick="showContactOptions()" class="quick-note-btn" title="Contact Instruction" data-search="contact call vendor">Contact</button>
                                 <button onclick="addReplaceNote()" class="quick-note-btn" title="Replace Instruction" data-search="replace swap change">Replace</button>
                                 <button onclick="addQuickNote('Tech called for a suppression. Adv tech of NSRM email.')" class="quick-note-btn" title="Suppression Request" data-search="nsrm suppression email">NSRM</button>
+                                <!-- BUTTONS: RECOMMENDATIONS_END -->
                             </div>
                         </div>
                     </div>
@@ -3745,9 +3769,11 @@
                         </div>
                         <div class="accordion-content">
                             <div class="button-group">
+                                <!-- BUTTONS: COMMUNICATION_START -->
                                 <button onclick="addTechQuestionNote()" class="quick-note-btn" title="Tech Asked Question" data-search="tech question asked">Tech Question</button>
                                 <button onclick="addStatusUpdateNote()" class="quick-note-btn" title="Status Update Request" data-search="status update request">Status Update</button>
                                 <button onclick="addTechRefusedNote()" class="quick-note-btn error-quick" title="Tech Refused Action" data-search="tech refused declined">Tech Refused</button>
+                                <!-- BUTTONS: COMMUNICATION_END -->
                             </div>
                         </div>
                     </div>
@@ -4187,6 +4213,274 @@
             isTabFlashing: false
         };
 
+        // ============= Configuration =============
+        const APP_CONFIG = {
+            TAG_KEYWORDS: {
+                'Call Dropped Mid Call': ['call dropped', 'dropped', 'disconnected', 'lost connection'],
+                'Caller Couldn\'t Hear Me': ['couldn\'t hear me', 'can\'t hear me', 'audio issues', 'mic problems'],
+                'Carel': ['carel', 'boss'],
+                'Couldn\'t Hear Caller': ['couldn\'t hear', 'can\'t hear caller', 'audio problems', 'static'],
+                'Comms': ['comm loss', 'communication loss', 'network', 'ethernet', 'comms', 'communication'],
+                'CPC': ['cpc'],
+                'DAE': ['dae', 'escalat', 'work order', 'wo'],
+                'Danfoss AKA65': ['aka65', 'aka'],
+                'Danfoss SVD': ['svd', 'storeview'],
+                'Defrost': ['defrost', 'forced defrost', 'terminated defrost'],
+                'Download': ['download', 'version download', 'load change download', 'main download', 'comms download', 'full dl', 'performed download'],
+                'HVAC': ['hvac', 'air conditioning', 'heating', 'rtu'],
+                'Lighting': ['lights', 'lighting', 'forced on lights'],
+                'Manager Escalation': ['manager', 'escalation', 'supervisor'],
+                'New Module': ['new module', 'module'],
+                'No Reply Needed': ['no reply', 'information only'],
+                'Novar ESS': ['novar', 'ess'],
+                'Opus Architect': ['opus arch', 'architect'],
+                'Opus Magnum': ['opus mag', 'magnum'],
+                'Other': ['other', 'misc', 'various'],
+                'Point Change': ['point change', 'board point', 'changing board'],
+                'Power Cycle': ['power cycle', 'restart', 'reboot'],
+                'Project': ['project'],
+                'Refrigeration': ['refrigeration', 'rack', 'cooling', 'temps', 'temperature', 'defrost', 'forced defrost', 'terminated defrost'],
+                'Remodel': ['remodel', 'renovation'],
+                'Sams': ['sams', 'sam\'s club'],
+                'Sporlan': ['sporlan'],
+                'Static': ['static', 'noise', 'interference'],
+                'Suppression': ['suppression', 'nsrm']
+            },
+            DAE_TEMPLATES: {
+                "Help Desk Post": `Store # 
+EMS - 
+WO# - 
+Issue - 
+What have you done? 
+Wiki Link Used - 
+Any screenshots of issue.:`,
+
+                "Condenser and Compressor Staging Changes": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What the technician has requested and the reason for the request:
+Additional notes:`,
+
+                "Changes to Rack Suction Settings": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What the technician has requested and the reason for the request:
+Additional notes:`,
+
+                "Changes to Chiller Settings": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What the technician has requested and the reason for the request:
+Additional notes:`,
+
+                "Changes to Sub cooler Settings": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What the technician has requested and the reason for the request:
+Additional notes:`,
+
+                "Heat Checks": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+Detailed description of heat check request:
+Additional notes:`,
+
+                "Reporting Issues with IoT": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Reason for escalation:
+Detailed error description:
+Screenshots of the error in IoT as well as any supporting screenshots from the EMS system. Paste them into a Word doc and attach it to the work order when you create it.:
+Additional notes:`,
+
+                "Setting MAC Addresses": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+New device type and position (For example, Novar ES1 on rack LTB or Emerson E2E on HVAC):
+MAC address of the new device (must be 12 characters):
+Old MAC address:
+Additional notes:`,
+
+                "Controller COMM Loss": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+Is the ethernet cable plugged into the device, yes or no?:
+Controller type (Novar EP2, Emerson E2E, Danfoss AK255 etc.):
+What system it controls (HVAC, Rack A, Rack B…etc.):
+Has the controller been power cycled, yes or no?:
+Is the controller functioning normally per the technician? If not, please provide details.: 
+MAC address (must be 12 characters):
+The switch and Port controller goes to (if tech can provide):
+Additional notes:`,
+
+                "Changing Board Points": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+Current module address and point number:
+New module address and point number:
+Additional notes:`,
+
+                "Carel BOSS Support": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+Detailed description of technician request OR
+If an alarm, include a screenshot of the alarm in IoT.:
+Additional notes:`,
+
+                "Novar Download Failures": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+Type of download needed (version, main, comm, etc.):
+What system it controls (HVAC, Rack A, Rack B…etc.):
+Description of controller behavior or error messages received. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:
+Additional notes:`,
+
+                "Danfoss Downloads": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What system it controls (HVAC, Rack A, Rack B…etc.):
+Description of what prompted the download request (Controller change out, controller software failure, etc.):
+MAC address (must be 12 characters):
+Additional notes:`,
+
+                "Manager Escalations": `Name of the manager or team lead authorizing the escalation:
+Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Reason for escalation:
+Detailed description of the issue:
+What actions Contact Center agents have taken so far:
+Any supporting screenshots of EMS systems or other documentation. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:
+Additional notes:`,
+
+                "Program Change Request": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What the technician has requested and the reason for the request:
+A screenshot of the module in the EMS system.:
+Additional notes:`,
+
+                "Taking RTU Fans Out of Continuous Mode": `Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+What RTU fan(s) the technician has requested to turn off and the reason for the request.:
+Additional notes:`,
+
+                "Parameter Deviation": `Name of the manager or team lead authorizing the escalation:
+Technician first and last name:
+Technician cell phone number:
+Technician email address:
+Store number:
+WO:
+Rack (LTA, MTB, DTC, etc.):
+EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
+Reason for escalation:
+Detailed description of request:
+Current setpoint and requested setpoint:
+Screenshots of setpoint in EMS system and of the Parameter Cutsheet.:
+Additional notes:`,
+
+                "Swap Work Order": `Swap Workorder Notes Show: (Enter the notes from the email).
+Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`,
+
+                "Mastermind Work Order": `Mastermind Report Notes Show: (Enter the notes from the work order attachment that is in all caps).
+Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`
+            }
+        };
+
+        const MODAL_REGISTRY = {
+            "FORCE_PARAM": { "title": "Force Parameter", "message": "What parameter are you forcing?", "defaultValue": "" },
+            "FORCE_OFF_ITEM": { "title": "Force Off", "message": "What are you forcing off?", "defaultValue": "" },
+            "SHUTDOWN_CIRCUIT": { "title": "Shutdown Circuit", "message": "What circuit are you shutting down?", "defaultValue": "" },
+            "BREAKER_PANEL": { "title": "Breaker Panel", "message": "What panel are the breakers in? {breakerDetails}", "defaultValue": "" },
+            "BREAKER_NUMBERS": { "title": "Breaker Numbers", "message": "What are the breaker numbers in panel {panel}?", "defaultValue": "" },
+            "BREAKER_STATUS": { "title": "Breaker Status", "message": "Are the breakers tripped or off?", "defaultValue": "" },
+            "ADVISORY_ISSUE": { "title": "Advisory Note", "message": "What is the issue you are advising on?", "defaultValue": "" },
+            "TECH_QUESTION": { "title": "Tech Question", "message": "What is the technician's question?", "defaultValue": "" },
+            "STATUS_UPDATE": { "title": "Status Update", "message": "What item are you providing a status update for?", "defaultValue": "" },
+            "TECH_REFUSED": { "title": "Tech Refused", "message": "What action did the technician refuse?", "defaultValue": "" },
+            "CIRCUIT_DEFROSTING": { "title": "Defrost", "message": "What circuit is defrosting?", "defaultValue": "" },
+            "OLD_COOLING_SETPOINT": { "title": "Old Cooling Setpoint", "message": "What was the old cooling setpoint?", "defaultValue": "" },
+            "OLD_HEATING_SETPOINT": { "title": "Old Heating Setpoint", "message": "What was the old heating setpoint?", "defaultValue": "" },
+            "NEW_COOLING_SETPOINT": { "title": "New Cooling Setpoint", "message": "What is the new cooling setpoint?", "defaultValue": "" },
+            "NEW_HEATING_SETPOINT": { "title": "New Heating Setpoint", "message": "What is the new heating setpoint?", "defaultValue": "" },
+            "RTU_NUMBER": { "title": "RTU Number", "message": "What is the RTU number?", "defaultValue": "" },
+            "TEST_COMPONENT": { "title": "Test Component", "message": "What component are you testing?", "defaultValue": "" },
+            "MONITOR_INSTRUCTION": { "title": "Monitor Instruction", "message": "What should be monitored?", "defaultValue": "" },
+            "CONTACT_SELECTION": { "title": "Contact Selection", "message": "{message}", "defaultValue": "" },
+            "CUSTOM_CONTACT": { "title": "Custom Contact", "message": "Enter the name and number of the person you spoke with:", "defaultValue": "" },
+            "CONTACT_DETAILS": { "title": "Contact Details", "message": "Who did you speak with?", "defaultValue": "" },
+            "RACK_NAME": { "title": "Rack Name", "message": "Enter the rack name for {action}:", "defaultValue": "" },
+            "ENTER_EQUIPMENT": { "title": "Enter Details", "message": "Enter equipment name:", "defaultValue": "" },
+            "ENTER_CIRCUIT": { "title": "Enter Details", "message": "Enter circuit name:", "defaultValue": "" }
+        };
+
         // ============= IndexedDB Storage System =============
         
         const SQLITE_STORAGE = {
@@ -4594,37 +4888,7 @@
         };
 
         // Tag analysis system
-        const TAG_KEYWORDS = {
-            'Call Dropped Mid Call': ['call dropped', 'dropped', 'disconnected', 'lost connection'],
-            'Caller Couldn\'t Hear Me': ['couldn\'t hear me', 'can\'t hear me', 'audio issues', 'mic problems'],
-            'Carel': ['carel', 'boss'],
-            'Couldn\'t Hear Caller': ['couldn\'t hear', 'can\'t hear caller', 'audio problems', 'static'],
-            'Comms': ['comm loss', 'communication loss', 'network', 'ethernet', 'comms', 'communication'],
-            'CPC': ['cpc'],
-            'DAE': ['dae', 'escalat', 'work order', 'wo'],
-            'Danfoss AKA65': ['aka65', 'aka'],
-            'Danfoss SVD': ['svd', 'storeview'],
-            'Defrost': ['defrost', 'forced defrost', 'terminated defrost'],
-            'Download': ['download', 'version download', 'load change download', 'main download', 'comms download', 'full dl', 'performed download'],
-            'HVAC': ['hvac', 'air conditioning', 'heating', 'rtu'],
-            'Lighting': ['lights', 'lighting', 'forced on lights'],
-            'Manager Escalation': ['manager', 'escalation', 'supervisor'],
-            'New Module': ['new module', 'module'],
-            'No Reply Needed': ['no reply', 'information only'],
-            'Novar ESS': ['novar', 'ess'],
-            'Opus Architect': ['opus arch', 'architect'],
-            'Opus Magnum': ['opus mag', 'magnum'],
-            'Other': ['other', 'misc', 'various'],
-            'Point Change': ['point change', 'board point', 'changing board'],
-            'Power Cycle': ['power cycle', 'restart', 'reboot'],
-            'Project': ['project'],
-            'Refrigeration': ['refrigeration', 'rack', 'cooling', 'temps', 'temperature', 'defrost', 'forced defrost', 'terminated defrost'],
-            'Remodel': ['remodel', 'renovation'],
-            'Sams': ['sams', 'sam\'s club'],
-            'Sporlan': ['sporlan'],
-            'Static': ['static', 'noise', 'interference'],
-            'Suppression': ['suppression', 'nsrm']
-        };
+        const TAG_KEYWORDS = APP_CONFIG.TAG_KEYWORDS;
 
         function analyzeNotesForTags() {
             const notesContent = document.getElementById('notes').value.toLowerCase();
@@ -7485,11 +7749,21 @@ verified in {SYSTEM}
                 document.getElementById('war-room-tab').style.display = 'block';
             }
             
-            // Pre-populate assigned stores with standard War Room sites
+            // Pre-populate assigned stores with standard War Room sites or saved data
             const assignedStoresField = document.getElementById('assigned-stores');
-            if (assignedStoresField && !assignedStoresField.value.trim()) {
-                assignedStoresField.placeholder = 'Standard War Room Sites:\n4\n1407\n5152\n\n(Edit as needed for your assignment)';
-                assignedStoresField.value = '4\n1407\n5152';
+            if (assignedStoresField) {
+                const savedAssignedStores = localStorage.getItem('warRoomAssignedStores');
+                if (savedAssignedStores) {
+                    assignedStoresField.value = savedAssignedStores;
+                } else if (!assignedStoresField.value.trim()) {
+                    assignedStoresField.placeholder = 'Standard War Room Sites:\n4\n1407\n5152\n\n(Edit as needed for your assignment)';
+                    assignedStoresField.value = '4\n1407\n5152';
+                }
+                
+                // Add event listener to save assigned stores on change
+                assignedStoresField.addEventListener('input', function() {
+                    localStorage.setItem('warRoomAssignedStores', this.value);
+                });
             }
             
             // Load saved template
@@ -8268,6 +8542,7 @@ verified in {SYSTEM}
                 
                 // Clear form
                 document.getElementById('assigned-stores').value = '';
+                localStorage.removeItem('warRoomAssignedStores');
                 
                 showNotification('🔄 Ready for new War Room check', 'info', 3000);
             }
@@ -8713,215 +8988,10 @@ verified in {SYSTEM}
         }
 
         // DAE Templates managed in JavaScript for maintainability
-        const DAE_TEMPLATES = {
-            "Help Desk Post": `Store # 
-EMS - 
-WO# - 
-Issue - 
-What have you done? 
-Wiki Link Used - 
-Any screenshots of issue.:`,
-
-            "Condenser and Compressor Staging Changes": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB, DTC, etc.):
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-What the technician has requested and the reason for the request:
-Additional notes:`,
-
-            "Changes to Rack Suction Settings": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB, DTC, etc.):
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-What the technician has requested and the reason for the request:
-Additional notes:`,
-
-            "Changes to Chiller Settings": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB, DTC, etc.):
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-What the technician has requested and the reason for the request:
-Additional notes:`,
-
-            "Changes to Sub cooler Settings": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB, DTC, etc.):
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-What the technician has requested and the reason for the request:
-Additional notes:`,
-
-            "Heat Checks": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB, DTC, etc.):
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-Detailed description of heat check request:
-Additional notes:`,
-
-            "Reporting Issues with IoT": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Reason for escalation:
-Detailed error description:
-Screenshots of the error in IoT as well as any supporting screenshots from the EMS system. Paste them into a Word doc and attach it to the work order when you create it.:
-Additional notes:`,
-
-            "Setting MAC Addresses": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB, DTC, etc.):
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-New device type and position (For example, Novar ES1 on rack LTB or Emerson E2E on HVAC):
-MAC address of the new device (must be 12 characters):
-Old MAC address:
-Additional notes:`,
-
-            "Controller COMM Loss": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB, DTC, etc.):
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-Is the ethernet cable plugged into the device, yes or no?:
-Controller type (Novar EP2, Emerson E2E, Danfoss AK255 etc.):
-What system it controls (HVAC, Rack A, Rack B…etc.):
-Has the controller been power cycled, yes or no?:
-Is the controller functioning normally per the technician? If not, please provide details.: 
-MAC address (must be 12 characters):
-The switch and Port controller goes to (if tech can provide):
-Additional notes:`,
-
-            "Changing Board Points": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB, DTC, etc.):
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-Current module address and point number:
-New module address and point number:
-Additional notes:`,
-
-            "Carel BOSS Support": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB, DTC, etc.):
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-Detailed description of technician request OR
-If an alarm, include a screenshot of the alarm in IoT.:
-Additional notes:`,
-
-            "Novar Download Failures": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-Type of download needed (version, main, comm, etc.):
-What system it controls (HVAC, Rack A, Rack B…etc.):
-Description of controller behavior or error messages received. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:
-Additional notes:`,
-
-            "Danfoss Downloads": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-What system it controls (HVAC, Rack A, Rack B…etc.):
-Description of what prompted the download request (Controller change out, controller software failure, etc.):
-MAC address (must be 12 characters):
-Additional notes:`,
-
-            "Manager Escalations": `Name of the manager or team lead authorizing the escalation:
-Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Reason for escalation:
-Detailed description of the issue:
-What actions Contact Center agents have taken so far:
-Any supporting screenshots of EMS systems or other documentation. Paste screenshots of error messages into a Word document and attach it to the work order as you create it.:
-Additional notes:`,
-
-            "Program Change Request": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB, DTC, etc.):
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-What the technician has requested and the reason for the request:
-A screenshot of the module in the EMS system.:
-Additional notes:`,
-
-            "Taking RTU Fans Out of Continuous Mode": `Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-What RTU fan(s) the technician has requested to turn off and the reason for the request.:
-Additional notes:`,
-
-            "Parameter Deviation": `Name of the manager or team lead authorizing the escalation:
-Technician first and last name:
-Technician cell phone number:
-Technician email address:
-Store number:
-WO:
-Rack (LTA, MTB, DTC, etc.):
-EMS system (Novar ESS32, Opus Architect, Opus Magnum, CPC UltraSite, Connect+, Danfoss AKA65, Danfoss Store View, Carel):
-Reason for escalation:
-Detailed description of request:
-Current setpoint and requested setpoint:
-Screenshots of setpoint in EMS system and of the Parameter Cutsheet.:
-Additional notes:`,
-
-            "Swap Work Order": `Swap Workorder Notes Show: (Enter the notes from the email).
-Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`,
-
-            "Mastermind Work Order": `Mastermind Report Notes Show: (Enter the notes from the work order attachment that is in all caps).
-Please email acserv@wal-mart.com when service is complete. Please provide notes regarding work done along with on/off site dates and times. You may also contact Alarm Central at 479-273-4600, options 1 and 4 between the hours of 7AM-7PM CST Mon-Fri:`
-        };
+        const DAE_TEMPLATES = APP_CONFIG.DAE_TEMPLATES;
         
         async function addQuickNoteWithInput(prefix, promptText) {
-            const userInput = await customPrompt(promptText, '', 'Enter Details');
+            const userInput = await customPrompt(promptText);
             if (userInput && userInput.trim() !== '') {
                 addQuickNote(prefix + userInput.trim() + '.');
                 // Tag analysis is handled by addQuickNote
@@ -9217,7 +9287,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             let rackName = AppState.currentRack;
             
             if (!rackName && requiresRack) {
-                rackName = await customPrompt(`Enter rack name for "${action}":`, '', 'Rack Name');
+                rackName = await customPrompt('RACK_NAME', { action: action });
                 if (!rackName || rackName.trim() === '') {
                     showNotification('❌ Rack name required', 'error', 2000);
                     return;
@@ -9251,7 +9321,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             const rackContext = getCurrentRackContext();
             const rackPrefix = rackContext ? ` on ${rackContext}` : '';
             
-            const parameter = await customPrompt('What did you force?\n\nExamples:\n• Suct PSI to 30\n• OAT to 68 degrees\n• Discharge temp to 105\n• Fan speed to 75%', '', 'Force Parameter');
+            const parameter = await customPrompt('FORCE_PARAM');
             if (parameter && parameter.trim() !== '') {
                 addQuickNote(`Forced ${parameter.trim()}${rackPrefix}.`);
                 // Tag analysis is handled by addQuickNote
@@ -9286,7 +9356,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 showNotification(`Auto-detected: ${lastForcedItem}`, 'success', 2000);
             } else {
                 // No forced items found, prompt for input
-                const item = await customPrompt('What did you force off?\n\nExamples:\n• Bypass Valve\n• Compressor 2\n• Fan speed\n• lights', '', 'Force Off Item');
+                const item = await customPrompt('FORCE_OFF_ITEM');
                 if (item && item.trim() !== '') {
                     addQuickNote(`Forced off ${item.trim()}${rackPrefix}.`);
                 }
@@ -9297,7 +9367,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             const rackContext = getCurrentRackContext();
             const rackPrefix = rackContext ? ` on ${rackContext}` : '';
             
-            const circuit = await customPrompt('Enter circuit to shutdown:\n\nExamples:\n• A3\n• B2\n• Circuit 5\n• Comp 1', '', 'Shutdown Circuit');
+            const circuit = await customPrompt('SHUTDOWN_CIRCUIT');
             if (!circuit || circuit.trim() === '') return;
             
             const note = `Shutdown circuit ${circuit.trim()}${rackPrefix}.`;
@@ -9316,19 +9386,19 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             let addMore = true;
             
             while (addMore && breakerDetails.length < 5) { // Limit to 5 panels max
-                const panel = await customPrompt(`Enter breaker panel name:\n\nCommon examples:\n• H1P1\n• H1P2\n• H1P\n• H2P\n• L1P\n• L2P\n• Panel A\n\n${breakerDetails.length > 0 ? 'Or leave blank to finish' : ''}`, '', 'Breaker Panel');
+                const panel = await customPrompt('BREAKER_PANEL', { breakerDetails: breakerDetails.length > 0 ? 'Or leave blank to finish' : '' });
                 
                 if (panel === null || panel.trim() === '') {
                     break; // User cancelled or left blank
                 }
                 
-                const breakers = await customPrompt(`Enter breaker numbers for panel ${panel.trim()}:\n\nExamples:\n• 15, 16, 17, 18\n• 12, 13, 14\n• 1, 2, 3, 4, 5`, '', 'Breaker Numbers');
+                const breakers = await customPrompt('BREAKER_NUMBERS', { panel: panel.trim() });
                 
                 if (breakers === null || breakers.trim() === '') {
                     continue; // Skip this panel if no breakers entered
                 }
                 
-                const status = await customPrompt(`Enter status for these breakers:\n\nCommon statuses:\n• Not Present\n• Faulted On\n• Faulted Off\n• Normal\n• Tripped`, '', 'Breaker Status');
+                const status = await customPrompt('BREAKER_STATUS');
                 
                 if (status === null || status.trim() === '') {
                     continue; // Skip this panel if no status entered
@@ -9357,7 +9427,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         }
 
         async function addAdvisoryNote() {
-            const issue = await customPrompt('Enter issue to advise tech about:\n\nExamples:\n• NSRM email\n• comm loss\n• controller issue\n• parameter deviation', '', 'Advisory Issue');
+            const issue = await customPrompt('ADVISORY_ISSUE');
             if (!issue || issue.trim() === '') return;
             
             const note = `Adv tech of ${issue.trim()}.`;
@@ -9365,7 +9435,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         }
 
         async function addTechQuestionNote() {
-            const question = await customPrompt('What did the tech want to know?\n\nExamples:\n• how to access the controller\n• what the alarm means\n• if the system is working properly', '', 'Tech Question');
+            const question = await customPrompt('TECH_QUESTION');
             if (!question || question.trim() === '') return;
             
             const note = `Tech wanted to know ${question.trim()}.`;
@@ -9373,7 +9443,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         }
 
         async function addStatusUpdateNote() {
-            const item = await customPrompt('What status update did the tech request?\n\nExamples:\n• the work order\n• the repair progress\n• the controller status', '', 'Status Update');
+            const item = await customPrompt('STATUS_UPDATE');
             if (!item || item.trim() === '') return;
             
             const note = `Tech wanted a status update on ${item.trim()}.`;
@@ -9381,7 +9451,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         }
 
         async function addTechRefusedNote() {
-            const action = await customPrompt('What did the tech refuse to do?\n\nExamples:\n• power cycle the controller\n• check the breakers\n• wait for the download', '', 'Tech Refused');
+            const action = await customPrompt('TECH_REFUSED');
             if (!action || action.trim() === '') return;
             
             const note = `Tech refused ${action.trim()}.`;
@@ -9389,7 +9459,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         }
 
         async function addDefrostAlreadyRunningNote() {
-            const circuit = await customPrompt('Enter circuit that is already defrosting:\n\nExamples:\n• C2\n• B3\n• Circuit 5', '', 'Circuit Defrosting');
+            const circuit = await customPrompt('CIRCUIT_DEFROSTING');
             if (!circuit || circuit.trim() === '') return;
             
             const note = `${circuit.trim()} is already defrosting.`;
@@ -9397,21 +9467,27 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         }
 
         async function addSetpointNote() {
-            const coolTemp = await customPrompt('Enter cooling setpoint:\n\nExample: 72 (degree symbol added automatically)', '', 'Cooling Setpoint');
-            if (!coolTemp || coolTemp.trim() === '') return;
+            const oldCool = await customPrompt('OLD_COOLING_SETPOINT');
+            if (!oldCool || oldCool.trim() === '') return;
             
-            const heatTemp = await customPrompt('Enter heating setpoint:\n\nExample: 68 (degree symbol added automatically)', '', 'Heating Setpoint');
-            if (!heatTemp || heatTemp.trim() === '') return;
+            const oldHeat = await customPrompt('OLD_HEATING_SETPOINT');
+            if (!oldHeat || oldHeat.trim() === '') return;
             
-            const unit = await customPrompt('Enter RTU/AHU number:\n\nExamples: 1, 2, 3', '', 'RTU/AHU Number');
+            const newCool = await customPrompt('NEW_COOLING_SETPOINT');
+            if (!newCool || newCool.trim() === '') return;
+            
+            const newHeat = await customPrompt('NEW_HEATING_SETPOINT');
+            if (!newHeat || newHeat.trim() === '') return;
+            
+            const unit = await customPrompt('RTU_NUMBER');
             if (!unit || unit.trim() === '') return;
             
-            const note = `Changed setpoint to ${coolTemp.trim()}°/${heatTemp.trim()}° for RTU ${unit.trim()}.`;
+            const note = `Changed setpoint to ${newCool.trim()}°/${newHeat.trim()}° for RTU ${unit.trim()} from ${oldCool.trim()}°/${oldHeat.trim()}°.`;
             addQuickNote(note);
         }
 
         async function addTestNote() {
-            const component = await customPrompt('What did you test?\n\nExamples:\n• controller functionality\n• sensor readings\n• valve operation\n• communication', '', 'Test Component');
+            const component = await customPrompt('TEST_COMPONENT');
             if (component && component.trim() !== '') {
                 addQuickNote('Tested ' + component.trim() + '.');
                 // Tag analysis is handled by addQuickNote
@@ -9419,7 +9495,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         }
 
         async function addMonitorNote() {
-            const instruction = await customPrompt('Monitor what?\n\nExamples:\n• temperatures for 30 minutes\n• system and call back if issues persist\n• alarms overnight\n• pressures during peak hours', '', 'Monitor Instruction');
+            const instruction = await customPrompt('MONITOR_INSTRUCTION');
             if (instruction && instruction.trim() !== '') {
                 addQuickNote('Advised to monitor ' + instruction.trim() + '.');
             }
@@ -9442,7 +9518,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 message += `${index + 1}. ${contact}\n`;
             });
             
-            const choice = await customPrompt(message + '\nEnter number (1-8):', '', 'Contact Selection');
+            const choice = await customPrompt('CONTACT_SELECTION', { message: message });
             
             if (choice && choice.trim() !== '') {
                 const choiceNum = parseInt(choice.trim());
@@ -9450,7 +9526,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                     addQuickNote('Advised tech to contact ' + contacts[choiceNum - 1] + '.');
                     // Tag analysis is handled by addQuickNote
                 } else if (choiceNum === 8) {
-                    const customContact = await customPrompt('Enter contact details:', '', 'Custom Contact');
+                    const customContact = await customPrompt('CUSTOM_CONTACT');
                     if (customContact && customContact.trim() !== '') {
                         addQuickNote('Advised tech to contact ' + customContact.trim() + '.');
                         // Tag analysis is handled by addQuickNote
@@ -9460,7 +9536,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         }
 
         async function addContactNote() {
-            const contact = await customPrompt('Contact who?\n\nExamples:\n• HVAC vendor\n• facilities management\n• IT support\n• local technician', '', 'Contact Details');
+            const contact = await customPrompt('CONTACT_DETAILS');
             if (contact && contact.trim() !== '') {
                 addQuickNote('Advised tech to contact ' + contact.trim() + '.');
             }
@@ -9470,7 +9546,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             const rackContext = getCurrentRackContext();
             const rackPrefix = rackContext ? ` on ${rackContext}` : '';
             
-            const component = await customPrompt('Replace what?\n\nExamples:\n• temperature sensor\n• controller board\n• communication cable\n• RIM board', '', 'Replace Component');
+            const component = await customPrompt('REPLACE_COMPONENT');
             if (component && component.trim() !== '') {
                 addQuickNote(`Advised to replace ${component.trim()}${rackPrefix}.`);
                 // Tag analysis is handled by addQuickNote
@@ -9739,22 +9815,62 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
             }
         }
         
+        // ============= Display Rules System =============
+        
+        // Configuration for conditional display logic
+        // This is parsed by the Generator to populate the Display Rules tab
+        const DISPLAY_RULES = [
+            {
+                condition: "AppState.selectedSystem === 'Novar'",
+                action: "show",
+                target: ".system-novar"
+            },
+            {
+                condition: "AppState.selectedSystem === 'Opus Arch' || AppState.selectedSystem === 'Opus Mag' || AppState.selectedSystem === 'CPC'",
+                action: "show",
+                target: ".system-opus-cpc"
+            }
+        ];
+
         // Update conditional button visibility based on system selection
         function updateConditionalButtons() {
             const selectedSystem = AppState.selectedSystem;
             
+            // Apply configured rules
+            if (typeof DISPLAY_RULES !== 'undefined') {
+                DISPLAY_RULES.forEach(rule => {
+                    try {
+                        // Evaluate condition
+                        // We use a safe evaluation wrapper
+                        const checkCondition = new Function('AppState', 'selectedSystem', `return ${rule.condition}`);
+                        const isMatch = checkCondition(AppState, selectedSystem);
+                        
+                        const elements = document.querySelectorAll(rule.target);
+                        elements.forEach(el => {
+                            if (rule.action === 'show') {
+                                el.style.display = isMatch ? '' : 'none';
+                            } else if (rule.action === 'hide') {
+                                el.style.display = isMatch ? 'none' : '';
+                            } else if (rule.action === 'enable') {
+                                el.disabled = !isMatch;
+                            } else if (rule.action === 'disable') {
+                                el.disabled = isMatch;
+                            }
+                        });
+                    } catch (e) {
+                        console.warn('Error applying display rule:', rule, e);
+                    }
+                });
+            }
+            
+            // Legacy/Hardcoded logic (preserved for safety, though rules above cover it)
             // Show/hide Clocks buttons (Novar only)
+            /* 
             const clockButtons = document.querySelectorAll('.system-novar');
             clockButtons.forEach(btn => {
                 btn.style.display = selectedSystem === 'Novar' ? '' : 'none';
             });
-            
-            // Show/hide Sporlan button (Opus/CPC only)
-            const sporlanButtons = document.querySelectorAll('.system-opus-cpc');
-            sporlanButtons.forEach(btn => {
-                const isOpusOrCPC = selectedSystem === 'Opus Arch' || selectedSystem === 'Opus Mag' || selectedSystem === 'CPC';
-                btn.style.display = isOpusOrCPC ? '' : 'none';
-            });
+            */
         }
         
         // Show ping buttons when Comms button is clicked
@@ -9985,12 +10101,33 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
         }
         
         // Helper functions to replace window.prompt and window.confirm
-        async function customPrompt(message, defaultValue = '', title = 'Input Required') {
+        async function customPrompt(messageOrKey, defaultValueOrReplacements = '', title = 'Input Required') {
+            let message = messageOrKey;
+            let finalDefaultValue = defaultValueOrReplacements;
+            let finalTitle = title;
+            
+            // Check registry
+            if (typeof MODAL_REGISTRY !== 'undefined' && MODAL_REGISTRY[messageOrKey]) {
+                const config = MODAL_REGISTRY[messageOrKey];
+                message = config.message;
+                finalTitle = config.title;
+                finalDefaultValue = config.defaultValue;
+                
+                if (typeof defaultValueOrReplacements === 'object' && defaultValueOrReplacements !== null) {
+                    const replacements = defaultValueOrReplacements;
+                    Object.entries(replacements).forEach(([key, value]) => {
+                        message = message.replace(new RegExp(`{${key}}`, 'g'), value);
+                    });
+                } else if (typeof defaultValueOrReplacements === 'string' && defaultValueOrReplacements !== '') {
+                     finalDefaultValue = defaultValueOrReplacements;
+                }
+            }
+
             return await showModal({
-                title: title,
+                title: finalTitle,
                 message: message,
                 input: true,
-                defaultValue: defaultValue,
+                defaultValue: finalDefaultValue,
                 placeholder: 'Enter value...',
                 confirmText: 'OK',
                 cancelText: 'Cancel'
@@ -10107,7 +10244,7 @@ Please email acserv@wal-mart.com when service is complete. Please provide notes 
                 const formData = getFormData();
                 
                 // Build the new format: "Tech_name | EMS | Store_Number | WO: Work_Order_Number - Rest of notes"
-                const techName = formData.techName || 'N/A';
+                const techName = formData.techName || 'John';
                 const selectedSystem = AppState.selectedSystem || 'N/A';
                 const storeNumber = formData.storeNumber || 'N/A';
                 const workOrder = formData.workOrder || 'N/A';

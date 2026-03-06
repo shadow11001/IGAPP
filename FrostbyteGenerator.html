@@ -1,0 +1,2974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frostbyte Generator - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            color: #495057;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .section h3 {
+            color: #495057;
+            margin: 15px 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .button-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 400px));
+            gap: 15px;
+            justify-content: start;
+        }
+
+        .button-card {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            transition: all 0.3s;
+            position: relative;
+            min-width: 280px;
+            max-width: 100%;
+        }
+
+        .button-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .button-card[draggable="true"] {
+            cursor: move;
+        }
+
+        .button-card:hover .fa-grip-vertical {
+            color: #667eea !important;
+        }
+
+        .button-card.dragging {
+            opacity: 0.4;
+            transform: scale(0.95);
+        }
+
+        .button-card.drag-over {
+            border-color: #28a745;
+            background: #f0fff4;
+            transform: translateY(-5px);
+        }
+
+        .button-card h4 {
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        .button-card p {
+            margin: 8px 0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .button-card .actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .rule-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+
+        .rule-item select {
+            margin: 5px 0;
+        }
+
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+
+        .dae-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .dae-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+        }
+
+        .feature-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #28a745;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            left: 32px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-snowflake"></i> Frostbyte Generator</h1>
+            <p>Advanced Configuration & Generation Tool</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('general')">
+                <i class="fas fa-cog"></i> General Settings
+            </button>
+            <button class="nav-tab" onclick="switchTab('buttons')">
+                <i class="fas fa-th"></i> Buttons Manager
+            </button>
+            <button class="nav-tab" onclick="switchTab('categories')">
+                <i class="fas fa-list-ul"></i> Categories
+            </button>
+            <button class="nav-tab" onclick="switchTab('notes')">
+                <i class="fas fa-file-alt"></i> Notes Format
+            </button>
+            <button class="nav-tab" onclick="switchTab('rules')">
+                <i class="fas fa-code-branch"></i> Display Rules
+            </button>
+            <button class="nav-tab" onclick="switchTab('modals')">
+                <i class="fas fa-window-maximize"></i> Modals
+            </button>
+            <button class="nav-tab" onclick="switchTab('dae')">
+                <i class="fas fa-clipboard-list"></i> DAE Templates
+            </button>
+            <button class="nav-tab" onclick="switchTab('features')">
+                <i class="fas fa-toggle-on"></i> Features
+            </button>
+            <button class="nav-tab" onclick="switchTab('advanced')">
+                <i class="fas fa-code"></i> Advanced
+            </button>
+        </div>
+
+        <!-- General Settings Tab -->
+        <div id="general-tab" class="tab-content active">
+            <div class="section">
+                <h2><i class="fas fa-file-code"></i> Load Template</h2>
+                <div class="info-box">
+                    <strong>⚠️ Important:</strong> First, load your Frostbyte.html file to extract its current configuration.
+                </div>
+                <div class="form-group">
+                    <label>Select Frostbyte.html Template</label>
+                    <input type="file" id="template-file" accept=".html" style="padding: 10px; border: 2px dashed #667eea; background: white;">
+                </div>
+                <div id="load-status" style="margin-top: 10px; padding: 10px; border-radius: 5px; display: none;"></div>
+            </div>
+
+            <div class="section">
+                <h2>Application Settings</h2>
+                <div class="form-group">
+                    <label>Application Version</label>
+                    <input type="text" id="app-version" value="2.0.0" placeholder="e.g., 2.0.0">
+                </div>
+                <div class="form-group">
+                    <label>Application Title</label>
+                    <input type="text" id="app-title" value="Walmart Digital Assets - Frostbyte">
+                </div>
+                <div class="form-group">
+                    <label>Meta Description</label>
+                    <input type="text" id="app-description" value="Walmart Digital Assets Notes Application">
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Theme Settings</h2>
+                <div class="form-group">
+                    <label>Default Theme</label>
+                    <select id="default-theme">
+                        <option value="light">Light Mode</option>
+                        <option value="dark">Dark Mode</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Primary Color (Light Mode)</label>
+                    <input type="color" id="primary-color-light" value="#f8f9fa">
+                </div>
+                <div class="form-group">
+                    <label>Primary Color (Dark Mode)</label>
+                    <input type="color" id="primary-color-dark" value="#2c2c2c">
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons Manager Tab -->
+        <div id="buttons-tab" class="tab-content">
+            <div class="section">
+                <h2>Quick Notes Buttons</h2>
+                <div class="info-box">
+                    <strong>Info:</strong> Manage all quick note buttons. You can add new buttons, edit existing ones, or remove buttons you don't need.
+                    <br><br>
+                    <strong>Features:</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Categories:</strong> Organize buttons by group (System Login, Diagnostics, Actions, etc.)</li>
+                        <li><strong>Sub-Categories:</strong> Further organize by HVAC, Lighting, or Refrigeration tabs</li>
+                        <li><strong>Modal Input:</strong> Buttons marked with <i class="fas fa-edit" style="color: #ffc107;"></i> require user input</li>
+                    </ul>
+                </div>
+                <button class="btn btn-success" onclick="addNewButton()">
+                    <i class="fas fa-plus"></i> Add New Button
+                </button>
+                
+                <!-- Controls Bar -->
+                <div id="buttons-controls" style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #dee2e6; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between;">
+                    <!-- Controls will be injected here -->
+                </div>
+
+                <div id="buttons-list" class="button-list" style="margin-top: 20px;">
+                    <!-- Buttons will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Tab -->
+        <div id="categories-tab" class="tab-content">
+            <div class="section">
+                <h2>Category Management</h2>
+                <div class="info-box">
+                    <strong>Info:</strong> Reorder categories to change how they appear in the application. You can also manage sub-categories here.
+                </div>
+                
+                <div id="categories-list" class="dae-list" style="margin-top: 20px;">
+                    <!-- Categories will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes Format Tab -->
+        <div id="notes-tab" class="tab-content">
+            <div class="section">
+                <h2>Notes Copy Format</h2>
+                <div class="info-box">
+                    <strong>Available Variables:</strong><br>
+                    <code>{techName}</code> - Technician Name<br>
+                    <code>{selectedSystem}</code> - Selected EMS System<br>
+                    <code>{storeNumber}</code> - Store Number<br>
+                    <code>{workOrder}</code> - Work Order<br>
+                    <code>{notes}</code> - Notes Content<br>
+                </div>
+                <div class="form-group">
+                    <label>Format Template</label>
+                    <textarea id="notes-format" placeholder="e.g., {techName} | {selectedSystem} | {storeNumber} | WO: {workOrder}{notes ? ' - ' + notes : ''}"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Separator</label>
+                    <input type="text" id="notes-separator" value=" | " placeholder="e.g., ' | '">
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Auto-formatting Rules</h2>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="auto-capitalize" checked>
+                    <label>Auto-capitalize first letter of notes</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="auto-period" checked>
+                    <label>Auto-add period at end if missing</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="trim-whitespace" checked>
+                    <label>Trim extra whitespace</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Display Rules Tab -->
+        <div id="rules-tab" class="tab-content">
+            <div class="section">
+                <h2>Conditional Display Rules</h2>
+                <div class="info-box">
+                    <strong>Info:</strong> Define rules for when certain buttons or sections should appear based on user actions.
+                </div>
+                <button class="btn btn-success" onclick="addNewRule()">
+                    <i class="fas fa-plus"></i> Add New Rule
+                </button>
+                <div id="rules-list" style="margin-top: 20px;">
+                    <!-- Rules will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modals Tab -->
+        <div id="modals-tab" class="tab-content">
+            <div class="section">
+                <h2>Button Modals Configuration</h2>
+                <div class="info-box">
+                    <strong>Info:</strong> Configure modals that appear when buttons are clicked to collect additional information.
+                </div>
+                <button class="btn btn-success" onclick="addNewModal()">
+                    <i class="fas fa-plus"></i> Add New Modal
+                </button>
+                <div id="modals-list" style="margin-top: 20px;">
+                    <!-- Modals will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- DAE Templates Tab -->
+        <div id="dae-tab" class="tab-content">
+            <div class="section">
+                <h2>DAE (Direct Action Entry) Templates</h2>
+                <div class="info-box">
+                    <strong>Info:</strong> Manage DAE templates that populate the DAE text area when selected.
+                </div>
+                <button class="btn btn-success" onclick="addNewDAE()">
+                    <i class="fas fa-plus"></i> Add New DAE Template
+                </button>
+                <div id="dae-list" class="dae-list" style="margin-top: 20px;">
+                    <!-- DAE templates will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Tab -->
+        <div id="features-tab" class="tab-content">
+            <div class="section">
+                <h2>Feature Toggles</h2>
+                <div class="info-box">
+                    <strong>Info:</strong> Enable or disable major features of the application.
+                </div>
+                
+                <div class="feature-toggle" id="feature-dead-air">
+                    <div>
+                        <strong>Dead Air Timer</strong>
+                        <p style="color: #6c757d; font-size: 14px;">Track dead air time during calls</p>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleFeature('dead-air')"></div>
+                </div>
+
+                <div class="feature-toggle" id="feature-infractions">
+                    <div>
+                        <strong>Infraction Tracker</strong>
+                        <p style="color: #6c757d; font-size: 14px;">Track and display infractions</p>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleFeature('infractions')"></div>
+                </div>
+
+                <div class="feature-toggle" id="feature-war-room">
+                    <div>
+                        <strong>War Room Check</strong>
+                        <p style="color: #6c757d; font-size: 14px;">War Room verification system</p>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleFeature('war-room')"></div>
+                </div>
+
+                <div class="feature-toggle" id="feature-email-processor">
+                    <div>
+                        <strong>Email Processor</strong>
+                        <p style="color: #6c757d; font-size: 14px;">Process and analyze emails</p>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleFeature('email-processor')"></div>
+                </div>
+
+                <div class="feature-toggle" id="feature-qa-checklist">
+                    <div>
+                        <strong>QA Checklist</strong>
+                        <p style="color: #6c757d; font-size: 14px;">Quality assurance checklist</p>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleFeature('qa-checklist')"></div>
+                </div>
+
+                <div class="feature-toggle" id="feature-history">
+                    <div>
+                        <strong>Notes History</strong>
+                        <p style="color: #6c757d; font-size: 14px;">Save and restore previous notes</p>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleFeature('history')"></div>
+                </div>
+
+                <div class="feature-toggle" id="feature-tag-recommendations">
+                    <div>
+                        <strong>Tag Recommendations</strong>
+                        <p style="color: #6c757d; font-size: 14px;">AI-powered tag suggestions</p>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleFeature('tag-recommendations')"></div>
+                </div>
+
+                <div class="feature-toggle" id="feature-database">
+                    <div>
+                        <strong>Database Storage</strong>
+                        <p style="color: #6c757d; font-size: 14px;">IndexedDB storage system</p>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleFeature('database')"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Tab -->
+        <div id="advanced-tab" class="tab-content">
+            <div class="section">
+                <h2>Advanced Settings</h2>
+                <div class="warning-box">
+                    <strong>Warning:</strong> Modifying these settings requires technical knowledge. Incorrect values may break the application.
+                </div>
+
+                <h3>Dead Air Timer</h3>
+                <div class="form-group">
+                    <label>Warning Threshold (seconds)</label>
+                    <input type="number" id="warning-threshold" value="30" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Critical Threshold (seconds)</label>
+                    <input type="number" id="critical-threshold" value="45" min="1">
+                </div>
+
+                <h3>Auto-Save</h3>
+                <div class="form-group">
+                    <label>Auto-save Interval (seconds)</label>
+                    <input type="number" id="autosave-interval" value="30" min="5">
+                </div>
+
+                <h3>Custom CSS</h3>
+                <div class="form-group">
+                    <label>Additional CSS</label>
+                    <textarea id="custom-css" placeholder="/* Your custom CSS here */"></textarea>
+                </div>
+
+                <h3>Custom JavaScript</h3>
+                <div class="form-group">
+                    <label>Additional JavaScript</label>
+                    <textarea id="custom-js" placeholder="// Your custom JavaScript here"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <button class="btn btn-secondary" onclick="loadConfiguration()">
+            <i class="fas fa-folder-open"></i> Load Config
+        </button>
+        <button class="btn btn-warning" onclick="saveConfiguration()">
+            <i class="fas fa-save"></i> Save Config
+        </button>
+        <button class="btn btn-primary" onclick="previewChanges()">
+            <i class="fas fa-eye"></i> Preview
+        </button>
+        <button class="btn btn-success" onclick="generateFrostbyte()">
+            <i class="fas fa-file-code"></i> Generate Frostbyte.html
+        </button>
+    </div>
+
+    <!-- Button Editor Modal -->
+    <div id="button-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="button-modal-title">Edit Button</h2>
+            </div>
+            <div class="form-group">
+                <label>Button Label</label>
+                <input type="text" id="button-label" placeholder="e.g., Forced Note">
+            </div>
+            <div class="form-group">
+                <label>Use Modal Prompt (Optional)</label>
+                <select id="button-modal-select" onchange="handleModalSelect()">
+                    <option value="">-- None (Custom Function) --</option>
+                    <!-- Populated dynamically from MODAL_REGISTRY -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Button Function Name</label>
+                <input type="text" id="button-function" placeholder="e.g., addForcedNote">
+            </div>
+            <div class="form-group">
+                <label>Note Text Template</label>
+                <textarea id="button-note-text" placeholder="e.g., Called {system} and forced unit {unit}."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Button Category</label>
+                <select id="button-category" onchange="handleCategoryChange()">
+                    <!-- Populated dynamically -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Sub-Category (Optional)</label>
+                <select id="button-subcategory" onchange="handleSubCategoryChange()">
+                    <option value="">None</option>
+                    <option value="All">All (HVAC, Lighting, Refrigeration)</option>
+                    <option value="HVAC">HVAC</option>
+                    <option value="Lighting">Lighting</option>
+                    <option value="Refrigeration">Refrigeration</option>
+                    <option value="_new_">+ Add New Sub-Category...</option>
+                </select>
+                <small style="display: block; margin-top: 5px; color: #6c757d;">
+                    <i class="fas fa-info-circle"></i> For buttons that appear in specific tabs under Diagnostics or Actions
+                </small>
+            </div>
+            <div class="form-group">
+                <label>Button Style</label>
+                <select id="button-style">
+                    <option value="quick-note-btn">Default (Blue)</option>
+                    <option value="success-quick">Success (Green)</option>
+                    <option value="error-quick">Error (Red)</option>
+                    <option value="warning-quick">Warning (Yellow)</option>
+                    <option value="info-quick">Info (Light Blue)</option>
+                    <option value="primary-quick">Primary (Purple)</option>
+                </select>
+            </div>
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="button-requires-modal">
+                <label>Requires Modal Input</label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('button-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveButton()">Save Button</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rule Editor Modal -->
+    <div id="rule-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="rule-modal-title">Edit Display Rule</h2>
+            </div>
+            
+            <div class="form-group">
+                <label>Trigger Type</label>
+                <select id="rule-type" onchange="handleRuleTypeChange()">
+                    <option value="system">System Selected</option>
+                    <option value="custom">Custom Condition (Advanced)</option>
+                </select>
+            </div>
+
+            <div id="rule-system-group" class="form-group">
+                <label>When System Is:</label>
+                <select id="rule-system">
+                    <!-- Populated dynamically -->
+                </select>
+            </div>
+
+            <div id="rule-custom-group" class="form-group" style="display: none;">
+                <label>Custom Condition (JavaScript)</label>
+                <input type="text" id="rule-condition" placeholder="e.g., selectSystem('Novar') || selectSystem('E2')">
+                <small style="color: #666;">Enter a JavaScript expression that returns true/false.</small>
+            </div>
+
+            <div class="form-group">
+                <label>Action</label>
+                <select id="rule-action">
+                    <option value="show">Show Element</option>
+                    <option value="hide">Hide Element</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Target Section/Element</label>
+                <select id="rule-target-select" onchange="handleRuleTargetChange()">
+                    <optgroup label="Standard Sections">
+                        <option value="system-login">System Login Section</option>
+                        <option value="diagnostics">Diagnostics Section</option>
+                        <option value="actions">Actions Section</option>
+                        <option value="downloads">Downloads Section</option>
+                        <option value="escalations">Escalations Section</option>
+                        <option value="call-status">Call Status Section</option>
+                        <option value="special-cases">Special Cases Section</option>
+                        <option value="recommendations">Recommendations Section</option>
+                        <option value="communication">Communication Section</option>
+                    </optgroup>
+                    <optgroup label="Features">
+                        <option value="war-room-btn">War Room Button</option>
+                        <option value="database-btn">Database Button</option>
+                        <option value="qa-checklist">QA Checklist</option>
+                    </optgroup>
+                    <option value="_custom_">Custom ID...</option>
+                </select>
+            </div>
+
+            <div id="rule-custom-target-group" class="form-group" style="display: none;">
+                <label>Custom Element ID</label>
+                <input type="text" id="rule-target-custom" placeholder="e.g., my-custom-div">
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('rule-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveRule()">Save Rule</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration object to store all settings
+        let config = {
+            version: '2.0.0',
+            title: 'Walmart Digital Assets - Frostbyte',
+            description: 'Walmart Digital Assets Notes Application',
+            theme: {
+                default: 'light',
+                colors: {
+                    light: '#f8f9fa',
+                    dark: '#2c2c2c'
+                }
+            },
+            buttons: [],
+            categoryOrder: [],
+            notesFormat: {
+                template: '{techName} | {selectedSystem} | {storeNumber} | WO: {workOrder}{notes ? \' - \' + notes : \'\'}',
+                separator: ' | ',
+                autoCapitalize: true,
+                autoPeriod: true,
+                trimWhitespace: true
+            },
+            displayRules: [],
+            modals: [],
+            daeTemplates: {},
+            features: {
+                deadAir: true,
+                infractions: true,
+                warRoom: true,
+                emailProcessor: true,
+                qaChecklist: true,
+                history: true,
+                tagRecommendations: true,
+                database: true
+            },
+            advanced: {
+                warningThreshold: 30,
+                criticalThreshold: 45,
+                autosaveInterval: 30,
+                customCSS: '',
+                customJS: ''
+            }
+        };
+
+        let currentEditingButton = null;
+        let currentEditingRule = null;
+        let frostbyteTemplate = null; // Store the loaded Frostbyte.html content
+
+        // Initialize the application
+        function init() {
+            loadDefaultConfiguration();
+            loadButtons();
+            loadDAETemplates();
+            loadRules();
+            setupFileUpload();
+            loadCategoriesTab();
+        }
+
+        // Setup file upload handler
+        function setupFileUpload() {
+            const fileInput = document.getElementById('template-file');
+            if (!fileInput) return;
+            
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    loadFrostbyteTemplate(file);
+                }
+            });
+        }
+
+        // Handle category dropdown change
+        function handleCategoryChange() {
+            const select = document.getElementById('button-category');
+            if (select && select.value === '_new_') {
+                const newCategory = prompt('Enter new category name:');
+                if (newCategory) {
+                    // Use Title Case for the value to match existing categories
+                    const categoryValue = newCategory.charAt(0).toUpperCase() + newCategory.slice(1);
+                    const option = document.createElement('option');
+                    option.value = categoryValue;
+                    option.textContent = categoryValue;
+                    option.selected = true;
+                    select.insertBefore(option, select.lastChild);
+                } else {
+                    select.value = 'Common';
+                }
+            }
+        }
+
+        function handleSubCategoryChange() {
+            const select = document.getElementById('button-subcategory');
+            if (select && select.value === '_new_') {
+                const newSubCategory = prompt('Enter new sub-category name:');
+                if (newSubCategory) {
+                    const subCategoryValue = newSubCategory.charAt(0).toUpperCase() + newSubCategory.slice(1);
+                    const option = document.createElement('option');
+                    option.value = subCategoryValue;
+                    option.textContent = subCategoryValue;
+                    option.selected = true;
+                    select.insertBefore(option, select.lastChild);
+                } else {
+                    select.value = '';
+                }
+            }
+        }
+
+        // Load the Frostbyte.html template from file
+        function loadFrostbyteTemplate(file) {
+            const statusDiv = document.getElementById('load-status');
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = '#fff3cd';
+            statusDiv.style.borderLeft = '4px solid #ffc107';
+            statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading Frostbyte.html...';
+
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                try {
+                    frostbyteTemplate = e.target.result;
+                    parseExistingConfiguration();
+                    
+                    // Reload UI with parsed data
+                    loadButtons();
+                    loadDAETemplates();
+                    loadRules();
+                    loadModals();
+                    loadCategoriesTab();
+                    
+                    statusDiv.style.background = '#d4edda';
+                    statusDiv.style.borderLeft = '4px solid #28a745';
+                    statusDiv.innerHTML = `<i class="fas fa-check-circle"></i> ✅ Frostbyte.html loaded successfully! Found ${config.buttons.length} buttons and ${Object.keys(config.daeTemplates).length} DAE templates.`;
+                    
+                    console.log('✅ Frostbyte.html loaded successfully');
+                    console.log(`📊 Loaded ${config.buttons.length} buttons`);
+                    console.log(`📋 Loaded ${Object.keys(config.daeTemplates).length} DAE templates`);
+                } catch (error) {
+                    statusDiv.style.background = '#f8d7da';
+                    statusDiv.style.borderLeft = '4px solid #dc3545';
+                    statusDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ❌ Error loading file: ${error.message}`;
+                    console.error('Error loading Frostbyte.html:', error);
+                }
+            };
+            
+            reader.onerror = () => {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.borderLeft = '4px solid #dc3545';
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ❌ Error reading file.';
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // Parse existing Frostbyte.html to extract current configuration
+        function parseExistingConfiguration() {
+            if (!frostbyteTemplate) return;
+
+            try {
+                // Extract version
+                const versionMatch = frostbyteTemplate.match(/currentVersion:\s*['"]([^'"]+)['"]/);
+                if (versionMatch) {
+                    config.version = versionMatch[1];
+                    document.getElementById('app-version').value = versionMatch[1];
+                }
+
+                // Extract title
+                const titleMatch = frostbyteTemplate.match(/<title>([^<]+)<\/title>/);
+                if (titleMatch) {
+                    config.title = titleMatch[1];
+                    document.getElementById('app-title').value = titleMatch[1];
+                }
+
+                // Extract meta description
+                const descMatch = frostbyteTemplate.match(/<meta name="description" content="([^"]+)">/);
+                if (descMatch) {
+                    config.description = descMatch[1];
+                    document.getElementById('app-description').value = descMatch[1];
+                }
+
+                // Parse buttons from HTML
+                parseButtonsFromHTML();
+
+                // Extract APP_CONFIG
+                const appConfigMatch = frostbyteTemplate.match(/const APP_CONFIG = (\{[\s\S]*?\});/);
+                if (appConfigMatch) {
+                    try {
+                        const appConfig = new Function(`return ${appConfigMatch[1]}`)();
+                        config.appConfig = appConfig; // Store for preservation
+                        
+                        // Extract DAE Templates
+                        if (appConfig.DAE_TEMPLATES) {
+                            config.daeTemplates = appConfig.DAE_TEMPLATES;
+                            console.log(`✅ Parsed ${Object.keys(config.daeTemplates).length} DAE templates from APP_CONFIG`);
+                        }
+                    } catch (e) {
+                        console.warn('Could not parse APP_CONFIG:', e);
+                    }
+                }
+
+                // Extract DAE templates (Legacy fallback)
+                if (!config.daeTemplates || Object.keys(config.daeTemplates).length === 0) {
+                    const daeMatch = frostbyteTemplate.match(/const DAE_TEMPLATES = \{([^}]+(?:\}[^}]*)*)\};/s);
+                    if (daeMatch) {
+                        try {
+                            const daeContent = 'const DAE_TEMPLATES = {' + daeMatch[1] + '};';
+                            // Parse DAE templates (simplified - would need better parsing)
+                            const daeRegex = /"([^"]+)":\s*`([^`]+)`/g;
+                            let match;
+                            config.daeTemplates = {};
+                            while ((match = daeRegex.exec(daeMatch[1])) !== null) {
+                                config.daeTemplates[match[1]] = match[2];
+                            }
+                        } catch (e) {
+                            console.warn('Could not parse DAE templates:', e);
+                        }
+                    }
+                }
+
+                // Extract notes format
+                const formatMatch = frostbyteTemplate.match(/\$\{techName\}[^`]+\$\{workOrder\}[^`]*`;/);
+                if (formatMatch) {
+                    document.getElementById('notes-format').value = formatMatch[0];
+                }
+
+                // Extract thresholds
+                const deadAirMatch = frostbyteTemplate.match(/deadAirThreshold:\s*(\d+)/);
+                if (deadAirMatch) {
+                    config.advanced.warningThreshold = parseInt(deadAirMatch[1]);
+                    document.getElementById('warning-threshold').value = deadAirMatch[1];
+                }
+
+                // Extract Display Rules
+                const rulesMatch = frostbyteTemplate.match(/const DISPLAY_RULES = (\[[\s\S]*?\]);/);
+                if (rulesMatch) {
+                    try {
+                        const rules = new Function(`return ${rulesMatch[1]}`)();
+                        config.displayRules = rules;
+                        console.log(`✅ Parsed ${rules.length} display rules`);
+                    } catch (e) {
+                        console.warn('Could not parse Display Rules:', e);
+                    }
+                }
+
+                // Extract Modal Registry
+                // Matches: const MODAL_REGISTRY = { ... };
+                // We use a balanced brace matcher approach or just a greedy match until the semicolon
+                const modalMatch = frostbyteTemplate.match(/const MODAL_REGISTRY = (\{[\s\S]*?\});/);
+                if (modalMatch) {
+                    try {
+                        const registry = new Function(`return ${modalMatch[1]}`)();
+                        config.modals = Object.entries(registry).map(([key, value]) => ({
+                            id: key,
+                            title: value.title,
+                            message: value.message,
+                            defaultValue: value.defaultValue,
+                            originalTitle: value.title,
+                            originalMessage: value.message,
+                            type: 'prompt',
+                            isRegistry: true
+                        }));
+                        console.log(`✅ Parsed ${config.modals.length} modals from registry`);
+                    } catch (e) {
+                        console.warn('Could not parse Modal Registry:', e);
+                    }
+                }
+
+                console.log('✅ Configuration parsed from Frostbyte.html');
+            } catch (error) {
+                console.error('Error parsing configuration:', error);
+            }
+        }
+
+        // Parse buttons from the HTML template
+        function parseButtonsFromHTML() {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(frostbyteTemplate, 'text/html');
+            const buttons = doc.querySelectorAll('.quick-note-btn, button[onclick*="add"], button[onclick*="selectSystem"]');
+            
+            config.buttons = [];
+            config.modals = []; // Reset modals
+            buttons.forEach((button, index) => {
+                const onclick = button.getAttribute('onclick') || '';
+                const label = button.textContent.trim();
+                const title = button.getAttribute('title') || label;
+                const className = button.className;
+                const dataSearch = button.getAttribute('data-search') || '';
+                
+                // Determine function type and extract note text
+                let functionName = '';
+                let noteText = '';
+                let category = 'Common';
+                let subCategory = null; // HVAC, Lighting, Refrigeration
+                let requiresModal = false;
+                
+                // Detect if button requires modal input
+                // Case 1: addQuickNoteWithInput('Prefix', 'Prompt Message')
+                if (onclick.includes('addQuickNoteWithInput')) {
+                    requiresModal = true;
+                    const argsMatch = onclick.match(/addQuickNoteWithInput\s*\(\s*(['"`])((?:[^\\]|\\.)*?)\1\s*,\s*(['"`])((?:[^\\]|\\.)*?)\3\s*\)/);
+                    if (argsMatch) {
+                        const message = argsMatch[4].replace(/\\'/g, "'").replace(/\\"/g, '"');
+                        const title = "Enter Details"; // Hardcoded in addQuickNoteWithInput
+                        
+                        const existingModal = config.modals.find(m => m.originalTitle === title && m.originalMessage === message);
+                        if (!existingModal) {
+                            config.modals.push({
+                                id: `modal-${config.modals.length + 1}`,
+                                title: title,
+                                message: message,
+                                defaultValue: '',
+                                originalTitle: title,
+                                originalMessage: message,
+                                type: 'prompt'
+                            });
+                        }
+                    }
+                }
+                // Case 2: Function calls that internally use customPrompt
+                else {
+                    const funcMatch = onclick.match(/^(\w+)\(/);
+                    if (funcMatch) {
+                        const funcName = funcMatch[1];
+                        // Find function definition in the template (handle async)
+                        const funcStartRegex = new RegExp(`(?:async\\s+)?function\\s+${funcName}\\s*\\(`);
+                        const funcStartMatch = frostbyteTemplate.match(funcStartRegex);
+                        
+                        if (funcStartMatch) {
+                            const startIndex = funcStartMatch.index;
+                            // Search window: 3000 chars should cover most function bodies
+                            const searchWindow = frostbyteTemplate.substring(startIndex, startIndex + 3000);
+                            // Stop at next function definition to avoid bleeding
+                            const nextFuncIndex = searchWindow.indexOf('function ', 10);
+                            const functionBody = nextFuncIndex > -1 ? searchWindow.substring(0, nextFuncIndex) : searchWindow;
+                            
+                            if (functionBody.includes('customPrompt')) {
+                                requiresModal = true;
+                                
+                                // Extract all customPrompt calls in this function
+                                // Updated to handle 1, 2, or 3 arguments
+                                const promptRegex = /customPrompt\s*\(\s*(['"`])((?:[^\\]|\\.)*?)\1(?:\s*,\s*(['"`])((?:[^\\]|\\.)*?)\3)?(?:\s*,\s*(['"`])((?:[^\\]|\\.)*?)\5)?\s*\)/g;
+                                let promptMatch;
+                                while ((promptMatch = promptRegex.exec(functionBody)) !== null) {
+                                    const message = promptMatch[2].replace(/\\'/g, "'").replace(/\\"/g, '"');
+                                    // If only 1 arg (key), we don't create a new modal as it's likely in registry
+                                    if (promptMatch[4]) {
+                                        const defaultValue = promptMatch[4];
+                                        const title = promptMatch[6] || 'Input Required';
+                                        
+                                        const existingModal = config.modals.find(m => m.originalTitle === title && m.originalMessage === message);
+                                        if (!existingModal) {
+                                            config.modals.push({
+                                                id: `modal-${config.modals.length + 1}`,
+                                                title: title,
+                                                message: message,
+                                                defaultValue: defaultValue,
+                                                originalTitle: title,
+                                                originalMessage: message,
+                                                type: 'prompt'
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Parse onclick to extract function and parameters
+                if (onclick.includes('addQuickNote')) {
+                    functionName = 'addQuickNote';
+                    const textMatch = onclick.match(/addQuickNote\(['"]([^'"]+)['"]\)/);
+                    if (textMatch) noteText = textMatch[1];
+                } else if (onclick.includes('addQuickNoteWithInput')) {
+                    functionName = 'addQuickNoteWithInput';
+                    // Try to match 2 arguments first (prefix, key)
+                    const twoArgsMatch = onclick.match(/addQuickNoteWithInput\(['"]([^'"]+)['"]\s*,\s*['"]([^'"]+)['"]/);
+                    if (twoArgsMatch) {
+                         noteText = twoArgsMatch[1]; // Prefix
+                         // Store modalId for the editor
+                         button.dataset.modalId = twoArgsMatch[2];
+                    } else {
+                        const textMatch = onclick.match(/addQuickNoteWithInput\(['"]([^'"]+)['"]/);
+                        if (textMatch) noteText = textMatch[1];
+                    }
+                    requiresModal = true;
+                } else if (onclick.includes('addForcedNote')) {
+                    functionName = 'addForcedNote';
+                    noteText = 'Force parameter';
+                    category = 'Actions';
+                    requiresModal = true;
+                } else if (onclick.includes('addForcedOffNote')) {
+                    functionName = 'addForcedOffNote';
+                    noteText = 'Force off parameter';
+                    category = 'Actions';
+                    requiresModal = true;
+                } else if (onclick.includes('addForcedFanNote')) {
+                    functionName = 'addForcedFanNote';
+                    noteText = 'Force fan';
+                    category = 'Actions';
+                    subCategory = 'HVAC';
+                    requiresModal = true;
+                } else if (onclick.includes('addDownloadNote')) {
+                    functionName = 'addDownloadNote';
+                    const textMatch = onclick.match(/addDownloadNote\(['"]([^'"]+)['"]\)/);
+                    if (textMatch) noteText = textMatch[1];
+                    category = 'Downloads';
+                } else if (onclick.includes('addContactNote')) {
+                    functionName = 'addContactNote';
+                    noteText = 'Contact tech';
+                    category = 'Recommendations';
+                    requiresModal = true;
+                } else if (onclick.includes('addSetpointNote')) {
+                    functionName = 'addSetpointNote';
+                    noteText = 'Change setpoint';
+                    category = 'Actions';
+                    subCategory = 'HVAC';
+                    requiresModal = true;
+                } else if (onclick.includes('addSetbackNote')) {
+                    functionName = 'addSetbackNote';
+                    noteText = 'Change setback';
+                    category = 'Actions';
+                    subCategory = 'HVAC';
+                    requiresModal = true;
+                } else if (onclick.includes('addEscalateNote')) {
+                    functionName = 'addEscalateNote';
+                    noteText = 'Escalate issue';
+                    category = 'Escalations';
+                    requiresModal = true;
+                } else if (onclick.includes('addPowerCycleNote')) {
+                    functionName = 'addPowerCycleNote';
+                    noteText = 'Power cycle recommended';
+                    category = 'Special Cases';
+                } else if (onclick.includes('addCheckBreakersNote')) {
+                    functionName = 'addCheckBreakersNote';
+                    noteText = 'Check breakers';
+                    category = 'Diagnostics';
+                    subCategory = 'Lighting';
+                    requiresModal = true;
+                } else if (onclick.includes('addShutdownCircuitNote')) {
+                    functionName = 'addShutdownCircuitNote';
+                    noteText = 'Shutdown circuit';
+                    category = 'Actions';
+                    subCategory = 'Refrigeration';
+                    requiresModal = true;
+                } else if (onclick.includes('addRackSettingsNote')) {
+                    functionName = 'addRackSettingsNote';
+                    noteText = 'Rack settings';
+                    category = 'Actions';
+                    subCategory = 'Refrigeration';
+                    requiresModal = true;
+                } else if (onclick.includes('addCaseSettingsNote')) {
+                    functionName = 'addCaseSettingsNote';
+                    noteText = 'Case settings';
+                    category = 'Actions';
+                    subCategory = 'Refrigeration';
+                    requiresModal = true;
+                } else if (onclick.includes('addStagingNote')) {
+                    functionName = 'addStagingNote';
+                    noteText = 'Staging changes';
+                    category = 'Diagnostics';
+                    subCategory = 'Refrigeration';
+                    requiresModal = true;
+                } else if (onclick.includes('addModCommLossNote')) {
+                    functionName = 'addModCommLossNote';
+                    noteText = 'Module comm loss';
+                    category = 'Diagnostics';
+                    requiresModal = true;
+                } else if (onclick.includes('addReplaceNote')) {
+                    functionName = 'addReplaceNote';
+                    noteText = 'Replace component';
+                    category = 'Recommendations';
+                    requiresModal = true;
+                } else if (onclick.includes('addMonitorNote')) {
+                    functionName = 'addMonitorNote';
+                    noteText = 'Monitor';
+                    category = 'Recommendations';
+                    requiresModal = true;
+                } else if (onclick.includes('addTestNote')) {
+                    functionName = 'addTestNote';
+                    noteText = 'Test';
+                    category = 'Diagnostics';
+                    requiresModal = true;
+                } else if (onclick.includes('addTechQuestionNote')) {
+                    functionName = 'addTechQuestionNote';
+                    noteText = 'Tech question';
+                    category = 'Communication';
+                    requiresModal = true;
+                } else if (onclick.includes('addStatusUpdateNote')) {
+                    functionName = 'addStatusUpdateNote';
+                    noteText = 'Status update';
+                    category = 'Communication';
+                    requiresModal = true;
+                } else if (onclick.includes('addTechRefusedNote')) {
+                    functionName = 'addTechRefusedNote';
+                    noteText = 'Tech refused';
+                    category = 'Communication';
+                    requiresModal = true;
+                } else if (onclick.includes('addDefrostAlreadyRunningNote')) {
+                    functionName = 'addDefrostAlreadyRunningNote';
+                    noteText = 'Already defrosting';
+                    category = 'Diagnostics';
+                    subCategory = 'Refrigeration';
+                } else if (onclick.includes('addAdvisoryNote')) {
+                    functionName = 'addAdvisoryNote';
+                    noteText = 'Advisory';
+                    category = 'Special Cases';
+                    requiresModal = true;
+                } else if (onclick.includes('showPingButtons')) {
+                    functionName = 'showPingButtons';
+                    noteText = 'Show ping options';
+                    category = 'Diagnostics';
+                } else if (onclick.includes('selectSystem')) {
+                    functionName = 'selectSystem';
+                    const systemMatch = onclick.match(/selectSystem\(['"]([^'"]+)['"]\)/);
+                    if (systemMatch) noteText = `Select ${systemMatch[1]}`;
+                    category = 'System Login';
+                } else {
+                    // Generic function call
+                    const funcMatch = onclick.match(/(\w+)\(/);
+                    if (funcMatch) functionName = funcMatch[1];
+                }
+                
+                // Determine category based on parent structure
+                const parentGroup = button.closest('[data-group]');
+                if (parentGroup) {
+                    const groupName = parentGroup.getAttribute('data-group');
+                    if (groupName === 'downloads') category = 'Downloads';
+                    else if (groupName === 'communication') category = 'Communication';
+                    else if (groupName === 'escalations') category = 'Escalations';
+                    else if (groupName === 'diagnostics') category = 'Diagnostics';
+                    else if (groupName === 'actions') category = 'Actions';
+                    else if (groupName === 'recommendations') category = 'Recommendations';
+                    else if (groupName === 'special-cases') category = 'Special Cases';
+                    else if (groupName === 'call-status') category = 'Call Status';
+                    else if (groupName === 'system-login') category = 'System Login';
+                }
+                
+                // Detect sub-category from parent accordion or data attributes
+                const parentAccordion = button.closest('.accordion-group');
+                if (parentAccordion) {
+                    const accordionHeader = parentAccordion.querySelector('.accordion-header');
+                    if (accordionHeader && accordionHeader.textContent.includes('HVAC')) {
+                        subCategory = 'HVAC';
+                    } else if (accordionHeader && accordionHeader.textContent.includes('Lighting')) {
+                        subCategory = 'Lighting';
+                    } else if (accordionHeader && accordionHeader.textContent.includes('Refrigeration')) {
+                        subCategory = 'Refrigeration';
+                    }
+                }
+                
+                // Check for data-subcategory attribute
+                const dataSubcat = button.getAttribute('data-subcategory') || button.closest('[data-subcategory]')?.getAttribute('data-subcategory');
+                if (dataSubcat) {
+                    // Normalize sub-category to Title Case (e.g. "hvac" -> "HVAC", "lighting" -> "Lighting")
+                    if (dataSubcat.toLowerCase() === 'hvac') subCategory = 'HVAC';
+                    else if (dataSubcat.toLowerCase() === 'lighting') subCategory = 'Lighting';
+                    else if (dataSubcat.toLowerCase() === 'refrigeration') subCategory = 'Refrigeration';
+                    else subCategory = dataSubcat.charAt(0).toUpperCase() + dataSubcat.slice(1);
+                }
+                
+                config.buttons.push({
+                    id: `btn-${index}`,
+                    label: label,
+                    title: title,
+                    className: className,
+                    onclick: onclick,
+                    functionName: functionName,
+                    noteText: noteText,
+                    category: category,
+                    subCategory: subCategory,
+                    dataSearch: dataSearch,
+                    requiresModal: requiresModal,
+                    modalId: button.dataset.modalId || null
+                });
+            });
+            
+            console.log(`✅ Parsed ${config.buttons.length} buttons from Frostbyte.html`);
+            console.log(`📊 Categories found:`, [...new Set(config.buttons.map(b => b.category))]);
+        }
+
+        // Helper to get unique categories
+        function getCategories() {
+            const categories = new Set(config.buttons.map(b => b.category));
+            // Ensure standard categories are included if they exist in buttons
+            // Actually, we just want whatever is in the buttons.
+            // But we might want to enforce a default order for the first run?
+            // The default order is handled by config.categoryOrder initialization.
+            return [...categories];
+        }
+
+        // Load categories tab
+        function loadCategoriesTab() {
+            const list = document.getElementById('categories-list');
+            list.innerHTML = '';
+            
+            // Get all unique categories
+            const categories = getCategories();
+            
+            // Initialize order if empty or missing items
+            if (!config.categoryOrder || config.categoryOrder.length === 0) {
+                config.categoryOrder = categories;
+            } else {
+                // Add any new categories to the end
+                categories.forEach(cat => {
+                    if (!config.categoryOrder.includes(cat)) {
+                        config.categoryOrder.push(cat);
+                    }
+                });
+                // Remove deleted categories
+                config.categoryOrder = config.categoryOrder.filter(cat => categories.includes(cat));
+            }
+            
+            config.categoryOrder.forEach((cat, index) => {
+                const item = document.createElement('div');
+                item.className = 'dae-item';
+                item.style.display = 'flex';
+                item.style.alignItems = 'center';
+                item.style.justifyContent = 'space-between';
+                
+                // Count buttons in this category
+                const count = config.buttons.filter(b => b.category === cat).length;
+                
+                // Check for sub-categories
+                const subCats = [...new Set(config.buttons
+                    .filter(b => b.category === cat && b.subCategory)
+                    .map(b => b.subCategory))];
+                
+                item.innerHTML = `
+                    <div>
+                        <h4 style="margin: 0;">${cat}</h4>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            ${count} buttons • ${subCats.length > 0 ? subCats.length + ' sub-categories: ' + subCats.join(', ') : 'No sub-categories'}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn btn-secondary btn-small" onclick="moveCategory(${index}, -1)" ${index === 0 ? 'disabled' : ''}>
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button class="btn btn-secondary btn-small" onclick="moveCategory(${index}, 1)" ${index === config.categoryOrder.length - 1 ? 'disabled' : ''}>
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function moveCategory(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= config.categoryOrder.length) return;
+            
+            const temp = config.categoryOrder[index];
+            config.categoryOrder[index] = config.categoryOrder[newIndex];
+            config.categoryOrder[newIndex] = temp;
+            
+            loadCategoriesTab();
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'categories') {
+                loadCategoriesTab();
+            }
+        }
+
+        // Load default configuration from current Frostbyte
+        function loadDefaultConfiguration() {
+            // This would ideally parse the existing Frostbyte.html
+            // For now, we'll use the config object
+            document.getElementById('app-version').value = config.version;
+            document.getElementById('app-title').value = config.title;
+            document.getElementById('app-description').value = config.description;
+        }
+
+        // Load buttons list with grouping and sorting
+        function loadButtons() {
+            const buttonsList = document.getElementById('buttons-list');
+            const controlsContainer = document.getElementById('buttons-controls');
+            
+            buttonsList.innerHTML = '';
+            controlsContainer.innerHTML = '';
+
+            if (config.buttons.length === 0) {
+                buttonsList.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">No buttons loaded yet. Buttons will be loaded automatically from Frostbyte.html.</p>';
+                return;
+            }
+
+            // Add sorting controls to the separate container
+            controlsContainer.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label style="font-weight: 600; white-space: nowrap;">
+                        <i class="fas fa-sort"></i> Sort by:
+                    </label>
+                    <select id="sort-buttons" style="padding: 8px; border: 2px solid #dee2e6; border-radius: 5px; min-width: 150px;">
+                        <option value="category">Category (Default)</option>
+                        <option value="label">Label (A-Z)</option>
+                        <option value="subcategory">Sub-Category</option>
+                        <option value="modal">Modal Required</option>
+                        <option value="order">Custom Order (Drag & Drop)</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="group-by-category" checked style="width: 18px; height: 18px; margin-right: 8px;">
+                        <strong>Group by Category</strong>
+                    </label>
+                    
+                    <div style="height: 20px; width: 1px; background: #dee2e6;"></div>
+                    
+                    <span style="color: #6c757d; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> ${config.buttons.length} buttons
+                    </span>
+                </div>
+            `;
+
+            // Add event listeners for sort controls
+            const sortSelect = document.getElementById('sort-buttons');
+            const groupCheckbox = document.getElementById('group-by-category');
+            
+            // Restore previous state if available
+            if (window.lastSortState) {
+                sortSelect.value = window.lastSortState.sortBy;
+                groupCheckbox.checked = window.lastSortState.groupBy;
+            }
+            
+            sortSelect.addEventListener('change', () => {
+                window.lastSortState = { ...window.lastSortState, sortBy: sortSelect.value };
+                loadButtons();
+            });
+            
+            groupCheckbox.addEventListener('change', () => {
+                window.lastSortState = { ...window.lastSortState, groupBy: groupCheckbox.checked };
+                loadButtons();
+            });
+
+            const sortBy = sortSelect.value;
+            const groupByCategory = groupCheckbox.checked;
+
+            // Sort buttons
+            let sortedButtons = [...config.buttons].map((btn, idx) => ({ ...btn, originalIndex: idx }));
+            
+            if (sortBy === 'category') {
+                sortedButtons.sort((a, b) => {
+                    if (a.category !== b.category) return (a.category || '').localeCompare(b.category || '');
+                    if (a.subCategory !== b.subCategory) return (a.subCategory || '').localeCompare(b.subCategory || '');
+                    // Use original index as secondary sort to allow reordering within categories
+                    return a.originalIndex - b.originalIndex;
+                });
+            } else if (sortBy === 'label') {
+                sortedButtons.sort((a, b) => (a.label || '').localeCompare(b.label || ''));
+            } else if (sortBy === 'subcategory') {
+                sortedButtons.sort((a, b) => {
+                    if (a.subCategory !== b.subCategory) return (a.subCategory || 'ZZZ').localeCompare(b.subCategory || 'ZZZ');
+                    return (a.label || '').localeCompare(b.label || '');
+                });
+            } else if (sortBy === 'modal') {
+                sortedButtons.sort((a, b) => {
+                    if (a.requiresModal !== b.requiresModal) return b.requiresModal ? 1 : -1;
+                    return (a.label || '').localeCompare(b.label || '');
+                });
+            }
+            // 'order' uses the array order (no sort)
+
+            // Group by category if enabled
+            if (groupByCategory) {
+                const grouped = {};
+                sortedButtons.forEach(button => {
+                    const cat = button.category || 'Uncategorized';
+                    if (!grouped[cat]) grouped[cat] = [];
+                    grouped[cat].push(button);
+                });
+
+                Object.keys(grouped).sort().forEach(category => {
+                    // Category section wrapper
+                    const categorySection = document.createElement('div');
+                    categorySection.style.cssText = 'margin: 25px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border: 2px solid #dee2e6;';
+                    
+                    // Category header
+                    const categoryHeader = document.createElement('div');
+                    categoryHeader.style.cssText = 'margin: 0 0 15px 0; padding: 12px 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
+                    categoryHeader.innerHTML = `
+                        <i class="fas fa-folder"></i> ${category} 
+                        <span style="opacity: 0.9; font-size: 13px; margin-left: 10px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px;">${grouped[category].length} buttons</span>
+                    `;
+                    categorySection.appendChild(categoryHeader);
+
+                    // Sub-category grouping within category
+                    const subGrouped = {};
+                    grouped[category].forEach(button => {
+                        const subCat = button.subCategory || 'General';
+                        if (!subGrouped[subCat]) subGrouped[subCat] = [];
+                        subGrouped[subCat].push(button);
+                    });
+
+                    Object.keys(subGrouped).sort().forEach(subCategory => {
+                        const subCategoryWrapper = document.createElement('div');
+                        subCategoryWrapper.style.cssText = 'margin: 15px 0; padding: 10px; background: white; border-radius: 8px; border-left: 4px solid #28a745;';
+                        
+                        if (Object.keys(subGrouped).length > 1 || subCategory !== 'General') {
+                            const subHeader = document.createElement('div');
+                            subHeader.style.cssText = 'margin: 0 0 12px 0; padding: 8px 12px; background: #28a745; color: white; border-radius: 5px; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: space-between;';
+                            subHeader.innerHTML = `
+                                <span><i class="fas fa-tag" style="font-size: 11px; margin-right: 5px;"></i> ${subCategory}</span>
+                                <span style="opacity: 0.9; font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px;">${subGrouped[subCategory].length} buttons</span>
+                            `;
+                            subCategoryWrapper.appendChild(subHeader);
+                        }
+
+                        const gridContainer = document.createElement('div');
+                        gridContainer.className = 'button-list';
+                        gridContainer.style.margin = '0';
+
+                        subGrouped[subCategory].forEach(button => {
+                            createButtonCard(button, gridContainer);
+                        });
+
+                        subCategoryWrapper.appendChild(gridContainer);
+                        categorySection.appendChild(subCategoryWrapper);
+                    });
+                    
+                    buttonsList.appendChild(categorySection);
+                });
+            } else {
+                // No grouping - flat list
+                const gridContainer = document.createElement('div');
+                gridContainer.className = 'button-list';
+                sortedButtons.forEach(button => {
+                    createButtonCard(button, gridContainer);
+                });
+                buttonsList.appendChild(gridContainer);
+            }
+        }
+
+        // Create individual button card with drag-and-drop
+        function createButtonCard(button, container) {
+            const card = document.createElement('div');
+            card.className = 'button-card';
+            card.draggable = true;
+            card.dataset.index = button.originalIndex;
+            card.style.cursor = 'move';
+            
+            card.innerHTML = `
+                <div style="position: absolute; top: 5px; right: 5px; display: flex; gap: 3px;">
+                    <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); moveButton(${button.originalIndex}, -1)" title="Move Up" style="padding: 4px 8px; font-size: 10px;">
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                    <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); moveButton(${button.originalIndex}, 1)" title="Move Down" style="padding: 4px 8px; font-size: 10px;">
+                        <i class="fas fa-arrow-down"></i>
+                    </button>
+                </div>
+                <div style="margin-bottom: 8px; padding-right: 70px;">
+                    <div style="margin-bottom: 5px;">
+                        <span style="background: #667eea; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; display: inline-block; margin-right: 3px;"><i class="fas fa-folder" style="font-size: 9px;"></i> ${button.category}</span>
+                        ${button.subCategory ? `<span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; display: inline-block;"><i class="fas fa-tag" style="font-size: 8px;"></i> ${button.subCategory}</span>` : ''}
+                    </div>
+                    <h4 style="margin: 5px 0 0 0;">
+                        <i class="fas fa-grip-vertical" style="color: #ccc; margin-right: 5px; font-size: 12px;"></i>
+                        ${button.label}
+                        ${button.requiresModal ? '<i class="fas fa-edit" style="color: #ffc107; margin-left: 5px; font-size: 11px;" title="Requires Modal Input"></i>' : ''}
+                    </h4>
+                </div>
+                <p style="margin: 5px 0;"><strong>Function:</strong> <code style="font-size: 11px;">${button.functionName}()</code></p>
+                ${button.noteText ? `<p style="margin: 5px 0; font-size: 12px; color: #666;"><strong>Note:</strong> ${button.noteText.length > 50 ? button.noteText.substring(0, 50) + '...' : button.noteText}</p>` : ''}
+                ${button.requiresModal ? `<p style="margin: 5px 0;"><span style="background: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 3px 8px; border-radius: 3px; font-size: 11px; display: inline-block;"><i class="fas fa-keyboard"></i> Requires Input</span></p>` : ''}
+                <div class="actions" style="margin-top: 10px; border-top: 1px solid #e9ecef; padding-top: 10px;">
+                    <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); editButton(${button.originalIndex})" style="flex: 1;">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-small" onclick="event.stopPropagation(); deleteButton(${button.originalIndex})" style="flex: 1;">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+           
+           
+            `;
+
+            // Drag and drop events            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragover', handleDragOver);
+            card.addEventListener('dragleave', handleDragLeave);
+            card.addEventListener('drop', handleDrop);
+            card.addEventListener('dragend', handleDragEnd);
+
+            container.appendChild(card);
+        }
+
+        // Drag and drop handlers
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+            
+            // Highlight all drop zones
+            document.querySelectorAll('.button-card').forEach(card => {
+                if (card !== this) {
+                    card.style.outline = '2px dashed #28a745';
+                    card.style.outlineOffset = '3px';
+                }
+            });
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            
+            if (draggedElement !== this) {
+                this.classList.add('drag-over');
+                this.style.outline = '3px solid #28a745';
+            }
+            
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+            this.style.outline = '2px dashed #28a745';
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+
+            this.classList.remove('drag-over');
+
+            if (draggedElement !== this) {
+                const draggedIndex = parseInt(draggedElement.dataset.index);
+                const targetIndex = parseInt(this.dataset.index);
+
+                // Swap buttons in config
+                const temp = config.buttons[draggedIndex];
+                config.buttons[draggedIndex] = config.buttons[targetIndex];
+                config.buttons[targetIndex] = temp;
+
+                loadButtons();
+                
+                // Show notification
+                showNotification('✓ Button reordered successfully!', 'success');
+            }
+
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            
+            // Remove all drag styles from all cards
+            document.querySelectorAll('.button-card').forEach(card => {
+                card.classList.remove('drag-over');
+                card.style.outline = '';
+                card.style.outlineOffset = '';
+            });
+            
+            draggedElement = null;
+        }
+
+        // Modal management
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        // Show notification helper
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? '#28a745' : '#dc3545'};
+                color: white;
+                border-radius: 5px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        }
+
+        // Move button up or down
+        function moveButton(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= config.buttons.length) return;
+
+            const temp = config.buttons[index];
+            config.buttons[index] = config.buttons[newIndex];
+            config.buttons[newIndex] = temp;
+
+            loadButtons();
+        }
+
+        // Rule Management
+        function handleRuleTypeChange() {
+            const type = document.getElementById('rule-type').value;
+            document.getElementById('rule-system-group').style.display = type === 'system' ? 'block' : 'none';
+            document.getElementById('rule-custom-group').style.display = type === 'custom' ? 'block' : 'none';
+        }
+
+        function handleRuleTargetChange() {
+            const val = document.getElementById('rule-target-select').value;
+            document.getElementById('rule-custom-target-group').style.display = val === '_custom_' ? 'block' : 'none';
+        }
+
+        // Helper to get available systems from buttons
+        function getAvailableSystems() {
+            const systems = new Set();
+            
+            // Extract from buttons
+            config.buttons.forEach(btn => {
+                if (btn.functionName === 'selectSystem' || (btn.onclick && btn.onclick.includes('selectSystem'))) {
+                    const match = (btn.onclick || '').match(/selectSystem\(['"]([^'"]+)['"]\)/);
+                    if (match) {
+                        systems.add(match[1]);
+                    }
+                }
+            });
+            
+            return [...systems].sort();
+        }
+
+        // Populate system dropdown
+        function populateRuleSystemDropdown(ensureValue) {
+            const select = document.getElementById('rule-system');
+            if (!select) return;
+            
+            const currentVal = select.value;
+            select.innerHTML = '';
+            
+            const systems = getAvailableSystems();
+            
+            // If we need to ensure a value exists and it's not in the list, add it
+            if (ensureValue && !systems.includes(ensureValue)) {
+                systems.push(ensureValue);
+                systems.sort();
+            }
+
+            systems.forEach(sys => {
+                const option = document.createElement('option');
+                option.value = sys;
+                option.textContent = sys;
+                select.appendChild(option);
+            });
+            
+            // Restore value if it exists in new list, otherwise default to first
+            if (ensureValue && systems.includes(ensureValue)) {
+                select.value = ensureValue;
+            } else if (systems.includes(currentVal)) {
+                select.value = currentVal;
+            } else if (systems.length > 0) {
+                select.value = systems[0];
+            }
+        }
+
+        function addNewRule() {
+            currentEditingRule = null;
+            document.getElementById('rule-modal-title').textContent = 'Add New Display Rule';
+            
+            // Populate systems first
+            populateRuleSystemDropdown();
+            
+            // Reset form
+            document.getElementById('rule-type').value = 'system';
+            
+            const systemSelect = document.getElementById('rule-system');
+            if (systemSelect.options.length > 0) {
+                systemSelect.selectedIndex = 0;
+            }
+
+            document.getElementById('rule-condition').value = '';
+            document.getElementById('rule-action').value = 'show';
+            document.getElementById('rule-target-select').value = 'downloads';
+            document.getElementById('rule-target-custom').value = '';
+            
+            handleRuleTypeChange();
+            handleRuleTargetChange();
+            
+            openModal('rule-modal');
+        }
+
+        function editRule(index) {
+            currentEditingRule = index;
+            const rule = config.displayRules[index];
+            
+            document.getElementById('rule-modal-title').textContent = 'Edit Display Rule';
+            
+            // Parse condition first to get system
+            const systemMatch = rule.condition.match(/selectSystem\(['"]([^'"]+)['"]\)/);
+            const systemVal = systemMatch ? systemMatch[1] : null;
+
+            // Populate systems with ensureValue
+            populateRuleSystemDropdown(systemVal);
+            
+            if (systemMatch) {
+                document.getElementById('rule-type').value = 'system';
+                document.getElementById('rule-system').value = systemVal;
+                document.getElementById('rule-condition').value = rule.condition; // Keep original just in case
+            } else {
+                document.getElementById('rule-type').value = 'custom';
+                document.getElementById('rule-condition').value = rule.condition;
+            }
+            
+            document.getElementById('rule-action').value = rule.action;
+            
+            // Check target
+            const select = document.getElementById('rule-target-select');
+            const options = Array.from(select.options).map(o => o.value);
+            
+            if (options.includes(rule.target)) {
+                select.value = rule.target;
+                document.getElementById('rule-target-custom').value = '';
+            } else {
+                select.value = '_custom_';
+                document.getElementById('rule-target-custom').value = rule.target;
+            }
+            
+            handleRuleTypeChange();
+            handleRuleTargetChange();
+            
+            openModal('rule-modal');
+        }
+
+        function saveRule() {
+            const type = document.getElementById('rule-type').value;
+            let condition = '';
+            
+            if (type === 'system') {
+                const system = document.getElementById('rule-system').value;
+                condition = `selectSystem('${system}')`;
+            } else {
+                condition = document.getElementById('rule-condition').value;
+            }
+            
+            if (!condition) {
+                alert('Please enter a condition');
+                return;
+            }
+            
+            const action = document.getElementById('rule-action').value;
+            
+            let target = document.getElementById('rule-target-select').value;
+            if (target === '_custom_') {
+                target = document.getElementById('rule-target-custom').value;
+            }
+            
+            if (!target) {
+                alert('Please select or enter a target element');
+                return;
+            }
+            
+            const ruleData = {
+                condition: condition,
+                action: action,
+                target: target
+            };
+            
+            if (currentEditingRule !== null) {
+                config.displayRules[currentEditingRule] = ruleData;
+            } else {
+                config.displayRules.push(ruleData);
+            }
+            
+            closeModal('rule-modal');
+            loadRules();
+        }
+
+        // Load display rules
+        function loadRules() {
+            const rulesList = document.getElementById('rules-list');
+            if (!rulesList) return;
+            
+            rulesList.innerHTML = '';
+            
+            if (config.displayRules.length === 0) {
+                rulesList.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">No display rules configured.</p>';
+                return;
+            }
+            
+            config.displayRules.forEach((rule, index) => {
+                const ruleItem = document.createElement('div');
+                ruleItem.className = 'rule-item';
+                ruleItem.style.cssText = 'background: white; border: 1px solid #dee2e6; padding: 15px; margin-bottom: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;';
+                
+                // Format condition for display
+                let displayCondition = rule.condition;
+                const sysMatch = rule.condition.match(/selectSystem\(['"]([^'"]+)['"]\)/);
+                if (sysMatch) {
+                    displayCondition = `System is <strong>${sysMatch[1]}</strong>`;
+                } else {
+                    displayCondition = `<code>${rule.condition}</code>`;
+                }
+                
+                ruleItem.innerHTML = `
+                    <div>
+                        <strong>If</strong> ${displayCondition} 
+                        <strong>then</strong> <span class="badge badge-${rule.action === 'show' ? 'success' : 'danger'}">${rule.action.toUpperCase()}</span> 
+                        <code>${rule.target}</code>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn btn-primary btn-small" onclick="editRule(${index})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger btn-small" onclick="deleteRule(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                rulesList.appendChild(ruleItem);
+            });
+        }
+
+        // Add new rule
+        function addNewRule() {
+            currentEditingRule = null;
+            document.getElementById('rule-modal-title').textContent = 'Add New Display Rule';
+            
+            // Populate systems first
+            populateRuleSystemDropdown();
+            
+            // Reset form
+            document.getElementById('rule-type').value = 'system';
+            
+            const systemSelect = document.getElementById('rule-system');
+            if (systemSelect.options.length > 0) {
+                systemSelect.selectedIndex = 0;
+            }
+
+            document.getElementById('rule-condition').value = '';
+            document.getElementById('rule-action').value = 'show';
+            document.getElementById('rule-target-select').value = 'downloads';
+            document.getElementById('rule-target-custom').value = '';
+            
+            handleRuleTypeChange();
+            handleRuleTargetChange();
+            
+            openModal('rule-modal');
+        }
+
+        function editRule(index) {
+            currentEditingRule = index;
+            const rule = config.displayRules[index];
+            
+            document.getElementById('rule-modal-title').textContent = 'Edit Display Rule';
+            
+            // Parse condition first to get system
+            const systemMatch = rule.condition.match(/selectSystem\(['"]([^'"]+)['"]\)/);
+            const systemVal = systemMatch ? systemMatch[1] : null;
+
+            // Populate systems with ensureValue
+            populateRuleSystemDropdown(systemVal);
+            
+            if (systemMatch) {
+                document.getElementById('rule-type').value = 'system';
+                document.getElementById('rule-system').value = systemVal;
+                document.getElementById('rule-condition').value = rule.condition; // Keep original just in case
+            } else {
+                document.getElementById('rule-type').value = 'custom';
+                document.getElementById('rule-condition').value = rule.condition;
+            }
+            
+            document.getElementById('rule-action').value = rule.action;
+            
+            // Check target
+            const select = document.getElementById('rule-target-select');
+            const options = Array.from(select.options).map(o => o.value);
+            
+            if (options.includes(rule.target)) {
+                select.value = rule.target;
+                document.getElementById('rule-target-custom').value = '';
+            } else {
+                select.value = '_custom_';
+                document.getElementById('rule-target-custom').value = rule.target;
+            }
+            
+            handleRuleTypeChange();
+            handleRuleTargetChange();
+            
+            openModal('rule-modal');
+        }
+
+        function saveRule() {
+            const type = document.getElementById('rule-type').value;
+            let condition = '';
+            
+            if (type === 'system') {
+                const system = document.getElementById('rule-system').value;
+                condition = `selectSystem('${system}')`;
+            } else {
+                condition = document.getElementById('rule-condition').value;
+            }
+            
+            if (!condition) {
+                alert('Please enter a condition');
+                return;
+            }
+            
+            const action = document.getElementById('rule-action').value;
+            
+            let target = document.getElementById('rule-target-select').value;
+            if (target === '_custom_') {
+                target = document.getElementById('rule-target-custom').value;
+            }
+            
+            if (!target) {
+                alert('Please select or enter a target element');
+                return;
+            }
+            
+            const ruleData = {
+                condition: condition,
+                action: action,
+                target: target
+            };
+            
+            if (currentEditingRule !== null) {
+                config.displayRules[currentEditingRule] = ruleData;
+            } else {
+                config.displayRules.push(ruleData);
+            }
+            
+            closeModal('rule-modal');
+            loadRules();
+        }
+
+        // Load modals
+        function loadModals() {
+            const modalsList = document.getElementById('modals-list');
+            if (!modalsList) return;
+            
+            modalsList.innerHTML = '';
+            
+            if (config.modals.length === 0) {
+                modalsList.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">No modals configured yet.</p>';
+                return;
+            }
+            
+            config.modals.forEach((modal, index) => {
+                const modalItem = document.createElement('div');
+                modalItem.className = 'rule-item';
+                modalItem.style.cssText = 'background: white; border: 1px solid #dee2e6; padding: 15px; margin-bottom: 10px; border-radius: 5px;';
+                modalItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <strong>${modal.id}</strong>
+                        <button class="btn btn-danger btn-small" onclick="deleteModal(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label>Title:</label>
+                        <input type="text" value="${modal.title}" onchange="updateModal(${index}, 'title', this.value)" style="width: 100%; padding: 5px;">
+                    </div>
+                    <div class="form-group">
+                        <label>Message (supports \\n for new lines):</label>
+                        <textarea rows="3" onchange="updateModal(${index}, 'message', this.value)" style="width: 100%; padding: 5px;">${modal.message}</textarea>
+                    </div>
+                    ${modal.defaultValue !== undefined ? `
+                    <div class="form-group">
+                        <label>Default Value:</label>
+                        <input type="text" value="${modal.defaultValue}" onchange="updateModal(${index}, 'defaultValue', this.value)" style="width: 100%; padding: 5px;">
+                    </div>` : ''}
+                `;
+                modalsList.appendChild(modalItem);
+            });
+        }
+
+        // Add new modal
+        function addNewModal() {
+            const modalId = prompt('Enter modal ID (e.g., settings-modal):');
+            if (!modalId) return;
+            
+            const modalTitle = prompt('Enter modal title:');
+            if (!modalTitle) return;
+            
+            config.modals.push({
+                id: modalId,
+                title: modalTitle,
+                message: '',
+                defaultValue: ''
+            });
+            
+            loadModals();
+        }
+
+        function deleteModal(index) {
+            if (confirm('Are you sure you want to delete this modal?')) {
+                config.modals.splice(index, 1);
+                loadModals();
+            }
+        }
+
+        function updateModal(index, field, value) {
+            config.modals[index][field] = value;
+        }
+
+        // Load DAE templates
+        function loadDAETemplates() {
+            const list = document.getElementById('dae-list');
+            list.innerHTML = '';
+            
+            Object.entries(config.daeTemplates).forEach(([key, value], index) => {
+                const item = document.createElement('div');
+                item.className = 'dae-item';
+                item.style.display = 'flex';
+                item.style.alignItems = 'center';
+                item.style.justifyContent = 'space-between';
+                item.style.padding = '12px';
+                item.style.borderRadius = '8px';
+                item.style.border = '2px solid #dee2e6';
+                item.style.position = 'relative';
+                item.style.cursor = 'pointer';
+                item.draggable = true;
+                item.dataset.index = index;
+                
+                item.innerHTML = `
+                    <div>
+                        <h4 style="margin: 0; font-size: 16px; color: #495057;">${key}</h4>
+                        <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">${value.replace(/`/g, '').trim()}</p>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); editDAETemplate('${key}')" title="Edit Template">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger btn-small" onclick="event.stopPropagation(); deleteDAETemplate('${key}')" title="Delete Template">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                // Drag and drop events for DAE items
+                item.addEventListener('dragstart', handleDAEDragStart);
+                item.addEventListener('dragover', handleDAEDragOver);
+                item.addEventListener('dragleave', handleDAEDragLeave);
+                item.addEventListener('drop', handleDAEDrop);
+                item.addEventListener('dragend', handleDAEDragEnd);
+
+                list.appendChild(item);
+            });
+        }
+
+        // Handlers for DAE drag and drop
+        let draggedDAEElement = null;
+
+        function handleDAEDragStart(e) {
+            draggedDAEElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.dataset.index);
+        }
+
+        function handleDAEDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+        }
+
+        function handleDAEDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDAEDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+
+            if (draggedDAEElement !== this) {
+                const draggedIndex = parseInt(draggedDAEElement.dataset.index);
+                const targetIndex = parseInt(this.dataset.index);
+
+                // Swap DAE templates in config
+                const temp = config.daeTemplates[Object.keys(config.daeTemplates)[draggedIndex]];
+                config.daeTemplates[Object.keys(config.daeTemplates)[draggedIndex]] = config.daeTemplates[Object.keys(config.daeTemplates)[targetIndex]];
+                config.daeTemplates[Object.keys(config.daeTemplates)[targetIndex]] = temp;
+
+                loadDAETemplates();
+                
+                // Show notification
+                showNotification('✓ DAE template reordered successfully!', 'success');
+            }
+        }
+
+        function handleDAEDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedDAEElement = null;
+        }
+
+        // Add new button
+        function addNewButton() {
+            currentEditingButton = null;
+            document.getElementById('button-modal-title').textContent = 'Add New Button';
+            document.getElementById('button-label').value = '';
+            document.getElementById('button-function').value = '';
+            document.getElementById('button-note-text').value = '';
+            document.getElementById('button-category').value = 'Common';
+            document.getElementById('button-subcategory').value = '';
+            document.getElementById('button-style').value = 'quick-note-btn';
+            document.getElementById('button-requires-modal').checked = false;
+            document.getElementById('button-modal-select').value = '';
+            
+            openModal('button-modal');
+        }
+
+        // Edit existing button
+        function editButton(index) {
+            currentEditingButton = config.buttons[index];
+            document.getElementById('button-modal-title').textContent = 'Edit Button';
+            document.getElementById('button-label').value = currentEditingButton.label;
+            document.getElementById('button-function').value = currentEditingButton.functionName;
+            document.getElementById('button-note-text').value = currentEditingButton.noteText;
+            document.getElementById('button-category').value = currentEditingButton.category;
+            document.getElementById('button-subcategory').value = currentEditingButton.subCategory || '';
+            document.getElementById('button-style').value = currentEditingButton.className;
+            document.getElementById('button-requires-modal').checked = currentEditingButton.requiresModal;
+            document.getElementById('button-modal-select').value = currentEditingButton.modalId || '';
+            
+            openModal('button-modal');
+        }
+
+        // Save button (add or update)
+        function saveButton() {
+            let category = document.getElementById('button-category').value;
+            
+            // Handle new category creation
+            if (category === '_new_') {
+                category = prompt('Enter new category name:');
+                if (!category) return;
+                // Keep original case for category names
+                category = category.charAt(0).toUpperCase() + category.slice(1);
+            }
+            
+            let subCategory = document.getElementById('button-subcategory').value;
+            
+            // Handle new sub-category creation
+            if (subCategory === '_new_') {
+                subCategory = prompt('Enter new sub-category name:');
+                if (!subCategory) {
+                    // Reset to empty if cancelled
+                    document.getElementById('button-subcategory').value = '';
+                    return;
+                }
+                // Keep original case or capitalize? Let's capitalize first letter
+                subCategory = subCategory.charAt(0).toUpperCase() + subCategory.slice(1);
+            }
+            
+            const modalSelect = document.getElementById('button-modal-select');
+            const selectedModalId = modalSelect ? modalSelect.value : '';
+            
+            let onclick = '';
+            if (currentEditingButton) {
+                // Update existing button
+                const buttonId = currentEditingButton.id;
+                onclick = `selectSystem('${currentEditingButton.noteText}')`;
+                
+                // Update button in config
+                config.buttons = config.buttons.map(btn => {
+                    if (btn.id === buttonId) {
+                        return {
+                            ...btn,
+                            label: document.getElementById('button-label').value,
+                            functionName: currentEditingButton.functionName,
+                            noteText: currentEditingButton.noteText,
+                            category: category,
+                            subCategory: subCategory,
+                            className: document.getElementById('button-style').value,
+                            requiresModal: document.getElementById('button-requires-modal').checked,
+                            modalId: selectedModalId
+                        };
+                    }
+                    return btn;
+                });
+                
+                showNotification('✓ Button updated successfully!', 'success');
+            } else {
+                // Add new button
+                const newButton = {
+                    id: `btn-${Date.now()}`,
+                    label: document.getElementById('button-label').value,
+                    functionName: document.getElementById('button-function').value,
+                    noteText: document.getElementById('button-note-text').value,
+                    category: category,
+                    subCategory: subCategory,
+                    className: document.getElementById('button-style').value,
+                    requiresModal: document.getElementById('button-requires-modal').checked,
+                    modalId: selectedModalId
+                };
+                
+                config.buttons.push(newButton);
+                showNotification('✓ Button added successfully!', 'success');
+            }
+            
+            closeModal('button-modal');
+            loadButtons();
+        }
+
+        // Delete button
+        function deleteButton(index) {
+            if (confirm('Are you sure you want to delete this button?')) {
+                const buttonId = config.buttons[index].id;
+                
+                // Remove button from config
+                config.buttons = config.buttons.filter(btn => btn.id !== buttonId);
+                
+                loadButtons();
+                showNotification('✓ Button deleted successfully!', 'success');
+            }
+        }
+
+        // Add new DAE template
+        function addNewDAE() {
+            const templateName = prompt('Enter DAE template name:');
+            if (!templateName) return;
+            
+            const templateContent = '';
+            config.daeTemplates[templateName] = templateContent;
+            
+            loadDAETemplates();
+            showNotification('✓ DAE template added successfully!', 'success');
+        }
+
+        // Edit DAE template
+        function editDAETemplate(name) {
+            const template = config.daeTemplates[name];
+            if (!template) return;
+            
+            const newContent = prompt('Edit DAE template content:', template.replace(/`/g, ''));
+            if (newContent === null) return; // Cancelled
+            
+            config.daeTemplates[name] = newContent.trim().replace(/[\n\r]+/g, ' ');
+            
+            loadDAETemplates();
+            showNotification('✓ DAE template updated successfully!', 'success');
+        }
+
+        // Delete DAE template
+        function deleteDAETemplate(name) {
+            if (confirm('Are you sure you want to delete this DAE template?')) {
+                delete config.daeTemplates[name];
+                
+                loadDAETemplates();
+                showNotification('✓ DAE template deleted successfully!', 'success');
+            }
+        }
+
+        // Toggle feature
+        function toggleFeature(feature) {
+            config.features[feature] = !config.features[feature];
+            showNotification(`✓ ${feature.replace(/-/g, ' ')} ${config.features[feature] ? 'enabled' : 'disabled'}!`, config.features[feature] ? 'success' : 'warning');
+        }
+
+        // Load configuration from config object
+        function loadConfiguration() {
+            document.getElementById('app-version').value = config.version;
+            document.getElementById('app-title').value = config.title;
+            document.getElementById('app-description').value = config.description;
+            
+            // Load buttons and other data
+            loadButtons();
+            loadDAETemplates();
+            loadRules();
+            loadCategoriesTab();
+        }
+
+        // Save configuration to file
+        function saveConfiguration() {
+            const dataStr = JSON.stringify(config, null, 4);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'frostbyte-config.json';
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            showNotification('✓ Configuration saved as frostbyte-config.json!', 'success');
+        }
+
+        // Preview changes in a new window
+        function previewChanges() {
+            generateFrostbyte('preview');
+        }
+
+        // Generate Frostbyte.html
+        function generateFrostbyte(mode = 'download') {
+            if (!frostbyteTemplate) {
+                alert('⚠️ Frostbyte.html template not loaded. Please ensure Frostbyte.html is in the same directory.');
+                return;
+            }
+
+            if (mode === 'download' && !confirm('This will generate a new Frostbyte.html file with your current configuration. Continue?')) {
+                return;
+            }
+
+            try {
+                let generatedHTML = frostbyteTemplate;
+
+                // Update version
+                generatedHTML = generatedHTML.replace(
+                    /currentVersion:\s*['"]([^'"]+)['"]/,
+                    `currentVersion: '${config.version}'`
+                );
+
+                // Update title
+                generatedHTML = generatedHTML.replace(
+                    /<title>[^<]+<\/title>/,
+                    `<title>${config.title}</title>`
+                );
+
+                // Update meta description
+                generatedHTML = generatedHTML.replace(
+                    /<meta name="description" content="[^"]*">/,
+                    `<meta name="description" content="${config.description}">`
+                );
+
+                // Update APP_CONFIG
+                if (config.appConfig) {
+                    if (Object.keys(config.daeTemplates).length > 0) {
+                        config.appConfig.DAE_TEMPLATES = config.daeTemplates;
+                    }
+                    const appConfigJSON = JSON.stringify(config.appConfig, null, 4);
+                    generatedHTML = generatedHTML.replace(
+                        /const APP_CONFIG = \{[\s\S]*?\};/,
+                        `const APP_CONFIG = ${appConfigJSON};`
+                    );
+                }
+
+                // Update Notes Format
+                const notesFormat = document.getElementById('notes-format').value;
+                if (notesFormat) {
+                    generatedHTML = generatedHTML.replace(
+                        /return `[^`]*\$\{techName\}[^`]+\$\{workOrder\}[^`]*`;/,
+                        `return \`${notesFormat}\`;`
+                    );
+                }
+
+                // Update Modal Registry
+                if (config.modals && config.modals.length > 0) {
+                    const registryObj = {};
+                    config.modals.forEach(m => {
+                        if (m.id && !m.id.startsWith('modal-')) {
+                             registryObj[m.id] = {
+                                title: m.title,
+                                message: m.message,
+                                defaultValue: m.defaultValue
+                            };
+                        } else if (m.isRegistry) {
+                             registryObj[m.id] = {
+                                title: m.title,
+                                message: m.message,
+                                defaultValue: m.defaultValue
+                            };
+                        }
+                    });
+                    
+                    if (Object.keys(registryObj).length > 0) {
+                        const registryJSON = JSON.stringify(registryObj, null, 4);
+                        generatedHTML = generatedHTML.replace(
+                            /const MODAL_REGISTRY = \{[\s\S]*?\};/,
+                            `const MODAL_REGISTRY = ${registryJSON};`
+                        );
+                    }
+                }
+
+                // Update Warning Threshold
+                generatedHTML = generatedHTML.replace(
+                    /deadAirThreshold:\s*\d+/,
+                    `deadAirThreshold: ${config.advanced.warningThreshold}`
+                );
+
+                // Update Storage Key
+                generatedHTML = generatedHTML.replace(
+                    /const STORAGE_KEY = ['"][^'"]+['"]/,
+                    `const STORAGE_KEY = '${config.advanced.storageKey}'`
+                );
+
+                // Update Display Rules
+                if (config.displayRules && config.displayRules.length > 0) {
+                    const rulesJSON = JSON.stringify(config.displayRules, null, 4);
+                    generatedHTML = generatedHTML.replace(
+                        /const DISPLAY_RULES = \[[\s\S]*?\];/,
+                        `const DISPLAY_RULES = ${rulesJSON};`
+                    );
+                }
+
+                // Apply Custom CSS
+                if (config.advanced.customCSS) {
+                    const customCSSComment = '/* CUSTOM CSS INJECTED BY GENERATOR */';
+                    if (!generatedHTML.includes(customCSSComment)) {
+                        generatedHTML = generatedHTML.replace(
+                            '</style>',
+                            `\n        ${customCSSComment}\n        ${config.advanced.customCSS}\n    </style>`
+                        );
+                    } else {
+                        generatedHTML = generatedHTML.replace(
+                            /\/\* CUSTOM CSS INJECTED BY GENERATOR \*\/[\s\S]*?(?=<\/style>)/,
+                            `/* CUSTOM CSS INJECTED BY GENERATOR */\n        ${config.advanced.customCSS}\n        `
+                        );
+                    }
+                }
+
+                // Apply Custom JavaScript
+                if (config.advanced.customJS) {
+                    const customJSComment = '/* CUSTOM JAVASCRIPT INJECTED BY GENERATOR */';
+                    if (!generatedHTML.includes(customJSComment)) {
+                        generatedHTML = generatedHTML.replace(
+                            /<\/script>\s*<\/body>/,
+                            `\n        ${customJSComment}\n        ${config.advanced.customJS}\n    <\/script>\n<\/body>`
+                        );
+                    } else {
+                        generatedHTML = generatedHTML.replace(
+                            /\/\* CUSTOM JAVASCRIPT INJECTED BY GENERATOR \*\/[\s\S]*?(?=<\/script>\s*<\/body>)/,
+                            `/* CUSTOM JAVASCRIPT INJECTED BY GENERATOR */\n        ${config.advanced.customJS}\n        `
+                        );
+                    }
+                }
+
+                // --- BUTTON GENERATION & REORDERING LOGIC ---
+                
+                // Helper for button generation
+                function generateButtonsHTML(btnList) {
+                    return btnList.map(btn => {
+                        let onclick = btn.onclick;
+                        if (!onclick) {
+                            if (btn.functionName === 'addQuickNote') {
+                                onclick = `addQuickNote('${btn.noteText.replace(/'/g, "\\'")}')`;
+                            } else if (btn.functionName === 'addQuickNoteWithInput') {
+                                onclick = `addQuickNoteWithInput('${btn.noteText.replace(/'/g, "\\'")}')`;
+                            } else {
+                                onclick = `${btn.functionName}()`;
+                            }
+                        }
+                        const className = btn.className || 'quick-note-btn';
+                        const title = btn.title || btn.label;
+                        const dataSearch = btn.dataSearch ? ` data-search="${btn.dataSearch}"` : '';
+                        
+                        return `<button onclick="${onclick}" class="${className}" title="${title}"${dataSearch}>${btn.label}</button>`;
+                    }).join('\n                                    ');
+                }
+
+                // First, update the buttons within the existing template (in memory)
+                const replaceButtons = (markerName, category, subCategory = null) => {
+                    const startMarker = `<!-- BUTTONS: ${markerName}_START -->`;
+                    const endMarker = `<!-- BUTTONS: ${markerName}_END -->`;
+                    
+                    const buttons = config.buttons.filter(b => 
+                        (b.category === category) && 
+                        (subCategory ? (b.subCategory && (b.subCategory.toLowerCase() === subCategory.toLowerCase() || b.subCategory === 'All')) : !b.subCategory)
+                    );
+                    
+                    const buttonsHTML = generateButtonsHTML(buttons);
+                    
+                    const regex = new RegExp(`${startMarker}[\\s\\S]*?${endMarker}`);
+                    if (regex.test(generatedHTML)) {
+                        generatedHTML = generatedHTML.replace(regex, `${startMarker}\n                                    ${buttonsHTML}\n                                    ${endMarker}`);
+                    }
+                };
+
+                replaceButtons('SYSTEM_LOGIN', 'System Login');
+                replaceButtons('DIAGNOSTICS_HVAC', 'Diagnostics', 'HVAC');
+                replaceButtons('DIAGNOSTICS_LIGHTING', 'Diagnostics', 'Lighting');
+                replaceButtons('DIAGNOSTICS_REFRIGERATION', 'Diagnostics', 'Refrigeration');
+                replaceButtons('ACTIONS_HVAC', 'Actions', 'HVAC');
+                replaceButtons('ACTIONS_LIGHTING', 'Actions', 'Lighting');
+                replaceButtons('ACTIONS_REFRIGERATION', 'Actions', 'Refrigeration');
+                replaceButtons('DOWNLOADS', 'Downloads');
+                replaceButtons('ESCALATIONS', 'Escalations');
+                replaceButtons('CALL_STATUS', 'Call Status');
+                replaceButtons('SPECIAL_CASES', 'Special Cases');
+                replaceButtons('RECOMMENDATIONS', 'Recommendations');
+                replaceButtons('COMMUNICATION', 'Communication');
+
+                // Now, handle REORDERING and CUSTOM CATEGORIES
+                const standardMap = {
+                    'System Login': 'system-login',
+                    'Diagnostics': 'diagnostics',
+                    'Actions': 'actions',
+                    'Downloads': 'downloads',
+                    'Escalations': 'escalations',
+                    'Call Status': 'call-status',
+                    'Special Cases': 'special-cases',
+                    'Recommendations': 'recommendations',
+                    'Communication': 'communication'
+                };
+
+                const categorySnippets = {};
+                let extractionSuccess = true;
+
+                // Extract snippets for standard categories
+                for (const [name, id] of Object.entries(standardMap)) {
+                    const startRegex = new RegExp(`<div class="accordion-group[^"]*" data-group="${id}">`);
+                    const match = generatedHTML.match(startRegex);
+                    
+                    if (match) {
+                        const startIdx = match.index;
+                        const nextGroupRegex = /<div class="accordion-group/g;
+                        nextGroupRegex.lastIndex = startIdx + 1;
+                        let nextMatch = nextGroupRegex.exec(generatedHTML);
+                        
+                        const qaChecklistIdx = generatedHTML.indexOf('id="qa-checklist"');
+                        let endIdx = -1;
+
+                        if (nextMatch && nextMatch.index < qaChecklistIdx) {
+                            endIdx = nextMatch.index;
+                        } else {
+                            const qaStart = generatedHTML.indexOf('<div id="qa-checklist"');
+                            const lastDiv = generatedHTML.lastIndexOf('</div>', qaStart);
+                            endIdx = generatedHTML.lastIndexOf('</div>', lastDiv - 1) + 6; 
+                        }
+                        
+                        if (endIdx !== -1) {
+                            categorySnippets[name] = generatedHTML.substring(startIdx, endIdx).trim();
+                        } else {
+                            extractionSuccess = false;
+                        }
+                    }
+                }
+
+                if (extractionSuccess) {
+                    let newContent = '';
+                    const order = (config.categoryOrder && config.categoryOrder.length > 0) 
+                        ? config.categoryOrder 
+                        : getCategories();
+                        
+                    order.forEach(category => {
+                        if (categorySnippets[category]) {
+                            newContent += '\n                    ' + categorySnippets[category];
+                        } else {
+                            // Custom Category Generation
+                            const categoryId = category.toLowerCase().replace(/\s+/g, '-');
+                            const buttons = config.buttons.filter(b => b.category === category);
+                            
+                            if (buttons.length > 0) {
+                                const subCats = [...new Set(buttons.filter(b => b.subCategory).map(b => b.subCategory))].sort();
+                                let innerHTML = '';
+                                
+                                if (subCats.length > 0) {
+                                    const tabsHTML = subCats.map((sc, idx) => 
+                                        `<button class="sub-category-btn ${idx === 0 ? 'active' : ''}" onclick="switchSubCategory('${categoryId}', '${sc.toLowerCase().replace(/\s+/g, '-')}')" data-tag="${sc}">${sc}</button>`
+                                    ).join('\n                                ');
+                                    
+                                    const contentHTML = subCats.map((sc, idx) => {
+                                        const scButtons = buttons.filter(b => b.subCategory === sc || b.subCategory === 'All');
+                                        const btnsHTML = generateButtonsHTML(scButtons);
+                                        return `
+                            <!-- ${sc} Sub-Category -->
+                            <div class="sub-category-content ${idx === 0 ? 'active' : ''}" data-subcategory="${sc.toLowerCase().replace(/\s+/g, '-')}">
+                                <div class="button-group">
+                                    ${btnsHTML}
+                                </div>
+                            </div>`;
+                                    }).join('\n');
+                                    
+                                    innerHTML = `
+                            <!-- Sub-Category Tabs -->
+                            <div class="sub-category-tabs">
+                                ${tabsHTML}
+                            </div>
+                            ${contentHTML}`;
+                                } else {
+                                    innerHTML = `
+                            <div class="button-group">
+                                ${generateButtonsHTML(buttons)}
+                            </div>`;
+                                }
+                                
+                                newContent += `
+                    <!-- ${category} Group (Dynamic) -->
+                    <div class="accordion-group hidden-until-system" data-group="${categoryId}">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span>${category}</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            ${innerHTML}
+                        </div>
+                    </div>`;
+                            }
+                        }
+                    });
+                    
+                    const firstCatStart = generatedHTML.indexOf('<div class="accordion-group" data-group="system-login">');
+                    const qaStart = generatedHTML.indexOf('<div id="qa-checklist"');
+                    const formContainerEnd = generatedHTML.lastIndexOf('</div>', qaStart);
+                    
+                    if (firstCatStart !== -1 && formContainerEnd !== -1) {
+                        generatedHTML = generatedHTML.substring(0, firstCatStart) + newContent + '\n                ' + generatedHTML.substring(formContainerEnd);
+                    }
+                }
+
+                if (mode === 'preview') {
+                    const previewWindow = window.open('', '_blank');
+                    previewWindow.document.write(generatedHTML);
+                    previewWindow.document.close();
+                } else {
+                    // Create download
+                    const blob = new Blob([generatedHTML], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Frostbyte_v${config.version}_Generated.html`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    alert(`✅ Frostbyte v${config.version} generated successfully!\nCheck your downloads folder for: Frostbyte_v${config.version}_Generated.html`);
+                }
+            } catch (error) {
+                console.error('Generation error:', error);
+                alert(`❌ Error generating Frostbyte: ${error.message}`);
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
