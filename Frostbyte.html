@@ -3797,6 +3797,7 @@
                             </div>
                         </div>
                         
+                        <!-- QA_CHECKLIST_START -->
                         <div class="checklist-item" onclick="toggleChecklistItem(this)">
                             <input type="checkbox" class="checklist-checkbox">
                             <div class="checklist-text">Thanks for calling Walmart Digital Assets, where we're always happy to help! My name is <span id="agent-name-display">[NAME]</span>, can I please have your name site and work order number from which you are calling?</div>
@@ -3836,6 +3837,7 @@
                             <input type="checkbox" class="checklist-checkbox">
                             <div class="checklist-text">Did you notate service channel if a work order was provided?</div>
                         </div>
+                        <!-- QA_CHECKLIST_END -->
                     </div>
                 </div>
                 
@@ -9374,6 +9376,317 @@ verified in {SYSTEM}
             addQuickNote(note);
         }
 
+        // Specialized modal for breaker selection
+        function showBreakerSelectionModal() {
+            return new Promise((resolve) => {
+                const modalOverlay = document.createElement('div');
+                modalOverlay.className = 'modal-overlay';
+                
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                modalContent.style.maxWidth = '700px';
+                modalContent.style.maxHeight = '90vh';
+                modalContent.style.overflowY = 'auto';
+                
+                const modalHeader = document.createElement('div');
+                modalHeader.className = 'modal-header';
+                modalHeader.innerHTML = '<h3>Breaker Details</h3>';
+                
+                const modalBody = document.createElement('div');
+                modalBody.className = 'modal-body';
+                
+                let builderState = {
+                    panelPrefix: '',
+                    panelNum: '',
+                    panelSuffix: '',
+                    breakers: [],
+                    status: '',
+                    entries: []
+                };
+                
+                // Helper to update panel preview
+                const getPanelName = (customVal) => {
+                    if (customVal) return customVal;
+                    if (builderState.panelPrefix === 'IOM') return 'IOM';
+                    const prefix = builderState.panelPrefix || '';
+                    const num = builderState.panelNum || '';
+                    const suffix = builderState.panelSuffix || '';
+                    return prefix + num + suffix;
+                };
+
+                const createButtonGroup = (label, items, key, multi = false, onChange = null) => {
+                    const container = document.createElement('div');
+                    container.style.marginBottom = '15px';
+                    
+                    const labelEl = document.createElement('div');
+                    labelEl.textContent = label;
+                    labelEl.style.fontSize = '0.9em';
+                    labelEl.style.marginBottom = '5px';
+                    labelEl.style.color = 'var(--text-secondary)';
+                    labelEl.style.fontWeight = 'bold';
+                    container.appendChild(labelEl);
+                    
+                    const btnContainer = document.createElement('div');
+                    btnContainer.style.display = 'flex';
+                    btnContainer.style.gap = '5px';
+                    btnContainer.style.flexWrap = 'wrap';
+                    
+                    items.forEach(item => {
+                        const btn = document.createElement('button');
+                        btn.className = 'secondary-button';
+                        btn.style.padding = '6px 12px';
+                        btn.textContent = item;
+                        
+                        btn.onclick = () => {
+                            if (multi) {
+                                const idx = builderState[key].indexOf(item);
+                                if (idx > -1) {
+                                    builderState[key].splice(idx, 1);
+                                    btn.style.backgroundColor = '';
+                                    btn.style.color = '';
+                                } else {
+                                    builderState[key].push(item);
+                                    builderState[key].sort((a, b) => a - b);
+                                    btn.style.backgroundColor = 'var(--primary-color)';
+                                    btn.style.color = 'white';
+                                }
+                            } else {
+                                if (builderState[key] === item) {
+                                    builderState[key] = '';
+                                    btn.style.backgroundColor = '';
+                                    btn.style.color = '';
+                                } else {
+                                    builderState[key] = item;
+                                    Array.from(btnContainer.children).forEach(b => {
+                                        b.style.backgroundColor = '';
+                                        b.style.color = '';
+                                    });
+                                    btn.style.backgroundColor = 'var(--primary-color)';
+                                    btn.style.color = 'white';
+                                }
+                            }
+                            if (onChange) onChange();
+                        };
+                        
+                        btnContainer.appendChild(btn);
+                    });
+                    
+                    container.appendChild(btnContainer);
+                    return container;
+                };
+
+                // Panel Builder Section
+                const panelBuilderSection = document.createElement('div');
+                panelBuilderSection.style.padding = '10px';
+                panelBuilderSection.style.backgroundColor = 'var(--bg-secondary)';
+                panelBuilderSection.style.borderRadius = '8px';
+                panelBuilderSection.style.marginBottom = '20px';
+                
+                const panelTitle = document.createElement('h4');
+                panelTitle.textContent = '1. Build Panel Name';
+                panelTitle.style.marginTop = '0';
+                panelBuilderSection.appendChild(panelTitle);
+                
+                const panelPreview = document.createElement('div');
+                panelPreview.style.fontSize = '1.2em';
+                panelPreview.style.fontWeight = 'bold';
+                panelPreview.style.marginBottom = '10px';
+                panelPreview.style.color = 'var(--primary-color)';
+                panelPreview.textContent = 'Panel: ';
+                
+                const updatePanelPreview = () => {
+                    const name = getPanelName(panelInput.value.trim());
+                    panelPreview.textContent = 'Panel: ' + (name || '(Select below)');
+                };
+
+                panelBuilderSection.appendChild(panelPreview);
+
+                panelBuilderSection.appendChild(createButtonGroup('Prefix', ['H', 'L', 'IOM'], 'panelPrefix', false, updatePanelPreview));
+                panelBuilderSection.appendChild(createButtonGroup('Number', ['1', '2', '3', '4', '5'], 'panelNum', false, updatePanelPreview));
+                panelBuilderSection.appendChild(createButtonGroup('Suffix', ['P', 'P1', 'P2', 'P3', 'P4', 'P5'], 'panelSuffix', false, updatePanelPreview));
+                
+                const customPanelContainer = document.createElement('div');
+                customPanelContainer.style.marginTop = '10px';
+                const panelInput = document.createElement('input');
+                panelInput.type = 'text';
+                panelInput.placeholder = 'Or enter Custom Panel Name...';
+                panelInput.className = 'form-control';
+                panelInput.style.width = '100%';
+                panelInput.oninput = updatePanelPreview;
+                customPanelContainer.appendChild(panelInput);
+                panelBuilderSection.appendChild(customPanelContainer);
+                
+                modalBody.appendChild(panelBuilderSection);
+
+                // Breakers & Status Section
+                const statusesSection = document.createElement('div');
+                statusesSection.style.padding = '10px';
+                statusesSection.style.border = '1px solid var(--border-color)';
+                statusesSection.style.borderRadius = '8px';
+                statusesSection.style.marginBottom = '20px';
+                
+                const step2Title = document.createElement('h4');
+                step2Title.textContent = '2. Add Breakers & Statuses';
+                step2Title.style.marginTop = '0';
+                statusesSection.appendChild(step2Title);
+
+                const breakerNumbers = Array.from({length: 42}, (_, i) => i + 1);
+                
+                // Keep references to redraw buttons when resetting selection
+                let breakersContainer;
+                let statusContainer;
+                
+                const renderBreakerStatusControls = () => {
+                    if (breakersContainer) statusesSection.removeChild(breakersContainer);
+                    if (statusContainer) statusesSection.removeChild(statusContainer);
+                    
+                    breakersContainer = createButtonGroup('Select Breakers', breakerNumbers, 'breakers', true);
+                    statusContainer = createButtonGroup('Select Status', ['Not Present', 'Faulted On', 'Faulted Off'], 'status', false);
+                    
+                    statusesSection.insertBefore(breakersContainer, addStatusBtnContainer);
+                    statusesSection.insertBefore(statusContainer, addStatusBtnContainer);
+                };
+
+                const addStatusBtnContainer = document.createElement('div');
+                addStatusBtnContainer.style.marginTop = '15px';
+                addStatusBtnContainer.style.display = 'flex';
+                addStatusBtnContainer.style.gap = '10px';
+                
+                const addCustomBreakerInput = document.createElement('input');
+                addCustomBreakerInput.type = 'text';
+                addCustomBreakerInput.placeholder = 'Custom Breaker(s) (Optional)';
+                addCustomBreakerInput.className = 'form-control';
+                addCustomBreakerInput.style.flex = '1';
+                
+                const addStatusBtn = document.createElement('button');
+                addStatusBtn.className = 'primary-button';
+                addStatusBtn.textContent = 'Add to Panel';
+                addStatusBtn.onclick = () => {
+                    const finalBreakers = addCustomBreakerInput.value.trim() || builderState.breakers.join(', ');
+                    const finalStatus = builderState.status;
+                    
+                    if (!finalBreakers || !finalStatus) {
+                        showNotification('Please select breakers and a status.', 'warning', 2000);
+                        return;
+                    }
+                    
+                    builderState.entries.push({
+                        breakers: finalBreakers,
+                        status: finalStatus
+                    });
+                    
+                    // Reset selection for next entry
+                    builderState.breakers = [];
+                    builderState.status = '';
+                    addCustomBreakerInput.value = '';
+                    renderBreakerStatusControls(); // Re-render to clear visual state
+                    updateEntriesList();
+                    showNotification('Added to panel list', 'success', 1500);
+                };
+                
+                addStatusBtnContainer.appendChild(addCustomBreakerInput);
+                addStatusBtnContainer.appendChild(addStatusBtn);
+                
+                statusesSection.appendChild(addStatusBtnContainer);
+                
+                renderBreakerStatusControls();
+                
+                modalBody.appendChild(statusesSection);
+
+                // Entries list preview
+                const entriesPreview = document.createElement('div');
+                entriesPreview.style.marginBottom = '20px';
+                
+                const entriesList = document.createElement('ul');
+                entriesList.style.paddingLeft = '20px';
+                
+                const updateEntriesList = () => {
+                    entriesList.innerHTML = '';
+                    if (builderState.entries.length === 0) {
+                        entriesList.innerHTML = '<li style="color:var(--text-secondary); font-style:italic;">No breakers added to this panel yet.</li>';
+                    } else {
+                        builderState.entries.forEach((entry, idx) => {
+                            const li = document.createElement('li');
+                            li.style.marginBottom = '8px';
+                            li.innerHTML = `<strong>Breakers:</strong> ${entry.breakers} ➡️ <strong>Status:</strong> ${entry.status} `;
+                            
+                            const removeBtn = document.createElement('button');
+                            removeBtn.textContent = '✖';
+                            removeBtn.style.background = 'none';
+                            removeBtn.style.border = 'none';
+                            removeBtn.style.color = '#ff4444';
+                            removeBtn.style.cursor = 'pointer';
+                            removeBtn.onclick = () => {
+                                builderState.entries.splice(idx, 1);
+                                updateEntriesList();
+                            };
+                            li.appendChild(removeBtn);
+                            entriesList.appendChild(li);
+                        });
+                    }
+                };
+                updateEntriesList(); // initial render
+                entriesPreview.appendChild(entriesList);
+                modalBody.appendChild(entriesPreview);
+
+                // Buttons
+                const modalButtons = document.createElement('div');
+                modalButtons.className = 'modal-buttons';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'modal-btn modal-btn-secondary';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.onclick = () => {
+                    modalOverlay.classList.remove('show');
+                    setTimeout(() => modalOverlay.remove(), 200);
+                    resolve(null);
+                };
+                
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = 'modal-btn modal-btn-primary';
+                confirmBtn.textContent = 'Save Panel Detailed Info';
+                confirmBtn.onclick = () => {
+                    const panelName = getPanelName(panelInput.value.trim());
+                    
+                    if (!panelName) {
+                        showNotification('Please build or enter a Panel Name.', 'warning', 3000);
+                        return;
+                    }
+                    if (builderState.entries.length === 0) {
+                        showNotification('Please add at least one breaker status entry.', 'warning', 3000);
+                        return;
+                    }
+                    
+                    modalOverlay.classList.remove('show');
+                    setTimeout(() => modalOverlay.remove(), 200);
+                    resolve({
+                        panel: panelName,
+                        entries: builderState.entries
+                    });
+                };
+                
+                modalButtons.appendChild(cancelBtn);
+                modalButtons.appendChild(confirmBtn);
+                
+                modalContent.appendChild(modalHeader);
+                modalContent.appendChild(modalBody);
+                modalContent.appendChild(modalButtons);
+                
+                modalOverlay.appendChild(modalContent);
+                document.body.appendChild(modalOverlay);
+                
+                setTimeout(() => modalOverlay.classList.add('show'), 10);
+                
+                modalOverlay.onclick = (e) => {
+                    if (e.target === modalOverlay) {
+                        modalOverlay.classList.remove('show');
+                        setTimeout(() => modalOverlay.remove(), 200);
+                        resolve(null);
+                    }
+                };
+            });
+        }
+
         async function addCheckBreakersNote() {
             // First add the initial check breakers note
             addQuickNote('Checked breakers.');
@@ -9382,36 +9695,17 @@ verified in {SYSTEM}
             const addDetails = await customConfirm('Add detailed breaker panel information?', 'Breaker Details');
             if (!addDetails) return;
             
-            let breakerDetails = [];
+            let breakerPanels = [];
             let addMore = true;
             
-            while (addMore && breakerDetails.length < 5) { // Limit to 5 panels max
-                const panel = await customPrompt('BREAKER_PANEL', { breakerDetails: breakerDetails.length > 0 ? 'Or leave blank to finish' : '' });
+            while (addMore && breakerPanels.length < 5) { // Limit to 5 panels max
+                const panelDetail = await showBreakerSelectionModal();
+                if (!panelDetail) break;
                 
-                if (panel === null || panel.trim() === '') {
-                    break; // User cancelled or left blank
-                }
-                
-                const breakers = await customPrompt('BREAKER_NUMBERS', { panel: panel.trim() });
-                
-                if (breakers === null || breakers.trim() === '') {
-                    continue; // Skip this panel if no breakers entered
-                }
-                
-                const status = await customPrompt('BREAKER_STATUS');
-                
-                if (status === null || status.trim() === '') {
-                    continue; // Skip this panel if no status entered
-                }
-                
-                breakerDetails.push({
-                    panel: panel.trim(),
-                    breakers: breakers.trim(),
-                    status: status.trim()
-                });
+                breakerPanels.push(panelDetail);
                 
                 // Ask if they want to add another panel
-                if (breakerDetails.length < 5) {
+                if (breakerPanels.length < 5) {
                     addMore = await customConfirm('Add another breaker panel?', 'Add Another Panel');
                 } else {
                     addMore = false;
@@ -9420,9 +9714,11 @@ verified in {SYSTEM}
             }
             
             // Add the detailed breaker information
-            breakerDetails.forEach(detail => {
-                const note = `For breaker panel ${detail.panel}, breakers ${detail.breakers}, are showing as ${detail.status}.`;
-                addQuickNote(note);
+            breakerPanels.forEach(panelObj => {
+                panelObj.entries.forEach(entry => {
+                    const note = `For breaker panel ${panelObj.panel}, breakers ${entry.breakers}, are showing as ${entry.status}.`;
+                    addQuickNote(note);
+                });
             });
         }
 
