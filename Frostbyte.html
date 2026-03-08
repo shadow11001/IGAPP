@@ -10540,7 +10540,20 @@ verified in {SYSTEM}
                 const formData = getFormData();
                 
                 // Build the new format: "Tech_name | EMS | Store_Number | WO: Work_Order_Number - Rest of notes"
-                const techName = formData.techName || 'John';
+                const randomTechNames = [
+                    // Anglo/European
+                    "John", "Michael", "William", "James", "Robert", "David", "Richard", "Joseph", "Charles", "Thomas",
+                    // Hispanic/Latino
+                    "Mateo", "Santiago", "Diego", "Alejandro", "Miguel", "Javier", "Carlos", "Jose", "Luis", "Juan",
+                    // African/African-American
+                    "Jamal", "Malik", "Andre", "DeAndre", "Tyrone", "Tariq", "Desmond", "Marquis", "Jerome", "Tremaine",
+                    // East Asian
+                    "Wei", "Jian", "Hiroshi", "Kenji", "Takashi", "Chen", "Jin", "Akira", "Daiki", "Taro",
+                    // Middle Eastern / South Asian
+                    "Muhammad", "Ali", "Ahmed", "Omar", "Yusuf", "Hassan", "Ibrahim", "Mustafa", "Amir", "Hamza"
+                ];
+                const defaultTechName = randomTechNames[Math.floor(Math.random() * randomTechNames.length)];
+                const techName = formData.techName || defaultTechName;
                 const selectedSystem = AppState.selectedSystem || 'N/A';
                 const storeNumber = formData.storeNumber || 'N/A';
                 const workOrder = formData.workOrder || 'N/A';
