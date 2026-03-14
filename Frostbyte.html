@@ -14140,30 +14140,61 @@ verified in {SYSTEM}
       }
 
       function parseNotesForEmsMapping(notes, storeNumber) {
-        if (!storeNumber || !frostbyteEmsMapping[storeNumber]) return;
+        if (!storeNumber) return;
 
-        // We sequentially process notes to find which circuits are attached to the current rack
+        let madeChanges = false;
+
+        // 1. Auto-map HVAC and Lighting controllers directly as Racks
+        const hvacRegex = /\b(HVAC|HVACL|HVAC\/L|HVAC\/Lights|AHM)\b/gi;
+        let hvacMatch;
+        while ((hvacMatch = hvacRegex.exec(notes)) !== null) {
+          let hvacTerm = hvacMatch[1].toUpperCase();
+          
+          if (!frostbyteEmsMapping[storeNumber]) {
+            frostbyteEmsMapping[storeNumber] = { racks: {} };
+          }
+          if (!frostbyteEmsMapping[storeNumber].racks) {
+            frostbyteEmsMapping[storeNumber].racks = {};
+          }
+          
+          if (!frostbyteEmsMapping[storeNumber].racks[hvacTerm]) {
+            frostbyteEmsMapping[storeNumber].racks[hvacTerm] = {
+              system: AppState.selectedSystem || "None",
+              circuits: {}
+            };
+            madeChanges = true;
+          } else if (AppState.selectedSystem && AppState.selectedSystem !== "None" && frostbyteEmsMapping[storeNumber].racks[hvacTerm].system !== AppState.selectedSystem) {
+            frostbyteEmsMapping[storeNumber].racks[hvacTerm].system = AppState.selectedSystem;
+            madeChanges = true;
+          }
+        }
+
+        // 2. Sequentially process notes to find which circuits are attached to the current rack
         let currentRack = null;
         // Match phrases like "Logged into [RACK]", "Set rack to [RACK]", "Forced defrost on [CIRCUIT]", "Terminated Defrost on [CIRCUIT]"
         const regex =
           /(?:Logged into|Rack set to)\s+([A-Za-z0-9_-]+)|(?:Forced defrost on|Terminated Defrost on)\s+([A-Za-z0-9_-]+)/gi;
         let match;
-        let madeChanges = false;
 
         while ((match = regex.exec(notes)) !== null) {
           if (match[1]) {
             // Match 1 is the rack
             let rackName = match[1];
             // Keep the case as it is in the mapping if it exists case-insensitively, or just use what was typed
-            let matchedExistingRack = Object.keys(
-              frostbyteEmsMapping[storeNumber].racks,
-            ).find((r) => r.toUpperCase() === rackName.toUpperCase());
+            let matchedExistingRack = undefined;
+            if (frostbyteEmsMapping[storeNumber] && frostbyteEmsMapping[storeNumber].racks) {
+              matchedExistingRack = Object.keys(
+                frostbyteEmsMapping[storeNumber].racks,
+              ).find((r) => r.toUpperCase() === rackName.toUpperCase());
+            }
             currentRack = matchedExistingRack || rackName;
           } else if (match[2]) {
             // Match 2 is the circuit
             let circuit = match[2];
             if (
               currentRack &&
+              frostbyteEmsMapping[storeNumber] &&
+              frostbyteEmsMapping[storeNumber].racks &&
               frostbyteEmsMapping[storeNumber].racks[currentRack]
             ) {
               const rData = frostbyteEmsMapping[storeNumber].racks[currentRack];
