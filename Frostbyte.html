@@ -3990,6 +3990,82 @@
 
           <!-- Quick Notes Tab Content -->
           <div id="quick-notes" class="tab-content active">
+            <!-- Current Rack Display -->
+            <div
+              style="
+                display: none;
+                margin-bottom: 10px;
+                padding: 8px 12px;
+                background: linear-gradient(
+                  135deg,
+                  #28a745 0%,
+                  #20c997 100%
+                );
+                color: white;
+                border-radius: 5px;
+                font-weight: 600;
+                text-align: center;
+              "
+            >
+              <i class="fas fa-server"></i> Current Rack:
+              <span class="current-rack-display"></span>
+              <button
+                onclick="clearCurrentRack()"
+                style="
+                  margin-left: 10px;
+                  padding: 2px 8px;
+                  background: rgba(255, 255, 255, 0.3);
+                  border: none;
+                  border-radius: 3px;
+                  color: white;
+                  cursor: pointer;
+                  font-size: 11px;
+                "
+                title="Clear Current Rack"
+              >
+                <i class="fas fa-times"></i> Clear
+              </button>
+            </div>
+
+            <div class="button-group" style="margin-bottom: 15px;">
+              <!-- Rack Management Buttons -->
+              <button
+                onclick="setCurrentRack()"
+                class="quick-note-btn success-quick"
+                title="Set Current Rack and Log In"
+                style="font-weight: 600"
+              >
+                <i class="fas fa-server"></i> Set Rack
+              </button>
+              <button
+                onclick="addSuctionPSINote()"
+                class="quick-note-btn rack-required-btn"
+                title="Check Suction PSI (uses current rack)"
+                style="opacity: 0.5"
+                disabled
+              >
+                Suct PSI
+              </button>
+              <button
+                onclick="addDischargePSINote()"
+                class="quick-note-btn rack-required-btn"
+                title="Check Discharge PSI (uses current rack)"
+                style="opacity: 0.5"
+                disabled
+              >
+                Disc PSI
+              </button>
+              <button
+                onclick="addReceiverLevelNote()"
+                class="quick-note-btn rack-required-btn"
+                title="Check Receiver Level (uses current rack)"
+                style="opacity: 0.5"
+                disabled
+              >
+                RECV LVL
+              </button>
+            </div>
+
             <!-- System Login Group -->
             <div class="accordion-group" data-group="system-login">
               <div class="accordion-header" onclick="toggleAccordion(this)">
@@ -4287,82 +4363,6 @@
                   class="sub-category-content"
                   data-subcategory="refrigeration"
                 >
-                  <!-- Current Rack Display -->
-                  <div
-                    style="
-                      display: none;
-                      margin-bottom: 10px;
-                      padding: 8px 12px;
-                      background: linear-gradient(
-                        135deg,
-                        #28a745 0%,
-                        #20c997 100%
-                      );
-                      color: white;
-                      border-radius: 5px;
-                      font-weight: 600;
-                      text-align: center;
-                    "
-                  >
-                    <i class="fas fa-server"></i> Current Rack:
-                    <span class="current-rack-display"></span>
-                    <button
-                      onclick="clearCurrentRack()"
-                      style="
-                        margin-left: 10px;
-                        padding: 2px 8px;
-                        background: rgba(255, 255, 255, 0.3);
-                        border: none;
-                        border-radius: 3px;
-                        color: white;
-                        cursor: pointer;
-                        font-size: 11px;
-                      "
-                      title="Clear Current Rack"
-                    >
-                      <i class="fas fa-times"></i> Clear
-                    </button>
-                  </div>
-
-                  <div class="button-group">
-                    <!-- Rack Management Buttons -->
-                    <button
-                      onclick="setCurrentRack()"
-                      class="quick-note-btn success-quick"
-                      title="Set Current Rack and Log In"
-                      style="font-weight: 600"
-                    >
-                      <i class="fas fa-server"></i> Set Rack
-                    </button>
-                    <button
-                      onclick="addSuctionPSINote()"
-                      class="quick-note-btn rack-required-btn"
-                      title="Check Suction PSI (uses current rack)"
-                      style="opacity: 0.5"
-                      disabled
-                    >
-                      Suct PSI
-                    </button>
-                    <button
-                      onclick="addDischargePSINote()"
-                      class="quick-note-btn rack-required-btn"
-                      title="Check Discharge PSI (uses current rack)"
-                      style="opacity: 0.5"
-                      disabled
-                    >
-                      Disc PSI
-                    </button>
-                    <button
-                      onclick="addReceiverLevelNote()"
-                      class="quick-note-btn rack-required-btn"
-                      title="Check Receiver Level (uses current rack)"
-                      style="opacity: 0.5"
-                      disabled
-                    >
-                      RECV LVL
-                    </button>
-                  </div>
-
                   <div class="button-group">
                     <!-- BUTTONS: DIAGNOSTICS_REFRIGERATION_START -->
                     <button
@@ -5632,63 +5632,13 @@
             <button
               type="button"
               class="ems-add-btn"
-              onclick="openInlineMapper()"
+              onclick="openEmsMappingBuilder()"
             >
               + Add Mapping
             </button>
           </div>
           <div id="ems-insights-content" class="ems-insights-content">
             <!-- Dynamic badges go here -->
-          </div>
-          <!-- Inline mapper form (hidden by default) -->
-          <div
-            id="inline-mapper-form"
-            class="inline-mapper-form"
-            style="display: none"
-          >
-            <input
-              type="text"
-              id="inline-rack-name"
-              placeholder="Rack (e.g. LTA, MTB)"
-            />
-            <select id="inline-ems-system">
-              <option value="">Select EMS...</option>
-              <option value="Novar">Novar</option>
-              <option value="Opus Arch">Opus Arch</option>
-              <option value="Opus Mag">Opus Mag</option>
-              <option value="CPC">CPC</option>
-              <option value="AKA65">AKA65 (Danfoss)</option>
-              <option value="Danfoss">Danfoss</option>
-              <option value="Carel Boss">Carel Boss</option>
-              <option value="Connect+">Connect+</option>
-              <option value="Ultrasite">Ultrasite</option>
-            </select>
-            <input
-              type="text"
-              id="inline-circuit-name"
-              placeholder="Circuit (A08) - Optional"
-            />
-            <select id="inline-circuit-type">
-              <option value="Regular">Regular</option>
-              <option value="Sporlan">Sporlan</option>
-              <option value="KE2">KE2</option>
-            </select>
-            <div class="inline-mapper-actions">
-              <button
-                type="button"
-                onclick="saveInlineMapping()"
-                class="primary-button btn-small"
-              >
-                Save
-              </button>
-              <button
-                type="button"
-                onclick="closeInlineMapper()"
-                class="secondary-button btn-small"
-              >
-                Cancel
-              </button>
-            </div>
           </div>
         </div>
 
@@ -11758,6 +11708,7 @@ verified in {SYSTEM}
 
           // Builder State
           let builderState = {
+            systems: "",
             prefix: "",
             type: "",
             letters: [],
@@ -11837,7 +11788,10 @@ verified in {SYSTEM}
 
           // Create Groups
           builderSection.appendChild(
-            createButtonGroup("Prefix", ["C", "R"], "prefix"),
+            createButtonGroup("Systems", ["HVAC", "HVACL", "AHM"], "systems")
+          );
+          builderSection.appendChild(
+            createButtonGroup("Prefix", ["C", "R", "CKT", "CKTS"], "prefix")
           );
           builderSection.appendChild(
             createButtonGroup("Type", ["LT", "MT", "DT"], "type"),
@@ -11868,15 +11822,20 @@ verified in {SYSTEM}
           // Logic to update manual input
           const updateManualInputFromBuilder = () => {
             let builtName = "";
-            // If only letters are selected (no prefix, no type), default to "Rack X"
+            let code = `${builderState.prefix}${builderState.type}${builderState.letters.join("")}`;
+            
+            // If only letters are selected (no prefix, no type, no systems), default to "Rack X"
             if (
+              !builderState.systems &&
               !builderState.prefix &&
               !builderState.type &&
               builderState.letters.length > 0
             ) {
               builtName = `Rack ${builderState.letters.join("")}`;
+            } else if (builderState.systems) {
+              builtName = code ? `${builderState.systems} ${code}` : builderState.systems;
             } else {
-              builtName = `${builderState.prefix}${builderState.type}${builderState.letters.join("")}`;
+              builtName = code;
             }
 
             if (builtName) {
@@ -14301,84 +14260,257 @@ verified in {SYSTEM}
         }
       }
 
-      function openInlineMapper() {
-        document.getElementById("inline-mapper-form").style.display = "flex";
-        // Pre-fill rack if provided in quick notes
-        const qRack = document.getElementById("quick-notes-rack").value.trim();
-        if (qRack && !document.getElementById("inline-rack-name").value) {
-          document.getElementById("inline-rack-name").value = qRack;
-        }
-        // Pre-fill circuit if provided
-        const qCirc = document
-          .getElementById("quick-notes-circuit")
-          .value.trim();
-        if (qCirc && !document.getElementById("inline-circuit-name").value) {
-          document.getElementById("inline-circuit-name").value = qCirc;
-        }
-      }
-
-      function closeInlineMapper() {
-        document.getElementById("inline-mapper-form").style.display = "none";
-        document.getElementById("inline-rack-name").value = "";
-        document.getElementById("inline-ems-system").value = "";
-        document.getElementById("inline-circuit-name").value = "";
-        document.getElementById("inline-circuit-type").value = "Regular";
-      }
-
-      function saveInlineMapping() {
+      function openEmsMappingBuilder() {
         const storeInput = document.getElementById("store-number").value.trim();
         if (!storeInput) {
           showNotification("Please enter a store number first.", "error");
           return;
         }
 
-        const rackName = document
-          .getElementById("inline-rack-name")
-          .value.trim();
-        const emsSystem = document.getElementById("inline-ems-system").value;
-        const circuitName = document
-          .getElementById("inline-circuit-name")
-          .value.trim();
-        const circuitType = document.getElementById(
-          "inline-circuit-type",
-        ).value;
+        const modalOverlay = document.createElement("div");
+        modalOverlay.className = "modal-overlay";
+        
+        const modalContent = document.createElement("div");
+        modalContent.className = "modal-content";
+        modalContent.style.maxWidth = "600px";
 
-        if (!rackName || !emsSystem) {
-          showNotification("Rack name and EMS System are required.", "error");
-          return;
-        }
+        // Header
+        const modalHeader = document.createElement("div");
+        modalHeader.className = "modal-header";
+        modalHeader.innerHTML = `<h3><i class="fas fa-network-wired"></i> EMS Mapping Builder - Store ${storeInput}</h3>`;
 
-        if (!frostbyteEmsMapping[storeInput]) {
-          frostbyteEmsMapping[storeInput] = { racks: {} };
-        }
-        if (!frostbyteEmsMapping[storeInput].racks[rackName]) {
-          frostbyteEmsMapping[storeInput].racks[rackName] = {
-            system: emsSystem,
-            circuits: {},
-          };
-        } else {
-          // Update system if changed
-          frostbyteEmsMapping[storeInput].racks[rackName].system = emsSystem;
-          // Ensure circuits obj exists
-          if (!frostbyteEmsMapping[storeInput].racks[rackName].circuits) {
-            frostbyteEmsMapping[storeInput].racks[rackName].circuits = {};
+        // Body
+        const modalBody = document.createElement("div");
+        modalBody.className = "modal-body";
+
+        // Builder Area
+        const builderArea = document.createElement("div");
+        builderArea.style.marginBottom = "20px";
+        builderArea.style.padding = "15px";
+        builderArea.style.backgroundColor = "var(--bg-secondary)";
+        builderArea.style.borderRadius = "8px";
+
+        // System Selection
+        const systemGroup = document.createElement("div");
+        systemGroup.style.marginBottom = "15px";
+        systemGroup.innerHTML = `<label style="display:block;margin-bottom:5px;color:var(--text-secondary);font-size:0.9em;">EMS System</label>`;
+        const emsSelect = document.createElement("select");
+        emsSelect.className = "form-control";
+        emsSelect.style.width = "100%";
+        emsSelect.style.marginBottom = "15px";
+        const emsOptions = ["Select EMS...", "Novar", "Opus Arch", "Opus Mag", "CPC", "AKA65", "Danfoss", "Carel Boss", "Connect+", "Ultrasite", "Emerson", "E2", "E3"];
+        emsOptions.forEach(opt => {
+          const option = document.createElement("option");
+          option.value = opt === "Select EMS..." ? "" : opt;
+          option.textContent = opt;
+          emsSelect.appendChild(option);
+        });
+        systemGroup.appendChild(emsSelect);
+
+        // Rack Quick Builder
+        const rackGroup = document.createElement("div");
+        rackGroup.innerHTML = `<label style="display:block;margin-bottom:5px;color:var(--text-secondary);font-size:0.9em;">Add Rack (Use buttons or type)</label>`;
+        
+        let builderState = { prefix: "", type: "", letters: [] };
+        
+        const createMultiGroup = (items, key, multi = false) => {
+           const btnContainer = document.createElement("div");
+           btnContainer.style.display = "flex";
+           btnContainer.style.gap = "5px";
+           btnContainer.style.flexWrap = "wrap";
+           btnContainer.style.marginBottom = "10px";
+
+           items.forEach((item) => {
+             const btn = document.createElement("button");
+             btn.className = "secondary-button";
+             btn.style.padding = "5px 10px";
+             btn.style.minWidth = "40px";
+             btn.textContent = item;
+             
+             btn.onclick = () => {
+               if (multi) {
+                 const idx = builderState[key].indexOf(item);
+                 if (idx > -1) {
+                   builderState[key].splice(idx, 1);
+                   btn.classList.remove("active-rack-btn");
+                   btn.style.backgroundColor = "";
+                   btn.style.color = "";
+                 } else {
+                   builderState[key].push(item);
+                   builderState[key].sort();
+                   btn.classList.add("active-rack-btn");
+                   btn.style.backgroundColor = "var(--primary-color)";
+                   btn.style.color = "white";
+                 }
+               } else {
+                 if (builderState[key] === item) {
+                   builderState[key] = "";
+                   btn.classList.remove("active-rack-btn");
+                   btn.style.backgroundColor = "";
+                   btn.style.color = "";
+                 } else {
+                   builderState[key] = item;
+                   Array.from(btnContainer.children).forEach((b) => {
+                     b.classList.remove("active-rack-btn");
+                     b.style.backgroundColor = "";
+                     b.style.color = "";
+                   });
+                   btn.classList.add("active-rack-btn");
+                   btn.style.backgroundColor = "var(--primary-color)";
+                   btn.style.color = "white";
+                 }
+               }
+               updateManualInput();
+             };
+             btnContainer.appendChild(btn);
+           });
+           return btnContainer;
+        };
+
+        const updateManualInput = () => {
+          let code = `${builderState.prefix}${builderState.type}${builderState.letters.join("")}`;
+          if (!builderState.prefix && !builderState.type && builderState.letters.length > 0) {
+            code = `Rack ${builderState.letters.join("")}`;
           }
+          if (code) {
+             rackInput.value = code;
+          }
+        };
+
+        rackGroup.appendChild(createMultiGroup(["HVAC", "HVACL", "AHM"], "prefix"));
+        rackGroup.appendChild(createMultiGroup(["C", "R", "CKT", "CKTS"], "prefix"));
+        rackGroup.appendChild(createMultiGroup(["LT", "MT", "DT"], "type"));
+        
+        const alphabet = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+        rackGroup.appendChild(createMultiGroup(alphabet, "letters", true));
+
+        const rackInputContainer = document.createElement("div");
+        rackInputContainer.style.display = "flex";
+        rackInputContainer.style.gap = "10px";
+        rackInputContainer.style.marginTop = "15px";
+
+        const rackInput = document.createElement("input");
+        rackInput.type = "text";
+        rackInput.className = "form-control";
+        rackInput.placeholder = "Rack Name (e.g. LTA)";
+        rackInput.style.flex = "1";
+
+        const addBtn = document.createElement("button");
+        addBtn.className = "primary-button";
+        addBtn.innerHTML = "<i class='fas fa-plus'></i> Add";
+        
+        rackInputContainer.appendChild(rackInput);
+        rackInputContainer.appendChild(addBtn);
+
+        rackGroup.appendChild(rackInputContainer);
+
+        builderArea.appendChild(systemGroup);
+        builderArea.appendChild(rackGroup);
+
+        // Results Area
+        const resultsArea = document.createElement("div");
+        resultsArea.innerHTML = `<label style="display:block;margin-bottom:5px;color:var(--text-secondary);font-size:0.9em;">Added Mappings (Store ${storeInput})</label>`;
+        const resultsList = document.createElement("div");
+        resultsList.style.maxHeight = "150px";
+        resultsList.style.overflowY = "auto";
+        resultsList.style.backgroundColor = "var(--bg-tertiary)";
+        resultsList.style.padding = "10px";
+        resultsList.style.borderRadius = "5px";
+        resultsList.style.border = "1px solid var(--border-color)";
+        
+        const refreshResults = () => {
+           resultsList.innerHTML = "";
+           if (frostbyteEmsMapping[storeInput] && frostbyteEmsMapping[storeInput].racks) {
+             const racks = frostbyteEmsMapping[storeInput].racks;
+             Object.keys(racks).forEach(r => {
+               const div = document.createElement("div");
+               div.style.padding = "5px";
+               div.style.borderBottom = "1px solid rgba(255,255,255,0.1)";
+               div.innerHTML = `<strong>${r}</strong> <span style="color:var(--text-muted)">→</span> ${racks[r].system}`;
+               resultsList.appendChild(div);
+             });
+           }
+           if (resultsList.innerHTML === "") {
+             resultsList.innerHTML = "<span style='color:var(--text-muted)'>No mappings added yet.</span>";
+           }
+        };
+        refreshResults();
+        resultsArea.appendChild(resultsList);
+
+        modalBody.appendChild(builderArea);
+        modalBody.appendChild(resultsArea);
+
+        addBtn.onclick = () => {
+           const rackName = rackInput.value.trim();
+           const ems = emsSelect.value;
+           
+           if (!rackName || !ems) {
+             showNotification("Please specify both EMS System and Rack Name.", "error");
+             return;
+           }
+
+           // Save to mapping
+           if (!frostbyteEmsMapping[storeInput]) {
+             frostbyteEmsMapping[storeInput] = { racks: {} };
+           }
+           if (!frostbyteEmsMapping[storeInput].racks[rackName]) {
+             frostbyteEmsMapping[storeInput].racks[rackName] = {
+               system: ems,
+               circuits: {},
+             };
+           } else {
+             frostbyteEmsMapping[storeInput].racks[rackName].system = ems;
+             if (!frostbyteEmsMapping[storeInput].racks[rackName].circuits) {
+               frostbyteEmsMapping[storeInput].racks[rackName].circuits = {};
+             }
+           }
+
+           saveEmsData();
+           updateEmsInsightsPanel();
+           renderEmsTable();
+
+           showNotification(`Mapped ${rackName} to ${ems}`, "success");
+           
+           // Clear ONLY the rack input and builder state
+           rackInput.value = "";
+           builderState = { prefix: "", type: "", letters: [] };
+           Array.from(rackGroup.querySelectorAll("button.secondary-button")).forEach(b => {
+             b.classList.remove("active-rack-btn");
+             b.style.backgroundColor = "";
+             b.style.color = "";
+           });
+
+           refreshResults();
+           rackInput.focus();
+        };
+
+        // Buttons
+        const modalButtons = document.createElement("div");
+        modalButtons.className = "modal-buttons";
+
+        const closeBtn = document.createElement("button");
+        closeBtn.className = "modal-btn modal-btn-primary";
+        closeBtn.textContent = "Done";
+        closeBtn.onclick = () => {
+          modalOverlay.classList.remove("show");
+          setTimeout(() => modalOverlay.remove(), 200);
+        };
+
+        modalButtons.appendChild(closeBtn);
+
+        modalContent.appendChild(modalHeader);
+        modalContent.appendChild(modalBody);
+        modalContent.appendChild(modalButtons);
+        modalOverlay.appendChild(modalContent);
+
+        document.body.appendChild(modalOverlay);
+        
+        const qRack = document.getElementById("quick-notes-rack")?.value.trim();
+        if (qRack) {
+          rackInput.value = qRack;
         }
 
-        if (circuitName) {
-          frostbyteEmsMapping[storeInput].racks[rackName].circuits[
-            circuitName
-          ] = circuitType;
-        }
-
-        saveEmsData();
-        updateEmsInsightsPanel();
-        renderEmsTable(); // update the dedicated tab too
-        closeInlineMapper();
-        showNotification(
-          `Mapping saved for Store ${storeInput}, Rack ${rackName}`,
-          "success",
-        );
+        setTimeout(() => modalOverlay.classList.add("show"), 10);
       }
 
       // EMS Mapper Dedicated Tab Functions
