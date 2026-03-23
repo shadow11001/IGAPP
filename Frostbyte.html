@@ -5642,6 +5642,14 @@
           </div>
         </div>
 
+        <label for="work-order">Work Order Number:</label>
+        <input
+          type="text"
+          id="work-order"
+          placeholder="Enter work order number"
+          aria-required="false"
+        />
+
         <div
           class="input-row"
           style="display: flex; gap: 10px; margin-bottom: 15px"
@@ -5665,14 +5673,6 @@
             />
           </div>
         </div>
-
-        <label for="work-order">Work Order Number:</label>
-        <input
-          type="text"
-          id="work-order"
-          placeholder="Enter work order number"
-          aria-required="false"
-        />
 
         <label for="autofill">Select a DAE:</label>
         <select
@@ -14132,7 +14132,7 @@ verified in {SYSTEM}
         let currentRack = null;
         // Match phrases like "Logged into [RACK]", "Set rack to [RACK]", "Forced defrost on [CIRCUIT]", "Terminated Defrost on [CIRCUIT]"
         const regex =
-          /(?:Logged into|Rack set to)\s+([A-Za-z0-9_-]+)|(?:Forced defrost on|Terminated Defrost on)\s+([A-Za-z0-9_-]+)/gi;
+          /(?:Logged into|Rack set to)\s+([A-Za-z0-9_-]+)|(?:Forced defrost on|Terminated Defrost on)\s+([A-Za-z0-9_, \-]+)/gi;
         let match;
 
         while ((match = regex.exec(notes)) !== null) {
@@ -14148,8 +14148,10 @@ verified in {SYSTEM}
             }
             currentRack = matchedExistingRack || rackName;
           } else if (match[2]) {
-            // Match 2 is the circuit
-            let circuit = match[2];
+            // Match 2 is the circuit(s)
+            let circuitsStr = match[2];
+            let circuitsArr = circuitsStr.split(",").map(c => c.trim()).filter(c => c);
+            
             if (
               currentRack &&
               frostbyteEmsMapping[storeNumber] &&
@@ -14159,16 +14161,42 @@ verified in {SYSTEM}
               const rData = frostbyteEmsMapping[storeNumber].racks[currentRack];
               if (!rData.circuits) rData.circuits = {};
 
-              // Let's standardise the circuit key (original case maintained)
-              let matchedExistingCircuit = Object.keys(rData.circuits).find(
-                (c) => c.toUpperCase() === circuit.toUpperCase(),
-              );
-              if (!matchedExistingCircuit) {
-                rData.circuits[circuit] = "Regular";
-                madeChanges = true;
-              }
+              circuitsArr.forEach((circuit) => {
+                // Let's standardise the circuit key (original case maintained)
+                let matchedExistingCircuit = Object.keys(rData.circuits).find(
+                  (c) => c.toUpperCase() === circuit.toUpperCase(),
+                );
+                if (!matchedExistingCircuit) {
+                  rData.circuits[circuit] = "Regular";
+                  madeChanges = true;
+                }
+              });
             }
           }
+        }
+
+        // 3. Fallback: Also map what is directly in the quick-notes-circuit input if there's a rack
+        const explicitRack = document.getElementById("quick-notes-rack")?.value.trim() || AppState.currentRack;
+        const explicitCircuitsStr = document.getElementById("quick-notes-circuit")?.value.trim();
+        
+        if (explicitRack && explicitCircuitsStr && 
+            frostbyteEmsMapping[storeNumber] && 
+            frostbyteEmsMapping[storeNumber].racks && 
+            frostbyteEmsMapping[storeNumber].racks[explicitRack]) {
+          
+          const expCircuitsArr = explicitCircuitsStr.split(",").map(c => c.trim()).filter(c => c);
+          const rData = frostbyteEmsMapping[storeNumber].racks[explicitRack];
+          if (!rData.circuits) rData.circuits = {};
+
+          expCircuitsArr.forEach((circuit) => {
+            let matchedExistingCircuit = Object.keys(rData.circuits).find(
+              (c) => c.toUpperCase() === circuit.toUpperCase()
+            );
+            if (!matchedExistingCircuit) {
+              rData.circuits[circuit] = "Regular";
+              madeChanges = true;
+            }
+          });
         }
 
         if (madeChanges) {
@@ -14222,7 +14250,7 @@ verified in {SYSTEM}
             circuitInfo = `<span class="circuit-info" title="Circuits: ${cList}">${Object.keys(rackInfo.circuits).length} Ckt(s)</span>`;
           }
 
-          html += `<div class="ems-badge ${isHighlight ? "highlight" : ""}">${rackName}: ${rackInfo.system}${circuitInfo}</div>`;
+          html += `<div class="ems-badge ${isHighlight ? "highlight" : ""}" style="cursor: pointer;" onclick="selectSystem('${rackInfo.system}'); addQuickNote('Logged into ${rackName}');">${rackName}: ${rackInfo.system}${circuitInfo}</div>`;
         }
         return html;
       }
@@ -14404,8 +14432,39 @@ verified in {SYSTEM}
 
         rackGroup.appendChild(rackInputContainer);
 
+        // Circuit Quick Builder
+        const circuitGroup = document.createElement("div");
+        circuitGroup.style.marginTop = "15px";
+        circuitGroup.innerHTML = `<label style="display:block;margin-bottom:5px;color:var(--text-secondary);font-size:0.9em;">Add Circuit (Optional)</label>`;
+
+        const circuitInputContainer = document.createElement("div");
+        circuitInputContainer.style.display = "flex";
+        circuitInputContainer.style.gap = "10px";
+
+        const circuitInput = document.createElement("input");
+        circuitInput.type = "text";
+        circuitInput.className = "form-control";
+        circuitInput.placeholder = "Circuit Name (e.g. A01)";
+        circuitInput.style.flex = "1";
+
+        const circuitTypeSelect = document.createElement("select");
+        circuitTypeSelect.className = "form-control";
+        circuitTypeSelect.style.flex = "1";
+        const cOptions = ["Regular", "Sporlan", "KE2"];
+        cOptions.forEach(opt => {
+          const option = document.createElement("option");
+          option.value = opt;
+          option.textContent = opt;
+          circuitTypeSelect.appendChild(option);
+        });
+
+        circuitInputContainer.appendChild(circuitInput);
+        circuitInputContainer.appendChild(circuitTypeSelect);
+        circuitGroup.appendChild(circuitInputContainer);
+
         builderArea.appendChild(systemGroup);
         builderArea.appendChild(rackGroup);
+        builderArea.appendChild(circuitGroup);
 
         // Results Area
         const resultsArea = document.createElement("div");
@@ -14427,6 +14486,17 @@ verified in {SYSTEM}
                div.style.padding = "5px";
                div.style.borderBottom = "1px solid rgba(255,255,255,0.1)";
                div.innerHTML = `<strong>${r}</strong> <span style="color:var(--text-muted)">→</span> ${racks[r].system}`;
+               
+               if (racks[r].circuits && Object.keys(racks[r].circuits).length > 0) {
+                 const circs = Object.keys(racks[r].circuits).map(c => `${c} (${racks[r].circuits[c]})`).join(", ");
+                 const cDiv = document.createElement("div");
+                 cDiv.style.fontSize = "0.85em";
+                 cDiv.style.color = "var(--text-secondary)";
+                 cDiv.style.paddingLeft = "10px";
+                 cDiv.innerHTML = `↳ Circuits: ${circs}`;
+                 div.appendChild(cDiv);
+               }
+
                resultsList.appendChild(div);
              });
            }
@@ -14443,6 +14513,8 @@ verified in {SYSTEM}
         addBtn.onclick = () => {
            const rackName = rackInput.value.trim();
            const ems = emsSelect.value;
+           const circuitName = circuitInput.value.trim();
+           const circuitType = circuitTypeSelect.value;
            
            if (!rackName || !ems) {
              showNotification("Please specify both EMS System and Rack Name.", "error");
@@ -14465,14 +14537,23 @@ verified in {SYSTEM}
              }
            }
 
+           if (circuitName) {
+             const circuits = circuitName.split(",").map(c => c.trim()).filter(c => c);
+             circuits.forEach(c => {
+               frostbyteEmsMapping[storeInput].racks[rackName].circuits[c] = circuitType;
+             });
+           }
+
            saveEmsData();
            updateEmsInsightsPanel();
            renderEmsTable();
 
-           showNotification(`Mapped ${rackName} to ${ems}`, "success");
+           showNotification(`Mapped ${rackName} ${circuitName ? `with circuit ${circuitName} ` : ''}to ${ems}`, "success");
            
            // Clear ONLY the rack input and builder state
            rackInput.value = "";
+           circuitInput.value = "";
+           circuitTypeSelect.value = "Regular";
            builderState = { prefix: "", type: "", letters: [] };
            Array.from(rackGroup.querySelectorAll("button.secondary-button")).forEach(b => {
              b.classList.remove("active-rack-btn");
