@@ -97,7 +97,7 @@ The **Frostbyte Generator** is an advanced admin panel and configuration tool fo
 {
     version: "2.0.0",
     title: "Frostbyte",
-    description: "Support tool for Walmart Digital Assets",
+    description: "Support tool for Upstream Digital Assets",
     author: "morphon",
     buttons: [...],
     daeTemplates: {...},

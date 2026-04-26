@@ -1,6 +1,6 @@
-# Walmart Digital Assets - QA Checklist Application (Frostbyte)
+# Upstream Digital Assets - QA Checklist Application (Frostbyte)
 
-A comprehensive, self-contained web application designed for Walmart Digital Assets contact center agents to streamline call documentation and quality assurance processes. Powered by **Frostbyte** technology for enhanced digital asset synchronization.
+A comprehensive, self-contained web application designed for Upstream Digital Assets contact center agents to streamline call documentation and quality assurance processes. Powered by **Frostbyte** technology for enhanced digital asset synchronization.
 
 ## 🌟 Features
 
@@ -1014,7 +1014,7 @@ Frostbyte/
 ## 📄 License & Credits
 
 ### License
-This application is developed for internal Walmart Digital Assets use.
+This application is developed for internal Upstream Digital Assets use.
 
 ### Credits
 - **Font Awesome** - Icons and theme toggle functionality

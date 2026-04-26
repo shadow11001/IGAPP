@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Walmart Digital Assets Notes Application"
+      content="Upstream Digital Assets Notes Application"
     />
-    <title>Walmart Digital Assets - Frostbyte</title>
+    <title>Upstream Digital Assets - Frostbyte</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -5068,7 +5068,7 @@
               <div class="checklist-item" onclick="toggleChecklistItem(this)">
                 <input type="checkbox" class="checklist-checkbox" />
                 <div class="checklist-text">
-                  Thanks for calling Walmart Digital Assets, where we're always
+                  Thanks for calling Upstream Digital Assets, where we're always
                   happy to help! My name is
                   <span id="agent-name-display">[NAME]</span>, can I please have
                   your name site and work order number from which you are
@@ -5096,7 +5096,7 @@
               <div class="checklist-item" onclick="toggleChecklistItem(this)">
                 <input type="checkbox" class="checklist-checkbox" />
                 <div class="checklist-text">
-                  Thank you for calling walmart digital assets stay on the line
+                  Thank you for calling upstream digital assets stay on the line
                   for a brief survey
                 </div>
               </div>
@@ -9298,8 +9298,8 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
         extractCaseNumber(text) {
           // First, check for circuit/rack format (e.g., "circuit 5 rack B" -> "B5")
           const circuitRackPatterns = [
-            /circuit\s+(\d+)\s+rack\s+([A-Z])/gi, // "circuit 5 rack B"
-            /rack\s+([A-Z])\s+circuit\s+(\d+)/gi, // "rack B circuit 5"
+            /circuit\s+(\d+(?:\.\d+)?)\s+rack\s+([A-Z])/gi, // "circuit 5.1 rack B"
+            /rack\s+([A-Z])\s+circuit\s+(\d+(?:\.\d+)?)/gi, // "rack B circuit 5.1"
           ];
 
           for (const pattern of circuitRackPatterns) {
@@ -9325,9 +9325,9 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
 
           // Standard patterns
           const casePatterns = [
-            /\b([A-Z]\d+)\b/g, // Pattern like A2, B1, C3
-            /case\s*([A-Z]\d+)/gi,
-            /defrost.*?([A-Z]\d+)/gi,
+            /\b([A-Z]\d+(?:\.\d+)?)\b/g, // Pattern like A2, B1.1, C3
+            /case\s*([A-Z]\d+(?:\.\d+)?)/gi,
+            /defrost.*?([A-Z]\d+(?:\.\d+)?)/gi,
           ];
 
           for (const pattern of casePatterns) {
@@ -9347,8 +9347,8 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
 
           // Check for circuit/rack format (e.g., "circuit 5 rack B" -> "B5")
           const circuitRackPatterns = [
-            /circuit\s+(\d+)\s+rack\s+([A-Z])/gi, // "circuit 5 rack B"
-            /rack\s+([A-Z])\s+circuit\s+(\d+)/gi, // "rack B circuit 5"
+            /circuit\s+(\d+(?:\.\d+)?)\s+rack\s+([A-Z])/gi, // "circuit 5.1 rack B"
+            /rack\s+([A-Z])\s+circuit\s+(\d+(?:\.\d+)?)/gi, // "rack B circuit 5.1"
           ];
 
           for (const pattern of circuitRackPatterns) {
@@ -9368,13 +9368,13 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
           }
 
           // Standard pattern
-          const casePattern = /\b([A-Z]\d+)\b/g;
+          const casePattern = /\b([A-Z]\d+(?:\.\d+)?)\b/g;
 
           const matches = [...text.matchAll(casePattern)];
           for (const match of matches) {
             const caseNum = match[1];
             // Only add if it looks like a valid case identifier (single letter + digits)
-            if (caseNum.length >= 2 && caseNum.length <= 4) {
+            if (caseNum.length >= 2 && caseNum.length <= 6) {
               caseNumbers.add(caseNum);
             }
           }
@@ -14250,7 +14250,7 @@ verified in {SYSTEM}
             circuitInfo = `<span class="circuit-info" title="Circuits: ${cList}">${Object.keys(rackInfo.circuits).length} Ckt(s)</span>`;
           }
 
-          html += `<div class="ems-badge ${isHighlight ? "highlight" : ""}" style="cursor: pointer;" onclick="selectSystem('${rackInfo.system}'); addQuickNote('Logged into ${rackName}');">${rackName}: ${rackInfo.system}${circuitInfo}</div>`;
+          html += `<div class="ems-badge ${isHighlight ? "highlight" : ""}" style="cursor: pointer;" onclick="selectSystem('${rackInfo.system}'); addQuickNote('Logged into ${rackName}.');">${rackName}: ${rackInfo.system}${circuitInfo}</div>`;
         }
         return html;
       }
