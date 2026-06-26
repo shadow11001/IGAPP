@@ -139,7 +139,7 @@ function renderEmsTable() {
         for (const rackName in storeData.racks) {
             html += `<tr>
                 <td>${storeId}</td>
-                <td>${storeData.ems || 'Unknown'}</td>
+                <td>${frostbyteEmsMapping[storeId].racks[rackName]?.ems || 'Unknown'}</td>
                 <td>${rackName}</td>
                 <td>
                     <button class="danger-button action-button" onclick="deleteEmsEntry('${storeId}', '${rackName}')" style="margin: 0; padding: 4px 8px;">Delete Rack</button>
@@ -184,12 +184,9 @@ function saveEmsEntry() {
 
     // Initialize store if it doesn't exist
     if (!frostbyteEmsMapping[storeId]) {
-        frostbyteEmsMapping[storeId] = { racks: {}, ems: emsType };
+        frostbyteEmsMapping[storeId] = { racks: {} };
     }
     
-    // Always update EMS type just in case they are re-adding
-    frostbyteEmsMapping[storeId].ems = emsType;
-
     if (!frostbyteEmsMapping[storeId].racks) {
         frostbyteEmsMapping[storeId].racks = {};
     }
