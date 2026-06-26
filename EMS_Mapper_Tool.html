@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMS Mapper Custom Tool</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; padding: 20px; background: #1e1e1e; color: #fff; }
+        .ems-mapper-container { background: #2d2d2d; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); max-width: 1000px; margin: 0 auto; }
+        h2 { color: #fff; margin-bottom: 20px; }
+        .ems-controls { display: flex; gap: 10px; margin-bottom: 20px; }
+        .form-control { padding: 8px 12px; border: 1px solid #444; border-radius: 4px; background: #3d3d3d; color: #fff; }
+        button { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; }
+        .primary-button { background: #007acc; color: white; }
+        .primary-button:hover { background: #005999; }
+        .secondary-button { background: #4d4d4d; color: white; }
+        .secondary-button:hover { background: #5d5d5d; }
+        .danger-button { background: #d32f2f; color: white; }
+        .danger-button:hover { background: #b71c1c; }
+        .ems-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .ems-table th, .ems-table td { padding: 12px; text-align: left; border-bottom: 1px solid #444; }
+        .ems-table th { background-color: #333; font-weight: 600; color: #ccc; }
+        .ems-table tr:hover { background-color: #3d3d3d; text-decoration: none; }
+        
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); }
+        .modal-content { background-color: #2d2d2d; margin: 10% auto; padding: 20px; border: 1px solid #444; width: 700px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-modal:hover { color: #fff; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #ccc; }
+        .form-group input { width: 100%; box-sizing: border-box; }
+        .action-button { background: transparent; border: 1px solid #666; color: #ccc; padding: 4px 8px; margin-right: 5px; border-radius: 3px; cursor: pointer; }
+        .action-button:hover { background: #444; color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="ems-mapper-container">
+    <h2>🗺️ EMS Mapper</h2>
+    <div class="ems-controls">
+        <input type="text" id="ems-search" placeholder="Search stores..." class="form-control" style="width: 200px" oninput="renderEmsTable()" />
+        <button class="primary-button" onclick="openEmsModal()">+ Add New Store</button>
+        <button class="secondary-button" onclick="exportEmsData()">📥 Export Data</button>
+        <button class="danger-button" onclick="clearEmsData()">🗑️ Clear Data</button>
+    </div>
+    <div class="table-container" style="overflow-x: auto">
+        <table class="ems-table" id="ems-table">
+            <thead>
+                <tr>
+                    <th>Store #</th>
+                    <th>EMS System</th>
+                    <th>Rack</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic rows -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div id="emsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeEmsModal()">&times;</span>
+        <h3 id="modalTitle" style="margin-top: 0;">Add Store EMS Map</h3>
+
+        <div class="form-group">
+            <label for="modalStoreId">Store Number:</label>
+            <input type="text" id="modalStoreId" class="form-control" placeholder="e.g. 1234">
+        </div>
+
+        <div class="form-group">
+            <label for="modalEmsType">EMS System:</label>
+            <select id="modalEmsType" class="form-control">
+                <option value="">Select EMS System...</option>
+                <option value="Novar ESS32">Novar ESS32</option>
+                <option value="Opus Architect">Opus Architect</option>
+                <option value="Opus Magnum">Opus Magnum</option>
+                <option value="CPC UltraSite">CPC UltraSite</option>
+                <option value="Connect+">Connect+</option>
+                <option value="Danfoss AKA65">Danfoss AKA65</option>
+                <option value="Danfoss Store View">Danfoss Store View</option>
+                <option value="Carel">Carel</option>
+            </select>
+        </div>
+
+        
+        <div class="form-group" style="background:#3d3d3d; padding:15px; border-radius:5px; margin-top:15px;">
+            <label style="margin-bottom:10px; display:block; color:#fff;">Rack Quick Builder (Click to build name)</label>
+            <div id="builder-controls">
+                <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px;" id="prefix-btns"></div>
+                <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px;" id="type-btns"></div>
+                <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px;" id="letter-btns"></div>
+            </div>
+            
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <input type="text" id="builderResult" class="form-control" placeholder="Rack Code (e.g. LTA)" style="flex:1;">
+                <button type="button" class="primary-button" onclick="addBuiltRack()">Add Rack to List &darr;</button>
+                <button type="button" class="danger-button" onclick="clearRackBuilder()">Clear</button>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top:15px;">
+            <label for="modalRacks">Racks to Save (comma separated):</label>
+            <input type="text" id="modalRacks" class="form-control" placeholder="e.g. LTA, MTB, DTC">
+        </div>
+
+
+        <button class="primary-button" onclick="saveEmsEntry()">Save Mappings</button>
+    </div>
+</div>
+
+<script>
+// State
+let frostbyteEmsMapping = JSON.parse(localStorage.getItem('emsMappingData')) || {};
+
+// Save to storage
+function saveToStorage() {
+    localStorage.setItem('emsMappingData', JSON.stringify(frostbyteEmsMapping));
+}
+
+// Render Table - Simplified for Store and Rack only
+function renderEmsTable() {
+    const tbody = document.querySelector("#ems-table tbody");
+    if (!tbody) return;
+
+    const searchTerm = document.getElementById("ems-search").value.trim().toLowerCase();
+    let html = "";
+
+    for (const storeId in frostbyteEmsMapping) {
+        if (searchTerm && !storeId.includes(searchTerm)) continue;
+
+        const storeData = frostbyteEmsMapping[storeId];
+        if (!storeData.racks) continue;
+
+        for (const rackName in storeData.racks) {
+            html += `<tr>
+                <td>${storeId}</td>
+                <td>${storeData.ems || 'Unknown'}</td>
+                <td>${rackName}</td>
+                <td>
+                    <button class="danger-button action-button" onclick="deleteEmsEntry('${storeId}', '${rackName}')" style="margin: 0; padding: 4px 8px;">Delete Rack</button>
+                </td>
+            </tr>`;
+        }
+    }
+
+    if (html === "") {
+        html = `<tr><td colspan="3" style="text-align: center; color: #888; padding: 20px;">No racks mapped. Add one to get started.</td></tr>`;
+    }
+
+    tbody.innerHTML = html;
+}
+
+// Modal functions
+function openEmsModal() {
+    document.getElementById('modalStoreId').value = '';
+    document.getElementById('modalEmsType').value = '';
+    document.getElementById('modalRacks').value = '';
+    clearRackBuilder();
+    document.getElementById('emsModal').style.display = 'block';
+}
+
+function closeEmsModal() {
+    document.getElementById('emsModal').style.display = 'none';
+}
+
+// Save an entry
+function saveEmsEntry() {
+    const storeId = document.getElementById('modalStoreId').value.trim();
+    const emsType = document.getElementById('modalEmsType').value;
+    const racksInput = document.getElementById('modalRacks').value.trim();
+
+    if (!storeId || !emsType || !racksInput) {
+        alert("Please provide the Store Number, EMS System, and at least one Rack.");
+        return;
+    }
+
+    // Split and clean up racks
+    const racksList = racksInput.split(',').map(r => r.trim()).filter(r => r);
+
+    // Initialize store if it doesn't exist
+    if (!frostbyteEmsMapping[storeId]) {
+        frostbyteEmsMapping[storeId] = { racks: {}, ems: emsType };
+    }
+    
+    // Always update EMS type just in case they are re-adding
+    frostbyteEmsMapping[storeId].ems = emsType;
+
+    if (!frostbyteEmsMapping[storeId].racks) {
+        frostbyteEmsMapping[storeId].racks = {};
+    }
+
+    // Set rack info
+    racksList.forEach(rackName => {
+        frostbyteEmsMapping[storeId].racks[rackName] = { 
+            circuits: {},
+            ems: emsType
+        };
+    });
+
+    saveToStorage();
+    renderEmsTable();
+    closeEmsModal();
+}
+
+// Delete entry
+function deleteEmsEntry(storeId, rackName) {
+    if (confirm(`Are you sure you want to delete Rack ${rackName} from Store ${storeId}?`)) {
+        if (frostbyteEmsMapping[storeId] && frostbyteEmsMapping[storeId].racks) {
+            delete frostbyteEmsMapping[storeId].racks[rackName];
+            
+            // Clean up store if empty
+            if (Object.keys(frostbyteEmsMapping[storeId].racks).length === 0) {
+                delete frostbyteEmsMapping[storeId];
+            }
+            
+            saveToStorage();
+            renderEmsTable();
+        }
+    }
+}
+
+// Export data - Simplified for Store and Rack ONLY
+function exportEmsData() {
+    if (Object.keys(frostbyteEmsMapping).length === 0) {
+        alert("No data to export");
+        return;
+    }
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(frostbyteEmsMapping, null, 2));
+    const downloadAnchorNode = document.createElement("a");
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `frostbyte_ems_mapping_${new Date().toISOString().split('T')[0]}.json`);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+// Clear all data
+function clearEmsData() {
+    if (confirm("Are you sure you want to clear all EMS Mapping data? This cannot be undone.")) {
+        frostbyteEmsMapping = {};
+        saveToStorage();
+        renderEmsTable();
+    }
+}
+
+// Close modal if clicked outside
+window.onclick = function(event) {
+    const modal = document.getElementById('emsModal');
+    if (event.target == modal) {
+        closeEmsModal();
+    }
+}
+
+// Initial render
+
+// Rack Name Builder State
+let builderState = { prefix: "", type: "", letters: [] };
+
+function initRackBuilder() {
+    const createMultiGroup = (items, key, multi = false, containerId) => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        
+        items.forEach((item) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "secondary-button";
+            btn.style.padding = "5px 10px";
+            btn.style.minWidth = "40px";
+            btn.textContent = item;
+            
+            btn.onclick = () => {
+                if (multi) {
+                    const idx = builderState[key].indexOf(item);
+                    if (idx > -1) {
+                        builderState[key].splice(idx, 1);
+                        btn.style.backgroundColor = "";
+                        btn.style.color = "";
+                    } else {
+                        builderState[key].push(item);
+                        builderState[key].sort();
+                        btn.style.backgroundColor = "#007acc";
+                        btn.style.color = "white";
+                    }
+                } else {
+                    if (builderState[key] === item) {
+                        builderState[key] = "";
+                        btn.style.backgroundColor = "";
+                        btn.style.color = "";
+                    } else {
+                        builderState[key] = item;
+                        Array.from(container.children).forEach((b) => {
+                            b.style.backgroundColor = "";
+                            b.style.color = "";
+                        });
+                        btn.style.backgroundColor = "#007acc";
+                        btn.style.color = "white";
+                    }
+                }
+                updateManualInput();
+            };
+            container.appendChild(btn);
+        });
+    };
+
+    createMultiGroup(["HVAC", "HVACL", "AHM", "C", "R", "CKT", "CKTS"], "prefix", false, "prefix-btns");
+    createMultiGroup(["LT", "MT", "DT"], "type", false, "type-btns");
+    
+    // Custom Box
+    const customContainer = document.getElementById("letter-btns");
+    const alphabet = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+    createMultiGroup(alphabet, "letters", true, "letter-btns");
+    
+    const customInput = document.createElement("input");
+    customInput.type = "text";
+    customInput.className = "form-control";
+    customInput.placeholder = "Custom Label";
+    customInput.style.width = "100px";
+    customInput.oninput = (e) => {
+        // Clear buttons if custom is used
+        builderState.letters = [e.target.value];
+        Array.from(document.getElementById("letter-btns").children).forEach((b) => {
+            if (b.tagName === 'BUTTON') {
+                b.style.backgroundColor = "";
+                b.style.color = "";
+            }
+        });
+        updateManualInput();
+    };
+    customContainer.appendChild(customInput);
+}
+
+function updateManualInput() {
+    const rackInput = document.getElementById("builderResult");
+    let code = `${builderState.prefix}${builderState.type}${builderState.letters.join("")}`;
+    if (!builderState.prefix && !builderState.type && builderState.letters.length > 0) {
+        code = `Rack ${builderState.letters.join("")}`;
+    }
+    rackInput.value = code;
+}
+
+function clearRackBuilder() {
+    builderState = { prefix: "", type: "", letters: [] };
+    initRackBuilder(); // reset UI
+    document.getElementById("builderResult").value = '';
+}
+
+function addBuiltRack() {
+    const code = document.getElementById("builderResult").value.trim();
+    if (!code) return;
+    
+    const racksInput = document.getElementById('modalRacks');
+    if (racksInput.value) {
+        racksInput.value += `, ${code}`;
+    } else {
+        racksInput.value = code;
+    }
+    
+    clearRackBuilder();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initRackBuilder();
+    // Attempt to migrate from earlier naming convention if this is first run
+    const oldMappingStr = localStorage.getItem('frostbyteEmsMapping');
+    if (oldMappingStr && !localStorage.getItem('emsMappingData')) {
+        try {
+            frostbyteEmsMapping = JSON.parse(oldMappingStr);
+            saveToStorage();
+        } catch (e) {
+            console.error("Failed to parse old mappings");
+        }
+    }
+    
+    renderEmsTable();
+});
+</script>
+</body>
+</html>
