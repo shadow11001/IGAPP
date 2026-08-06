@@ -382,183 +382,7 @@
         color: #ecf0f1;
       }
 
-      /* Email Processing Styles */
-      .email-processor {
-        margin-top: 10px;
-      }
-
-      .email-processor h3 {
-        margin: 0 0 15px 0;
-        font-size: 16px;
-        font-weight: 600;
-        color: #333;
-        text-align: center;
-      }
-
-      .email-input-section {
-        margin-bottom: 20px;
-      }
-
-      .email-input-section label {
-        display: block;
-        font-size: 12px;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 6px;
-        margin-top: 10px;
-      }
-
-      .email-input-section label:first-of-type {
-        margin-top: 0;
-      }
-
-      .email-field-container {
-        position: relative;
-        display: flex;
-        gap: 6px;
-        align-items: flex-start;
-      }
-
-      .email-field,
-      .email-textarea,
-      .response-textarea {
-        flex: 1;
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ced4da;
-        border-radius: 6px;
-        font-size: 13px;
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background: white;
-        color: #495057;
-        resize: vertical;
-        transition: border-color 0.2s ease;
-        box-sizing: border-box;
-      }
-
-      .copy-field-btn {
-        flex-shrink: 0;
-        padding: 8px 12px;
-        background: #28a745;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        height: fit-content;
-        align-self: flex-start;
-      }
-
-      .copy-field-btn:hover {
-        background: #218838;
-        transform: translateY(-1px);
-      }
-
-      .copy-field-btn:active {
-        transform: translateY(0);
-      }
-
-      .email-field:focus,
-      .email-textarea:focus,
-      .response-textarea:focus {
-        outline: none;
-        border-color: #007bff;
-        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-      }
-
-      .email-controls,
-      .response-controls {
-        display: flex;
-        gap: 8px;
-        margin-top: 10px;
-        flex-wrap: wrap;
-      }
-
-      .email-analysis {
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 6px;
-        padding: 15px;
-        margin-top: 15px;
-      }
-
-      .email-analysis h4 {
-        margin: 0 0 10px 0;
-        font-size: 14px;
-        font-weight: 600;
-        color: #495057;
-      }
-
-      .extracted-info {
-        background: white;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-        padding: 12px;
-        margin-bottom: 15px;
-        font-size: 13px;
-      }
-
-      .info-item {
-        display: flex;
-        margin-bottom: 8px;
-        align-items: flex-start;
-      }
-
-      .info-label {
-        font-weight: 600;
-        color: #495057;
-        min-width: 80px;
-        margin-right: 8px;
-      }
-
-      .info-value {
-        color: #333;
-        flex: 1;
-      }
-
-      .info-value.highlight {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 3px;
-        padding: 2px 6px;
-        color: #856404;
-        font-weight: 600;
-      }
-
-      .email-type-badge {
-        display: inline-block;
-        background: #007bff;
-        color: white;
-        font-size: 11px;
-        font-weight: 500;
-        padding: 2px 8px;
-        border-radius: 12px;
-      }
-
-      .suggested-templates {
-        background: #e8f5e9;
-        border: 1px solid #4caf50;
-        border-radius: 6px;
-        padding: 12px;
-        margin-bottom: 15px;
-        font-size: 13px;
-      }
-
-      .email-warning-banner {
-        background: #fff3cd;
-        color: #856404;
-        padding: 12px;
-        margin-bottom: 15px;
-        border-radius: 6px;
-        border-left: 4px solid #ffc107;
-      }
-
-      /* Dark mode for email processing */
-      body.dark-mode .email-processor h3 {
-        color: #ecf0f1;
-      }
+      
 
       body.dark-mode .email-input-section label {
         color: #bdc3c7;
@@ -3972,9 +3796,7 @@
             <button class="tab-btn" onclick="switchTab('qa-checklist')">
               QA Checklist
             </button>
-            <button class="tab-btn" onclick="switchTab('email-processing')">
-              📧 Email
-            </button>
+            
             <button
               class="tab-btn"
               onclick="switchTab('war-room')"
@@ -9103,782 +8925,6 @@ Last Updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
         }
       }
 
-      // Email Processing System
-      const EMAIL_PROCESSOR = {
-        // Email type patterns based on content analysis
-        emailTypes: {
-          "Defrost Request": {
-            patterns: [
-              /(?:force|perform|request|run|need|start|initiate)\s+(?:a\s+)?defrost/gi,
-              /emergency\s+defrost/gi,
-              /forced\s+defrost/gi,
-            ],
-            antiPatterns: [
-              /check.*defrost/gi,
-              /verify.*defrost/gi,
-              /any.*defrost.*overlap/gi,
-            ],
-            template: "defrost",
-          },
-          MasterMind: {
-            patterns: [/mastermind/gi, /master\s+mind/gi],
-            template: "mastermind",
-          },
-          "RTU Setpoint": {
-            patterns: [/rtu/gi, /setpoint/gi, /set\s+point/gi, /temperature/gi],
-            template: "general",
-          },
-          "Fan Control": {
-            patterns: [
-              /fan/gi,
-              /continuous/gi,
-              /fan.*continuous/gi,
-              /continuous.*fan/gi,
-            ],
-            template: "general",
-          },
-          Lighting: {
-            patterns: [
-              /\blight(?:s|ing)?\b/gi,
-              /\blamp/gi,
-              /forced.*light/gi,
-              /light.*forced/gi,
-            ],
-            antiPatterns: [/daylight/gi],
-            template: "general",
-          },
-          "PDR Request": {
-            patterns: [
-              /parameter/gi,
-              /deviation/gi,
-              /pdr/gi,
-              /outside.*parameter/gi,
-              /change.*defrost.*duration/gi,
-              /defrost.*duration.*change/gi,
-              /(?:add|remove|change).*defrost.*cycle/gi,
-              /defrost.*(?:minutes|time|setting)/gi,
-              /parameter.*sheet/gi,
-              /spec.*sheet/gi,
-            ],
-            template: "pdr",
-          },
-          "PCR Request": {
-            patterns: [/point.*change/gi, /pcr/gi, /board.*point/gi],
-            template: "pcr",
-          },
-          Escalation: {
-            patterns: [/escalat/gi, /urgent/gi, /emergency/gi, /critical/gi],
-            template: "escalation",
-          },
-          "Status Update": {
-            patterns: [/status/gi, /update/gi, /progress/gi, /completed/gi],
-            template: "general",
-          },
-          "Status Check": {
-            patterns: [
-              /check.*for/gi,
-              /verify/gi,
-              /confirm/gi,
-              /please\s+check/gi,
-              /could\s+you.*check/gi,
-            ],
-            template: "general",
-          },
-          "Download Request": {
-            patterns: [
-              /download/gi,
-              /force.*download/gi,
-              /push.*download/gi,
-              /request.*download/gi,
-              /need.*download/gi,
-              /version.*download/gi,
-            ],
-            template: "download",
-          },
-          "General Inquiry": {
-            patterns: [/question/gi, /inquiry/gi, /help/gi, /can\s+you/gi],
-            template: "general",
-          },
-        },
-
-        // Extract work order in various formats (always 9 digits)
-        extractWorkOrder(text) {
-          const patterns = [
-            /(?:work\s*order|wo|w\/o)[#:\s]*(\d{9})\b/gi,
-            /\bWO(\d{9})\b/gi,
-            /\b(\d{9})\b/g, // Just 9-digit numbers - removed 'i' flag and made more permissive
-          ];
-
-          for (const pattern of patterns) {
-            const matches = [...text.matchAll(pattern)]; // Use matchAll for better matching
-            if (matches.length > 0) {
-              // Extract just the 9-digit number from first match
-              for (const match of matches) {
-                const fullMatch = match[0];
-                const numberMatch = fullMatch.match(/(\d{9})/);
-                if (numberMatch) {
-                  console.log("Work order found:", numberMatch[1]);
-                  return numberMatch[1];
-                }
-              }
-            }
-          }
-          return null;
-        },
-
-        // Extract store number (1-4 digits, context-aware)
-        extractStoreNumber(text) {
-          // Look for store number patterns with prioritization
-          const storePatterns = [
-            /(?:store|site|club)[#:\s]*(\d{1,4})\b/gi, // Highest priority: explicit store/site/club
-            /subject:[^\n]*?(?:store|site|club)[#:\s]*(\d{1,4})\b/gi, // Store in subject line
-            /subject:[^\n]*?\b(\d{4})\b/gi, // 4-digit number in subject (common store pattern)
-          ];
-
-          // Try patterns in order of priority
-          for (const pattern of storePatterns) {
-            const matches = [...text.matchAll(pattern)];
-            if (matches.length > 0) {
-              for (const match of matches) {
-                const numberMatch = match[1];
-                const num = parseInt(numberMatch);
-                // Store numbers are typically 1-4 digits, not 9 (work orders)
-                // Exclude years (e.g., 2025) by checking if the number appears in a date context
-                const isInDate = new RegExp(
-                  `(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|\\d{1,2}[/\\-]\\d{1,2}[/\\-]|sent:|date:)[^\\n]*?${numberMatch}`,
-                  "gi",
-                ).test(text);
-                if (
-                  num >= 1 &&
-                  num <= 9999 &&
-                  numberMatch.length <= 4 &&
-                  !isInDate
-                ) {
-                  console.log("Store number found:", numberMatch);
-                  return numberMatch;
-                }
-              }
-            }
-          }
-          return null;
-        },
-
-        // Extract ALL store numbers (1-4 digits, context-aware)
-        extractAllStoreNumbers(text) {
-          const storeNumbers = new Set();
-          const storePatterns = [
-            /(?:store|site|club)[#:\s]*(\d{1,4})\b/gi,
-            /subject:[^\n]*?(?:store|site|club)[#:\s]*(\d{1,4})\b/gi,
-            /subject:[^\n]*?\b(\d{4})\b/gi,
-          ];
-
-          for (const pattern of storePatterns) {
-            const matches = [...text.matchAll(pattern)];
-            for (const match of matches) {
-              const numberMatch = match[1];
-              const num = parseInt(numberMatch);
-              const isInDate = new RegExp(
-                `(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|\\d{1,2}[/\\-]\\d{1,2}[/\\-]|sent:|date:)[^\\n]*?${numberMatch}`,
-                "gi",
-              ).test(text);
-              if (
-                num >= 1 &&
-                num <= 9999 &&
-                numberMatch.length <= 4 &&
-                !isInDate
-              ) {
-                storeNumbers.add(numberMatch);
-              }
-            }
-          }
-          return Array.from(storeNumbers);
-        },
-
-        // Extract case number (like A2, B1, C3, etc.)
-        extractCaseNumber(text) {
-          // First, check for circuit/rack format (e.g., "circuit 5 rack B" -> "B5")
-          const circuitRackPatterns = [
-            /circuit\s+(\d+(?:\.\d+)?)\s+rack\s+([A-Z])/gi, // "circuit 5.1 rack B"
-            /rack\s+([A-Z])\s+circuit\s+(\d+(?:\.\d+)?)/gi, // "rack B circuit 5.1"
-          ];
-
-          for (const pattern of circuitRackPatterns) {
-            const matches = [...text.matchAll(pattern)];
-            if (matches.length > 0) {
-              const match = matches[0];
-              let caseNum;
-              // Check which pattern matched and build the case number
-              if (pattern.source.startsWith("circuit")) {
-                // circuit X rack Y -> YX
-                caseNum = match[2] + match[1];
-              } else {
-                // rack Y circuit X -> YX
-                caseNum = match[1] + match[2];
-              }
-              console.log(
-                "Case number found from circuit/rack format:",
-                caseNum,
-              );
-              return caseNum;
-            }
-          }
-
-          // Standard patterns
-          const casePatterns = [
-            /\b([A-Z]\d+(?:\.\d+)?)\b/g, // Pattern like A2, B1.1, C3
-            /case\s*([A-Z]\d+(?:\.\d+)?)/gi,
-            /defrost.*?([A-Z]\d+(?:\.\d+)?)/gi,
-          ];
-
-          for (const pattern of casePatterns) {
-            const matches = [...text.matchAll(pattern)];
-            if (matches.length > 0) {
-              const caseNum = matches[0][1];
-              console.log("Case number found:", caseNum);
-              return caseNum;
-            }
-          }
-          return null;
-        },
-
-        // Extract ALL case numbers (like A2, B1, C3, etc.)
-        extractAllCaseNumbers(text) {
-          const caseNumbers = new Set();
-
-          // Check for circuit/rack format (e.g., "circuit 5 rack B" -> "B5")
-          const circuitRackPatterns = [
-            /circuit\s+(\d+(?:\.\d+)?)\s+rack\s+([A-Z])/gi, // "circuit 5.1 rack B"
-            /rack\s+([A-Z])\s+circuit\s+(\d+(?:\.\d+)?)/gi, // "rack B circuit 5.1"
-          ];
-
-          for (const pattern of circuitRackPatterns) {
-            const matches = [...text.matchAll(pattern)];
-            for (const match of matches) {
-              let caseNum;
-              // Check which pattern matched and build the case number
-              if (pattern.source.startsWith("circuit")) {
-                // circuit X rack Y -> YX
-                caseNum = match[2] + match[1];
-              } else {
-                // rack Y circuit X -> YX
-                caseNum = match[1] + match[2];
-              }
-              caseNumbers.add(caseNum);
-            }
-          }
-
-          // Standard pattern
-          const casePattern = /\b([A-Z]\d+(?:\.\d+)?)\b/g;
-
-          const matches = [...text.matchAll(casePattern)];
-          for (const match of matches) {
-            const caseNum = match[1];
-            // Only add if it looks like a valid case identifier (single letter + digits)
-            if (caseNum.length >= 2 && caseNum.length <= 6) {
-              caseNumbers.add(caseNum);
-            }
-          }
-
-          console.log("All case numbers found:", Array.from(caseNumbers));
-          return Array.from(caseNumbers);
-        },
-
-        // Extract rack name (LTA, LTB, MTC, MTD, DTB, RCU, etc.)
-        extractRackName(text) {
-          const rackPatterns = [
-            /(?:rack|on the|to the)\s*:?\s*(LTA|LTB|LTC|LTD|MTA|MTB|MTC|MTD|DTB|DTA|RCU|CKT)\b/gi, // "rack: LTA", "on the LTA", "to the LTA"
-            /\b(LTA|LTB|LTC|LTD|MTA|MTB|MTC|MTD|DTB|DTA|RCU|CKT)\s+rack\b/gi, // "LTA rack"
-            /\b(LTA|LTB|LTC|LTD|MTA|MTB|MTC|MTD|DTB|DTA|RCU|CKT)\s*(?=\s*$|\s*\.|\s*,|\s+controller|\s+system)/gi, // Standalone rack names at word boundaries
-          ];
-
-          for (const pattern of rackPatterns) {
-            const matches = [...text.matchAll(pattern)];
-            if (matches.length > 0) {
-              const rack = matches[0][1].toUpperCase();
-              console.log("Rack name found:", rack);
-              return rack;
-            }
-          }
-          return null;
-        },
-
-        // Extract technician name from email signature or content
-        extractTechName(text) {
-          // Common patterns for tech names - ordered by priority
-          const namePatterns = [
-            // Pattern 1: "X here" (anywhere in first paragraph)
-            /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+here/gi,
-
-            // Pattern 2: "This is X" or "My name is X"
-            /(?:this\s+is|my\s+name\s+is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/gi,
-
-            // Pattern 3: Name after "Thanks," or "Regards," (signature)
-            /(?:thanks|regards|sincerely)[,:\s]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s*$/gim,
-
-            // Pattern 4: Single name (first name only) on its own line at start
-            /^([A-Z][a-z]+)\s*\n/gm,
-
-            // Pattern 5: Full name on its own line
-            /^([A-Z][a-z]+\s+[A-Z][a-z]+)\s*$/gm,
-
-            // Pattern 6: Name on its own line (middle of email)
-            /\n\s*([A-Z][a-z]+\s+[A-Z][a-z]+)\s*\n/g,
-          ];
-
-          for (const pattern of namePatterns) {
-            const matches = [...text.matchAll(pattern)];
-            if (matches.length > 0) {
-              const name = matches[0][1].trim();
-              // Filter out common false positives
-              const excludeWords = [
-                "Store",
-                "Site",
-                "Rack",
-                "Case",
-                "Work",
-                "Order",
-                "Tech",
-                "Phone",
-                "Email",
-                "Team",
-                "There",
-                "All",
-                "Thanks",
-                "Good",
-                "Morning",
-                "Afternoon",
-                "Evening",
-                "Need",
-                "Want",
-                "Could",
-                "Would",
-                "Should",
-              ];
-              if (
-                !excludeWords.some((word) =>
-                  name.toLowerCase().includes(word.toLowerCase()),
-                )
-              ) {
-                console.log("Tech name found:", name);
-                return name;
-              }
-            }
-          }
-          return null;
-        },
-
-        // Extract technician phone number from email
-        extractTechPhone(text) {
-          // Common phone number patterns
-          const phonePatterns = [
-            /(?:phone|tel|cell|mobile)[:\s]*\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/gi,
-            /\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, // General phone pattern
-            /\d{3}[-.\s]?\d{7}/g, // Phone without area code separators
-          ];
-
-          for (const pattern of phonePatterns) {
-            const matches = [...text.matchAll(pattern)];
-            if (matches.length > 0) {
-              const phone = matches[0][0].trim();
-              console.log("Tech phone found:", phone);
-              return phone;
-            }
-          }
-          return null;
-        },
-
-        // Extract technician email from email content
-        extractTechEmail(text) {
-          // Email pattern - prioritize walmart.com emails
-          const emailPatterns = [
-            /\b([a-zA-Z0-9._+-]+@walmart\.com)\b/gi, // Walmart emails first
-            /\b([a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/g, // General email pattern
-          ];
-
-          for (const pattern of emailPatterns) {
-            const matches = [...text.matchAll(pattern)];
-            if (matches.length > 0) {
-              // Filter out common system emails
-              const systemEmails = [
-                "customercare.walmart.com",
-                "incontactemail.com",
-                "no-reply",
-                "noreply",
-              ];
-              for (const match of matches) {
-                const email = match[1].toLowerCase();
-                const isSystemEmail = systemEmails.some((sys) =>
-                  email.includes(sys),
-                );
-                if (!isSystemEmail) {
-                  console.log("Tech email found:", email);
-                  return email;
-                }
-              }
-            }
-          }
-          return null;
-        },
-
-        // Classify email type based on content
-        classifyEmail(text) {
-          const lowerText = text.toLowerCase();
-          let bestMatch = { type: "General Inquiry", confidence: 0 };
-
-          for (const [type, config] of Object.entries(this.emailTypes)) {
-            let matches = 0;
-
-            // Check for anti-patterns first (patterns that exclude this type)
-            if (config.antiPatterns) {
-              let hasAntiPattern = false;
-              for (const antiPattern of config.antiPatterns) {
-                const found = lowerText.match(antiPattern);
-                if (found) {
-                  hasAntiPattern = true;
-                  break;
-                }
-              }
-              // Skip this type if anti-pattern is found
-              if (hasAntiPattern) {
-                continue;
-              }
-            }
-
-            // Count pattern matches
-            for (const pattern of config.patterns) {
-              const found = lowerText.match(pattern);
-              if (found) {
-                matches += found.length;
-              }
-            }
-
-            if (matches > bestMatch.confidence) {
-              bestMatch = {
-                type,
-                confidence: matches,
-                template: config.template,
-              };
-            }
-          }
-
-          return bestMatch;
-        },
-
-        // Get suggested DAE templates based on email content
-        getSuggestedTemplates(emailData) {
-          const suggestions = [];
-          const emailType = emailData.emailType;
-
-          // Template mapping with descriptions and keywords
-          const templateInfo = {
-            defrost: {
-              name: "Force Defrost Response",
-              description:
-                "Tech requested a forced defrost cycle for a case or rack",
-              keywords: ["defrost", "force", "cycle"],
-            },
-            pdr: {
-              name: "PDR (Parameter Deviation Request)",
-              description:
-                "Request involves changing parameters outside normal ranges",
-              keywords: [
-                "parameter",
-                "deviation",
-                "defrost duration",
-                "cycle change",
-              ],
-            },
-            pcr: {
-              name: "PCR (Point Change Request)",
-              description:
-                "Request to change board points or controller configuration",
-              keywords: ["point change", "board", "module"],
-            },
-            download: {
-              name: "Controller Download",
-              description:
-                "Tech needs a controller download or firmware update",
-              keywords: ["download", "version", "firmware"],
-            },
-            mastermind: {
-              name: "MasterMind/Alarm Response",
-              description: "Related to MasterMind alarm system",
-              keywords: ["mastermind", "alarm"],
-            },
-            escalation: {
-              name: "Manager Escalation",
-              description: "Urgent issue requiring escalation",
-              keywords: ["escalation", "urgent", "critical"],
-            },
-            general: {
-              name: "General Response",
-              description: "Standard response for common inquiries",
-              keywords: ["status", "check", "verify", "question"],
-            },
-          };
-
-          // Add primary suggestion based on detected type
-          if (emailType.template && templateInfo[emailType.template]) {
-            suggestions.push(templateInfo[emailType.template]);
-          }
-
-          // Add alternative suggestions based on extracted data
-          if (emailData.rackName && emailType.template !== "defrost") {
-            // If rack is mentioned but not defrost, could be rack-related
-            const rackSuggestions = [
-              "Controller COMM Loss",
-              "Changes to Rack Suction Settings",
-            ];
-            suggestions.push({
-              name: "Rack-Related Issue",
-              description: `Rack ${emailData.rackName} mentioned - may need comm check or settings adjustment`,
-              keywords: ["rack", emailData.rackName],
-            });
-          }
-
-          // If work order but no clear type, suggest general templates
-          if (emailData.workOrder && suggestions.length === 0) {
-            suggestions.push({
-              name: "Work Order Follow-up",
-              description: "Acknowledge WO and request more details if needed",
-              keywords: ["work order", emailData.workOrder],
-            });
-          }
-
-          return suggestions.length > 0 ? suggestions : null;
-        },
-      };
-
-      // Email processing functions
-      function processEmail() {
-        const emailSubject = document
-          .getElementById("email-subject")
-          .value.trim();
-        const emailBody = document.getElementById("email-body").value.trim();
-
-        if (!emailSubject && !emailBody) {
-          showNotification(
-            "❌ Please paste email content first",
-            "error",
-            3000,
-          );
-          return;
-        }
-
-        showNotification("🔍 Extracting information...", "info", 2000);
-
-        // Combine subject and body for processing
-        const emailText =
-          (emailSubject ? "Subject: " + emailSubject + "\n\n" : "") + emailBody;
-
-        // Extract information
-        const emailData = {
-          subject: emailSubject,
-          body: emailBody,
-          workOrder: EMAIL_PROCESSOR.extractWorkOrder(emailText),
-          storeNumber: EMAIL_PROCESSOR.extractStoreNumber(emailText),
-          caseNumber: EMAIL_PROCESSOR.extractCaseNumber(emailText),
-          rackName: EMAIL_PROCESSOR.extractRackName(emailText),
-          techName: EMAIL_PROCESSOR.extractTechName(emailText),
-          techPhone: EMAIL_PROCESSOR.extractTechPhone(emailText),
-          techEmail: EMAIL_PROCESSOR.extractTechEmail(emailText),
-          emailType: EMAIL_PROCESSOR.classifyEmail(emailText),
-          rawContent: emailText,
-        };
-
-        // Get suggested DAE templates
-        emailData.suggestedTemplates =
-          EMAIL_PROCESSOR.getSuggestedTemplates(emailData);
-
-        // Display results
-        displayEmailAnalysis(emailData);
-
-        // Auto-populate main form if work order detected
-        if (emailData.workOrder) {
-          populateMainForm(emailData);
-        }
-      }
-
-      function displayEmailAnalysis(emailData) {
-        const analysisDiv = document.getElementById("email-analysis");
-        const extractedInfoDiv = document.getElementById("extracted-info");
-        const templatesDiv = document.getElementById("suggested-templates");
-
-        // Build extracted info display
-        let infoHTML = "";
-
-        if (emailData.workOrder) {
-          infoHTML += `<div class="info-item">
-                    <span class="info-label">Work Order:</span>
-                    <span class="info-value highlight">${emailData.workOrder}</span>
-                </div>`;
-        }
-
-        if (emailData.storeNumber) {
-          infoHTML += `<div class="info-item">
-                    <span class="info-label">Store:</span>
-                    <span class="info-value highlight">${emailData.storeNumber}</span>
-                </div>`;
-        }
-
-        if (emailData.caseNumber) {
-          infoHTML += `<div class="info-item">
-                    <span class="info-label">Case:</span>
-                    <span class="info-value highlight">${emailData.caseNumber}</span>
-                </div>`;
-        }
-
-        if (emailData.rackName) {
-          infoHTML += `<div class="info-item">
-                    <span class="info-label">Rack:</span>
-                    <span class="info-value highlight">${emailData.rackName}</span>
-                </div>`;
-        }
-
-        if (emailData.techName) {
-          infoHTML += `<div class="info-item">
-                    <span class="info-label">Tech Name:</span>
-                    <span class="info-value">${emailData.techName}</span>
-                </div>`;
-        }
-
-        if (emailData.techPhone) {
-          infoHTML += `<div class="info-item">
-                    <span class="info-label">Tech Phone:</span>
-                    <span class="info-value">${emailData.techPhone}</span>
-                </div>`;
-        }
-
-        if (emailData.techEmail) {
-          infoHTML += `<div class="info-item">
-                    <span class="info-label">Tech Email:</span>
-                    <span class="info-value">${emailData.techEmail}</span>
-                </div>`;
-        }
-
-        infoHTML += `<div class="info-item">
-                <span class="info-label">Detected Issue Type:</span>
-                <span class="info-value">
-                    <span class="email-type-badge">${emailData.emailType.type}</span>
-                    ${emailData.emailType.confidence > 1 ? `(${emailData.emailType.confidence} keyword matches)` : ""}
-                </span>
-            </div>`;
-
-        // Notes are ALWAYS needed when work order is present
-        if (emailData.workOrder) {
-          infoHTML += `<div class="info-item">
-                    <span class="info-label">Quick Notes:</span>
-                    <span class="info-value highlight">✅ Auto-filled - Add your work details!</span>
-                </div>`;
-        }
-
-        // If no useful data found
-        if (
-          !emailData.workOrder &&
-          !emailData.storeNumber &&
-          !emailData.techName
-        ) {
-          infoHTML += `<div class="info-item" style="background: #fff3cd; padding: 10px; border-radius: 6px;">
-                    <span style="color: #856404;">⚠️ <strong>Limited data extracted.</strong> This may be an email thread or formatted in an unexpected way. Consider manually extracting the information.</span>
-                </div>`;
-        }
-
-        extractedInfoDiv.innerHTML = infoHTML;
-
-        // Display suggested templates
-        let templatesHTML = "";
-        if (
-          emailData.suggestedTemplates &&
-          emailData.suggestedTemplates.length > 0
-        ) {
-          templatesHTML +=
-            '<div style="margin-bottom: 10px;"><strong>Based on the email content, consider these DAE templates:</strong></div>';
-          emailData.suggestedTemplates.forEach((template, index) => {
-            const priority = index === 0 ? "⭐ Primary" : "💡 Alternative";
-            templatesHTML += `<div style="background: white; padding: 10px; margin-bottom: 8px; border-radius: 4px; border-left: 4px solid ${index === 0 ? "#4caf50" : "#2196f3"};">
-                        <div style="font-weight: bold; margin-bottom: 4px;">${priority}: ${template.name}</div>
-                        <div style="font-size: 0.9em; color: #666; margin-bottom: 6px;">${template.description}</div>
-                        <div style="font-size: 0.85em; color: #999;">Keywords detected: ${template.keywords.join(", ")}</div>
-                    </div>`;
-          });
-        } else {
-          templatesHTML = `<div style="color: #666;">
-                    ℹ️ No specific DAE template detected. Review the email and choose the appropriate response template based on the tech's request.
-                </div>`;
-        }
-
-        templatesDiv.innerHTML = templatesHTML;
-        analysisDiv.style.display = "block";
-
-        showNotification("✅ Information extracted!", "success", 3000);
-      }
-
-      function populateMainForm(emailData) {
-        // Switch to Quick Notes tab
-        switchTab("quick-notes");
-
-        // Populate form fields
-        if (emailData.workOrder) {
-          document.getElementById("work-order").value = emailData.workOrder;
-        }
-
-        if (emailData.storeNumber) {
-          document.getElementById("store-number").value = emailData.storeNumber;
-        }
-
-        if (emailData.techName) {
-          document.getElementById("tech-name").value = emailData.techName;
-        }
-
-        // Show notification
-        showNotification(
-          `📝 Work order ${emailData.workOrder} detected - Form populated. Please add your notes!`,
-          "info",
-          5000,
-        );
-
-        // Focus on notes field
-        setTimeout(() => {
-          const notesField = document.getElementById("notes");
-          if (notesField) {
-            notesField.focus();
-          }
-        }, 500);
-      }
-
-      function copyEmailField(fieldId) {
-        const field = document.getElementById(fieldId);
-        const text = field.value.trim();
-
-        if (!text) {
-          const fieldName = fieldId === "email-subject" ? "Subject" : "Body";
-          showNotification(`❌ No ${fieldName} to copy`, "error", 2000);
-          return;
-        }
-
-        navigator.clipboard
-          .writeText(text)
-          .then(() => {
-            const fieldName = fieldId === "email-subject" ? "Subject" : "Body";
-            showNotification(
-              `📋 ${fieldName} copied to clipboard!`,
-              "success",
-              2000,
-            );
-          })
-          .catch(() => {
-            showNotification("❌ Failed to copy", "error", 2000);
-          });
-      }
-
-      function clearEmailProcessor() {
-        document.getElementById("email-subject").value = "";
-        document.getElementById("email-body").value = "";
-        document.getElementById("email-analysis").style.display = "none";
-
-        showNotification("🗑️ Email extractor cleared", "success", 2000);
-      }
-
       // War Room System
       const WAR_ROOM_SYSTEM = {
         state: {
@@ -13565,7 +12611,19 @@ verified in {SYSTEM}
       }
 
       // Show/hide button groups based on system selection
+      
       function selectSystem(system) {
+        /* [INJECTED OPUS EVENT] */
+        if (system === 'Opus Architect' || system === 'Opus Magnum') {
+            const storeNum = document.getElementById("store-number").value.trim();
+            const rackName = AppState.currentRack ? AppState.currentRack.name : "Unknown";
+            if (storeNum) {
+                window.dispatchEvent(new CustomEvent('opusClassified', { 
+                    detail: { storeId: parseInt(storeNum), rackName: rackName, emsType: system } 
+                }));
+            }
+        }
+    
         AppState.selectedSystem = system;
         if (system && system !== "None") {
           if (!AppState.connectedSystems) AppState.connectedSystems = new Set();
@@ -13948,6 +13006,93 @@ verified in {SYSTEM}
         });
       }
 
+      
+      // ====== ServiceChannel & IoT Proxy Integrations ======
+      document.addEventListener("DOMContentLoaded", () => {
+        const woInput = document.getElementById("work-order");
+        const storeInput = document.getElementById("store-number");
+        const techNameInput = document.getElementById("tech-name");
+
+        if(woInput) {
+          woInput.addEventListener("blur", () => {
+            const woVal = woInput.value.trim();
+            if(woVal) {
+              window.dispatchEvent(new CustomEvent('fetchFromServiceChannel', { detail: { woId: woVal } }));
+            }
+          });
+        }
+        
+        if(storeInput) {
+          storeInput.addEventListener("blur", () => {
+            const storeVal = storeInput.value.trim();
+            if(storeVal) {
+              window.dispatchEvent(new CustomEvent('fetchFromSAOne', { detail: { storeNumber: storeVal } }));
+              window.dispatchEvent(new CustomEvent('fetchFromIOT', { detail: { storeNumber: storeVal } }));
+            }
+          });
+        }
+
+        window.addEventListener('serviceChannelDataReady', (e) => {
+          if(e.detail && e.detail.woData) {
+            const woData = e.detail.woData;
+            const data = e.detail.data;
+            if(woData.store && storeInput && !storeInput.value) {
+                storeInput.value = woData.store;
+                // Trigger store blur to fetch IoT/SAOne immediately
+                storeInput.dispatchEvent(new Event('blur'));
+            }
+            if(woData.trade) {
+                // Populate trade/name if found in notes using some heuristics in Frostbyte logic maybe?
+            }
+            
+            // Setup Tech Name 
+            if(data) {
+                 // Try looking for Name/Tech Name in notes JSON, logic belongs here depending on payload shape
+            }
+            showNotification(`ServiceChannel Data Pulled successfully for ${e.detail.woId}`);
+          }
+        });
+        
+        window.addEventListener('iotDataReady', (e) => {
+           if(e.detail.data) {
+                const storeId = e.detail.storeNumber;
+                console.log("IoT Data received for", storeId);
+                // Parse IoT and pass to EMS SQLite processor
+           } 
+        });
+      });
+      
+      // Inject links next to inputs
+      document.addEventListener("DOMContentLoaded", () => {
+         const storeGroup = document.getElementById("store-number").closest(".form-group");
+         if(storeGroup) {
+             const link = document.createElement("a");
+             link.id = "iot-link";
+             link.text = "🌍 Open in IoT";
+             link.style = "font-size:12px; margin-left:10px; display:inline-block;";
+             link.target = "_blank";
+             storeGroup.appendChild(link);
+             
+             document.getElementById("store-number").addEventListener("input", (e) => {
+                link.href = `https://em.walmart.com/us/sensors?query=US%7C${e.target.value}#`;
+             });
+         }
+         
+         const woGroup = document.getElementById("work-order").closest(".form-group");
+         if(woGroup) {
+             const link = document.createElement("a");
+             link.id = "sc-link";
+             link.text = "🎫 Open in ServiceChannel";
+             link.style = "font-size:12px; margin-left:10px; display:inline-block;";
+             link.target = "_blank";
+             woGroup.appendChild(link);
+             
+             document.getElementById("work-order").addEventListener("input", (e) => {
+                link.href = `https://www.servicechannel.com/sc/wo/workorders/list?id=${e.target.value}`;
+             });
+         }
+      });
+      
       // Initialize application
       document.addEventListener("DOMContentLoaded", async function () {
         try {
@@ -14056,6 +13201,77 @@ verified in {SYSTEM}
       });
 
       // Add notification container for accessibility
+      
+      // ====== EMS Mapper SQLite Loader ======
+      function setupEmsSqliteLoader() {
+         const emsSection = document.getElementById("ems-mapper");
+         if(!emsSection) return;
+
+         const loaderHtml = `
+            <div style="margin-top:20px; background:#2d2d2d; padding:15px; border-radius:8px;">
+               <h4>Import EMS Mapper Database</h4>
+               <p style="font-size:12px; color:#aaa;">Select the EMS_Scanner_DB.sqlite file exported from the Scanner Tool.</p>
+               <input type="file" id="sqlite-upload" accept=".sqlite,.db" style="display:block; margin: 10px 0;">
+               <button class="primary-button" id="download-updated-db" style="display:none; margin-top:10px;">💾 Download Updated Database</button>
+            </div>
+         `;
+         emsSection.insertAdjacentHTML('afterbegin', loaderHtml);
+
+         // Add SQL.js script tag dynamically to head
+         if(!document.getElementById("sql-js-script")) {
+            const script = document.createElement("script");
+            script.id = "sql-js-script";
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js";
+            document.head.appendChild(script);
+         }
+
+         let mainDB = null;
+
+         document.getElementById('sqlite-upload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            const arrayBuffer = await file.arrayBuffer();
+            const Uint8ArrayData = new Uint8Array(arrayBuffer);
+            
+            if(typeof initSqlJs !== 'undefined') {
+                 const SQL = await initSqlJs({ locateFile: () => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.wasm" });
+                 mainDB = new SQL.Database(Uint8ArrayData);
+                 showNotification("SQLite Database Loaded Successfully!");
+                 document.getElementById("download-updated-db").style.display = "inline-block";
+                 // Trigger a global event to let other logic know DB is loaded
+                 window.dispatchEvent(new CustomEvent('emsDbLoaded', { detail: { db: mainDB } }));
+            }
+         });
+
+         document.getElementById("download-updated-db").addEventListener('click', () => {
+             if(!mainDB) return;
+             const data = mainDB.export();
+             const blob = new Blob([data], { type: "application/x-sqlite3" });
+             const url = URL.createObjectURL(blob);
+             const a = document.createElement("a");
+             a.href = url;
+             a.download = `EMS_Scanner_DB_Updated.sqlite`;
+             document.body.appendChild(a);
+             a.click();
+             setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 100);
+         });
+
+         // Listen for Opus classification updates to run SQL
+         window.addEventListener('opusClassified', (e) => {
+             if(!mainDB) return;
+             const { storeId, rackName, emsType } = e.detail;
+             try {
+                 mainDB.run("UPDATE Racks SET ems_type = ?, needs_review = 0 WHERE store_id = ? AND rack_name = ?", [emsType, storeId, rackName]);
+                 showNotification(`Updated ${rackName} to ${emsType} in Database!`, "success");
+             } catch(err) {
+                 console.error("SQL Error", err);
+             }
+         });
+      }
+
+      document.addEventListener("DOMContentLoaded", setupEmsSqliteLoader);
+      
       // EMS Mapping System Logic
       function saveEmsData() {
         localStorage.setItem(

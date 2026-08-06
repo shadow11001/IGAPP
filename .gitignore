@@ -24,3 +24,5 @@ patch_tags.py
 temp.js
 test.js
 development/programs/All in 1_v1.1.html
+development/
+node_modules/

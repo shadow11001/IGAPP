@@ -1186,6 +1186,64 @@
                 
                 // Parse TAG_KEYWORDS later when APP_CONFIG matched
 
+
+                // Parse Checkboxes and Labels inside the template
+                const labelsMatch = {
+                    techName: frostbyteTemplate.match(/<label for="tech-name">([^<]+)<\/label>/),
+                    storeNumber: frostbyteTemplate.match(/<label for="store-number">([^<]+)<\/label>/),
+                    workOrder: frostbyteTemplate.match(/<label for="work-order">([^<]+)<\/label>/),
+                    dae: frostbyteTemplate.match(/<label for="autofill">([^<]+)<\/label>/)
+                };
+                
+                if (labelsMatch.techName) {
+                    config.formLabels = {
+                        techName: labelsMatch.techName[1] || 'Technician Name:',
+                        storeNumber: labelsMatch.storeNumber ? labelsMatch.storeNumber[1] : 'Store Number:',
+                        workOrder: labelsMatch.workOrder ? labelsMatch.workOrder[1] : 'Work Order Number:',
+                        dae: labelsMatch.dae ? labelsMatch.dae[1] : 'Select a DAE:'
+                    };
+                    document.getElementById('label-tech-name').value = config.formLabels.techName;
+                    document.getElementById('label-store-number').value = config.formLabels.storeNumber;
+                    document.getElementById('label-work-order').value = config.formLabels.workOrder;
+                    document.getElementById('label-dae').value = config.formLabels.dae;
+                }
+
+                // Parse QA Checklist
+                const qaMatch = frostbyteTemplate.match(/<- This should finally make dark mode work with visible QA_CHECKLIST_START -->([\s\S]*?)<- This should finally make dark mode work with visible QA_CHECKLIST_END -->/);
+                if (qaMatch && qaMatch[1]) {
+                    const checklistItems = [];
+                    const divs = qaMatch[1].match(/<div class="checklist-text">([\s\S]*?)<\/div>/g);
+                    if (divs) {
+                        divs.forEach(div => {
+                            const textMatch = div.match(/<div class="checklist-text">([\s\S]*?)<\/div>/);
+                            if (textMatch && textMatch[1]) {
+                                checklistItems.push(textMatch[1].trim());
+                            }
+                        });
+                        config.qaChecklist = checklistItems;
+                        document.getElementById('qa-items').value = checklistItems.join('\n');
+                    }
+                }
+
+                // Parse Tab Toggles
+                const emailTabMatch = frostbyteTemplate.match(/<div id="email-processing"[^>]*style="display:\s*none/);
+                if (emailTabMatch) {
+                    config.features.EmailProcessor = false;
+                } else {
+                    config.features.EmailProcessor = true;
+                }
+                
+                const warTabMatch = frostbyteTemplate.match(/<div id="war-room"[^>]*style="display:\s*none/);
+                if (warTabMatch) {
+                    config.features.WarRoom = false;
+                } else {
+                    config.features.WarRoom = true;
+                }
+                document.getElementById('feature-email').checked = config.features.EmailProcessor;
+                document.getElementById('feature-warroom').checked = config.features.WarRoom;
+                
+                // Parse TAG_KEYWORDS later when APP_CONFIG matched
+
                 // Extract APP_CONFIG
                 const appConfigMatch = frostbyteTemplate.match(/const APP_CONFIG = (\{[\s\S]*?\});/);
                 if (appConfigMatch) {
