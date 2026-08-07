@@ -13609,8 +13609,13 @@ verified in {SYSTEM}
           }
 
           if (typeof updateEmsInsightsPanel === 'function') {
-            updateEmsInsightsPanel();
-          }
+              updateEmsInsightsPanel();
+            }
+            
+            // Add a "Logged into" note dynamically
+            if (typeof addQuickNote === 'function') {
+                addQuickNote(`Logged into ${rackName}.`);
+            }
 
           setTimeout(async () => {
                const sysUpper = system ? system.toUpperCase() : "";
