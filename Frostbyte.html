@@ -13333,6 +13333,10 @@ verified in {SYSTEM}
                  const exported = window.mainDB.export();
                  await saveToIndexedDB(exported);
                  
+                 // Explicitly set the DOM label so the UI looks active
+                 const labelBox = document.getElementById("selected-system-label");
+                 if(labelBox) labelBox.innerText = emsType;
+                 
                  // Immediately re-render panels to reflect the new system type
                  if (typeof renderEmsTable === 'function') renderEmsTable();
                  if (typeof updateEmsInsightsPanel === 'function') updateEmsInsightsPanel();
@@ -13583,15 +13587,18 @@ verified in {SYSTEM}
           rackField.value = rackName;
         }
         
+        // Store it so that the state isn't reset by the checkAndAutoMapEms logic right after
         // Re-render panels explicitly to reflect the CSS class change
         if (typeof updateEmsInsightsPanel === 'function') updateEmsInsightsPanel();
 
         // Let setCurrentRack establish the context properly
         setTimeout(async () => {
-             if (system && system !== "Unknown" && system.toUpperCase() !== "OPUS") {
+             const sysUpper = system ? system.toUpperCase() : "";
+             if (sysUpper && sysUpper !== "UNKNOWN" && sysUpper !== "OPUS") {
                   selectSystem(system);
                   showNotification(`Selected ${rackName} and set system to ${system}`, "success");
              } else {
+                  // For OPUS/Unknown we need to set the label visual manually and wait for their input
                   showNotification(`Selected ${rackName}. Please select specific EMS type.`, "info");
              }
          }, 100);
