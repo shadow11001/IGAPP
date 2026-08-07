@@ -13203,6 +13203,7 @@ verified in {SYSTEM}
       // Add notification container for accessibility
       
       // ====== EMS Mapper SQLite Loader ======
+      // ====== EMS Mapper SQLite Loader ======
       function setupEmsSqliteLoader() {
          const emsSection = document.getElementById("ems-mapper");
          if(!emsSection) return;
@@ -13210,14 +13211,13 @@ verified in {SYSTEM}
          const loaderHtml = `
             <div style="margin-top:20px; background:#2d2d2d; padding:15px; border-radius:8px;">
                <h4>Import EMS Mapper Database</h4>
-               <p style="font-size:12px; color:#aaa;">Select the EMS_Scanner_DB.sqlite file exported from the Scanner Tool.</p>
+               <p style="font-size:12px; color:#aaa;" id="sqlite-status-text">Select the EMS_Scanner_DB.sqlite file exported from the Scanner Tool to overwrite cache.</p>
                <input type="file" id="sqlite-upload" accept=".sqlite,.db" style="display:block; margin: 10px 0;">
                <button class="primary-button" id="download-updated-db" style="display:none; margin-top:10px;">💾 Download Updated Database</button>
             </div>
          `;
          emsSection.insertAdjacentHTML('afterbegin', loaderHtml);
 
-         // Add SQL.js script tag dynamically to head
          if(!document.getElementById("sql-js-script")) {
             const script = document.createElement("script");
             script.id = "sql-js-script";
@@ -13226,6 +13226,64 @@ verified in {SYSTEM}
          }
 
          window.mainDB = null;
+         
+         const IDB_NAME = 'FrostbyteSqliteCache';
+         const STORE_NAME = 'sqliteBackup';
+         const DB_KEY = 'mainDB';
+
+         function openIndexedDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(IDB_NAME, 1);
+                req.onupgradeneeded = (e) => { e.target.result.createObjectStore(STORE_NAME); };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+         }
+
+         async function loadFromIndexedDB() {
+            try {
+                const idb = await openIndexedDB();
+                return new Promise((resolve, reject) => {
+                    const tx = idb.transaction(STORE_NAME, 'readonly');
+                    const store = tx.objectStore(STORE_NAME);
+                    const req = store.get(DB_KEY);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            } catch(e) { return null; }
+         }
+
+         async function saveToIndexedDB(uint8Data) {
+            try {
+                const idb = await openIndexedDB();
+                return new Promise((resolve, reject) => {
+                    const tx = idb.transaction(STORE_NAME, 'readwrite');
+                    const store = tx.objectStore(STORE_NAME);
+                    const req = store.put(uint8Data, DB_KEY);
+                    req.onsuccess = () => resolve();
+                    req.onerror = () => reject(req.error);
+                });
+            } catch(e) {}
+         }
+
+         // Attempt auto-load on start
+         setTimeout(async () => {
+             if(typeof initSqlJs !== 'undefined') {
+                 try {
+                     const savedData = await loadFromIndexedDB();
+                     if (savedData) {
+                         const SQL = await initSqlJs({ locateFile: () => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.wasm" });
+                         window.mainDB = new SQL.Database(savedData);
+                         document.getElementById("download-updated-db").style.display = "inline-block";
+                         document.getElementById("sqlite-status-text").innerText = "Database loaded from local cache.";
+                         window.dispatchEvent(new CustomEvent('emsDbLoaded', { detail: { db: window.mainDB } }));
+                         
+                         if (typeof renderEmsTable === 'function') renderEmsTable();
+                         if (typeof updateEmsInsightsPanel === 'function') updateEmsInsightsPanel();
+                     }
+                 } catch(e) {}
+             }
+         }, 1000);
 
          document.getElementById('sqlite-upload').addEventListener('change', async (e) => {
             const file = e.target.files[0];
@@ -13237,12 +13295,18 @@ verified in {SYSTEM}
             if(typeof initSqlJs !== 'undefined') {
                  const SQL = await initSqlJs({ locateFile: () => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.wasm" });
                  window.mainDB = new SQL.Database(Uint8ArrayData);
-                 showNotification("SQLite Database Loaded Successfully!");
+                 
+                 // Save to indexedDB for next reload
+                 await saveToIndexedDB(Uint8ArrayData);
+                 
+                 showNotification("SQLite Database Loaded and Cached Successfully!");
                  document.getElementById("download-updated-db").style.display = "inline-block";
-                 // Trigger a global event to let other logic know DB is loaded
+                 document.getElementById("sqlite-status-text").innerText = "Database updated and cached locally.";
+                 
                  window.dispatchEvent(new CustomEvent('emsDbLoaded', { detail: { db: window.mainDB } }));
-                   renderEmsTable();
-                   updateEmsInsightsPanel();
+                 
+                 if (typeof renderEmsTable === 'function') renderEmsTable();
+                 if (typeof updateEmsInsightsPanel === 'function') updateEmsInsightsPanel();
             }
          });
 
@@ -13259,13 +13323,15 @@ verified in {SYSTEM}
              setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 100);
          });
 
-         // Listen for Opus classification updates to run SQL
-         window.addEventListener('opusClassified', (e) => {
+         window.addEventListener('opusClassified', async (e) => {
              if(!window.mainDB) return;
              const { storeId, rackName, emsType } = e.detail;
              try {
-                 mainDB.run("UPDATE Racks SET ems_type = ?, needs_review = 0 WHERE store_id = ? AND rack_name = ?", [emsType, storeId, rackName]);
+                 window.mainDB.run("UPDATE Racks SET ems_type = ?, needs_review = 0 WHERE store_id = ? AND rack_name = ?", [emsType, storeId, rackName]);
                  showNotification(`Updated ${rackName} to ${emsType} in Database!`, "success");
+                 // Re-cache mutated DB
+                 const exported = window.mainDB.export();
+                 await saveToIndexedDB(exported);
              } catch(err) {
                  console.error("SQL Error", err);
              }
@@ -13425,38 +13491,104 @@ verified in {SYSTEM}
       }
 
       function getEmsInsightForStore(storeNumber, rackFilter = "", circuitFilter = "") {
-        let results = [];
+        let html = "";
         storeNumber = storeNumber.trim();
-        if(!storeNumber) return results;
+        if(!storeNumber) return html;
 
         if (window.mainDB) {
-            let query = `SELECT r.rack_name, r.ems_type FROM Racks r WHERE r.store_id = ?`;
+            let query = `SELECT r.rack_name, r.ems_type, GROUP_CONCAT(c.circuit_name) FROM Racks r LEFT JOIN Circuits c ON r.rack_id = c.rack_id WHERE r.store_id = ? GROUP BY r.rack_id`;
             let params = [parseInt(storeNumber)];
-            
-            if (rackFilter) {
-               query += ` AND r.rack_name = ?`;
-               params.push(rackFilter);
-            }
             
             try {
                const res = window.mainDB.exec(query, params);
                if (res.length > 0) {
+                   html += `<div style="display:flex; flex-wrap:wrap; gap:8px;">`;
                    res[0].values.forEach(row => {
-                       results.push({ rack: row[0], system: row[1] });
+                       const rackName = row[0];
+                       const system = row[1];
+                       const circuitsStr = row[2] || "";
+                       const circuits = circuitsStr ? circuitsStr.split(',') : [];
+                       
+                       if (rackFilter && rackName.toUpperCase() !== rackFilter.toUpperCase()) {
+                           return;
+                       }
+                       
+                       let circuitMatch = false;
+                       if (circuitFilter && circuits.length > 0) {
+                           if (circuits.find(c => c.toUpperCase().includes(circuitFilter.toUpperCase()))) {
+                               circuitMatch = true;
+                           }
+                       }
+                       
+                       const isSelected = AppState.currentRack && AppState.currentRack.name === rackName;
+                       let highlightStyle = "";
+                       if (isSelected || circuitMatch) {
+                           highlightStyle = "background-color: var(--primary-color); color: white;";
+                       }
+                       
+                       // For selection, if system is OPUS, we might have special behavior,
+                       // but selectRackAndEms will handle the UI part.
+                       html += `<div style="padding: 5px 10px; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); font-size: 11px; cursor: pointer; ${highlightStyle}" onclick="selectRackAndEms('${rackName}', '${system}')">`;
+                       html += `<strong>${rackName}</strong>: ${system}`;
+                       if (circuitMatch) {
+                         html += ` <span style="color: #4caf50; margin-left: 5px;"><i class="fas fa-check-circle"></i></span>`;
+                       }
+                       html += `</div>`;
                    });
+                   html += `</div>`;
                }
             } catch(e) {}
         } else {
             // Legacy logic
             const storeData = frostbyteEmsMapping[storeNumber];
             if (storeData && storeData.racks) {
+              html += `<div style="display:flex; flex-wrap:wrap; gap:8px;">`;
               for (const rackName in storeData.racks) {
+                const info = storeData.racks[rackName];
                 if (rackFilter && rackName.toUpperCase() !== rackFilter.toUpperCase()) continue;
-                results.push({ rack: rackName, system: storeData.racks[rackName].system });
+                
+                const isSelected = AppState.currentRack && AppState.currentRack.name === rackName;
+                let circuitMatch = false;
+                if (circuitFilter && info.circuits) {
+                  circuitMatch = Object.keys(info.circuits).some((c) =>
+                    c.toUpperCase().includes(circuitFilter.toUpperCase())
+                  );
+                }
+                let highlightStyle = "";
+                if (isSelected || circuitMatch) {
+                  highlightStyle = "background-color: var(--primary-color); color: white;";
+                }
+                html += `<div style="padding: 5px 10px; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); font-size: 11px; cursor: pointer; ${highlightStyle}" onclick="selectRackAndEms('${rackName}', '${info.system}')">`;
+                html += `<strong>${rackName}</strong>: ${info.system}`;
+                if (circuitMatch) {
+                  html += ` <span style="color: #4caf50; margin-left: 5px;"><i class="fas fa-check-circle"></i></span>`;
+                }
+                html += `</div>`;
               }
+              html += `</div>`;
             }
         }
-        return results;
+        return html;
+      }
+
+      function selectRackAndEms(rackName, system) {
+        // Set the rack field
+        const rackField = document.getElementById("quick-notes-rack");
+        if (rackField) {
+          rackField.value = rackName;
+          rackField.dispatchEvent(new Event("input"));
+        }
+        
+        // Let setCurrentRack establish the context properly
+        setTimeout(async () => {
+            // Set the EMS system visually and conceptually
+            if (system && system !== "Unknown" && system.toUpperCase() !== "OPUS") {
+                selectSystem(system);
+                showNotification(`Selected ${rackName} and set system to ${system}`, "success");
+            } else {
+                showNotification(`Selected ${rackName}. Please select specific EMS type.`, "info");
+            }
+        }, 100);
       }
 
       function updateEmsInsightsPanel() {
@@ -13482,18 +13614,7 @@ verified in {SYSTEM}
 
         if (storeInput) {
             insightPanel.style.display = "block";
-            const insights = getEmsInsightForStore(storeInput, rackInput, circuitInput);
-            
-            if (insights.length > 0) {
-                let htmlOut = "<ul style='margin: 0; padding-left: 20px;'>";
-                insights.forEach(item => {
-                    htmlOut += `<li><strong>${item.rack}</strong>: ${item.system}</li>`;
-                });
-                htmlOut += "</ul>";
-                insightContent.innerHTML = htmlOut;
-            } else {
-                insightContent.innerHTML = "<em>No known EMS data for this request.</em>";
-            }
+            insightContent.innerHTML = getEmsInsightForStore(storeInput, rackInput, circuitInput);
           } else {
             insightPanel.style.display = "none";
           }
