@@ -13332,6 +13332,10 @@ verified in {SYSTEM}
                  // Re-cache mutated DB
                  const exported = window.mainDB.export();
                  await saveToIndexedDB(exported);
+                 
+                 // Immediately re-render panels to reflect the new system type
+                 if (typeof renderEmsTable === 'function') renderEmsTable();
+                 if (typeof updateEmsInsightsPanel === 'function') updateEmsInsightsPanel();
              } catch(err) {
                  console.error("SQL Error", err);
              }
@@ -13509,9 +13513,7 @@ verified in {SYSTEM}
                        const circuitsStr = row[2] || "";
                        const circuits = circuitsStr ? circuitsStr.split(',') : [];
                        
-                       if (rackFilter && rackName.toUpperCase() !== rackFilter.toUpperCase()) {
-                           return;
-                       }
+                       
                        
                        let circuitMatch = false;
                        if (circuitFilter && circuits.length > 0) {
@@ -13545,7 +13547,7 @@ verified in {SYSTEM}
               html += `<div style="display:flex; flex-wrap:wrap; gap:8px;">`;
               for (const rackName in storeData.racks) {
                 const info = storeData.racks[rackName];
-                if (rackFilter && rackName.toUpperCase() !== rackFilter.toUpperCase()) continue;
+                
                 
                 const isSelected = AppState.currentRack && AppState.currentRack.name === rackName;
                 let circuitMatch = false;
