@@ -13608,7 +13608,7 @@ verified in {SYSTEM}
         // Re-sync if AppState.currentRack exists but quick-notes-rack is empty
         const rackField = document.getElementById("quick-notes-rack");
         if (AppState.currentRack && rackField && rackField.value === "") {
-          rackField.value = AppState.currentRack;
+          rackField.value = typeof AppState.currentRack === "object" ? AppState.currentRack.name : AppState.currentRack;
         }
 
         checkAndAutoMapEms(); // Try to auto-learn from current selections
