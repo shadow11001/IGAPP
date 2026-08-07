@@ -13225,7 +13225,7 @@ verified in {SYSTEM}
             document.head.appendChild(script);
          }
 
-         let mainDB = null;
+         window.mainDB = null;
 
          document.getElementById('sqlite-upload').addEventListener('change', async (e) => {
             const file = e.target.files[0];
@@ -13236,17 +13236,19 @@ verified in {SYSTEM}
             
             if(typeof initSqlJs !== 'undefined') {
                  const SQL = await initSqlJs({ locateFile: () => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.wasm" });
-                 mainDB = new SQL.Database(Uint8ArrayData);
+                 window.mainDB = new SQL.Database(Uint8ArrayData);
                  showNotification("SQLite Database Loaded Successfully!");
                  document.getElementById("download-updated-db").style.display = "inline-block";
                  // Trigger a global event to let other logic know DB is loaded
-                 window.dispatchEvent(new CustomEvent('emsDbLoaded', { detail: { db: mainDB } }));
+                 window.dispatchEvent(new CustomEvent('emsDbLoaded', { detail: { db: window.mainDB } }));
+                   renderEmsTable();
+                   updateEmsInsightsPanel();
             }
          });
 
          document.getElementById("download-updated-db").addEventListener('click', () => {
-             if(!mainDB) return;
-             const data = mainDB.export();
+             if(!window.mainDB) return;
+             const data = window.mainDB.export();
              const blob = new Blob([data], { type: "application/x-sqlite3" });
              const url = URL.createObjectURL(blob);
              const a = document.createElement("a");
@@ -13259,7 +13261,7 @@ verified in {SYSTEM}
 
          // Listen for Opus classification updates to run SQL
          window.addEventListener('opusClassified', (e) => {
-             if(!mainDB) return;
+             if(!window.mainDB) return;
              const { storeId, rackName, emsType } = e.detail;
              try {
                  mainDB.run("UPDATE Racks SET ems_type = ?, needs_review = 0 WHERE store_id = ? AND rack_name = ?", [emsType, storeId, rackName]);
@@ -13422,53 +13424,39 @@ verified in {SYSTEM}
         }
       }
 
-      function getEmsInsightForStore(
-        storeNumber,
-        rackFilter = "",
-        circuitFilter = "",
-      ) {
-        const storeData = frostbyteEmsMapping[storeNumber];
-        if (
-          !storeData ||
-          !storeData.racks ||
-          Object.keys(storeData.racks).length === 0
-        ) {
-          return '<div class="ems-badge" style="background-color: var(--warning-color); color: black;">Unknown Store - Add Mapping</div>';
-        }
+      function getEmsInsightForStore(storeNumber, rackFilter = "", circuitFilter = "") {
+        let results = [];
+        storeNumber = storeNumber.trim();
+        if(!storeNumber) return results;
 
-        let html = "";
-        for (const rackName in storeData.racks) {
-          const rackInfo = storeData.racks[rackName];
-          let isHighlight = false;
-
-          // Highlight if rack directly matches
-          if (
-            rackFilter &&
-            rackName.toUpperCase().includes(rackFilter.toUpperCase())
-          ) {
-            isHighlight = true;
-          }
-
-          let circuitInfo = "";
-          if (rackInfo.circuits && Object.keys(rackInfo.circuits).length > 0) {
-            // Highlight if any of the circuits for this rack match
-            if (circuitFilter) {
-              for (const c in rackInfo.circuits) {
-                if (c.toUpperCase().includes(circuitFilter.toUpperCase())) {
-                  isHighlight = true;
-                  break;
-                }
+        if (window.mainDB) {
+            let query = `SELECT r.rack_name, r.ems_type FROM Racks r WHERE r.store_id = ?`;
+            let params = [parseInt(storeNumber)];
+            
+            if (rackFilter) {
+               query += ` AND r.rack_name = ?`;
+               params.push(rackFilter);
+            }
+            
+            try {
+               const res = window.mainDB.exec(query, params);
+               if (res.length > 0) {
+                   res[0].values.forEach(row => {
+                       results.push({ rack: row[0], system: row[1] });
+                   });
+               }
+            } catch(e) {}
+        } else {
+            // Legacy logic
+            const storeData = frostbyteEmsMapping[storeNumber];
+            if (storeData && storeData.racks) {
+              for (const rackName in storeData.racks) {
+                if (rackFilter && rackName.toUpperCase() !== rackFilter.toUpperCase()) continue;
+                results.push({ rack: rackName, system: storeData.racks[rackName].system });
               }
             }
-            const cList = Object.keys(rackInfo.circuits)
-              .map((c) => `${c} (${rackInfo.circuits[c]})`)
-              .join(", ");
-            circuitInfo = `<span class="circuit-info" title="Circuits: ${cList}">${Object.keys(rackInfo.circuits).length} Ckt(s)</span>`;
-          }
-
-          html += `<div class="ems-badge ${isHighlight ? "highlight" : ""}" style="cursor: pointer;" onclick="selectSystem('${rackInfo.system}'); addQuickNote('Logged into ${rackName}.');">${rackName}: ${rackInfo.system}${circuitInfo}</div>`;
         }
-        return html;
+        return results;
       }
 
       function updateEmsInsightsPanel() {
@@ -13815,47 +13803,79 @@ verified in {SYSTEM}
         const tbody = document.querySelector("#ems-table tbody");
         if (!tbody) return;
 
-        const searchTerm = document
-          .getElementById("ems-search")
-          .value.trim()
-          .toLowerCase();
+        const searchTerm = document.getElementById("ems-search").value.trim().toLowerCase();
         let html = "";
 
-        for (const storeId in frostbyteEmsMapping) {
-          if (searchTerm && !storeId.includes(searchTerm)) continue;
-
-          const storeData = frostbyteEmsMapping[storeId];
-          if (!storeData.racks) continue;
-
-          for (const rackName in storeData.racks) {
-            const rackInfo = storeData.racks[rackName];
-            let cHtml = "-";
-            if (
-              rackInfo.circuits &&
-              Object.keys(rackInfo.circuits).length > 0
-            ) {
-              cHtml = Object.keys(rackInfo.circuits)
-                .map((c) => `${c} (${rackInfo.circuits[c]})`)
-                .join("<br>");
+        if (window.mainDB) {
+            // New SQLite Logic
+            let query = `
+                SELECT s.store_id, r.rack_name, r.ems_type, r.needs_review, GROUP_CONCAT(c.circuit_name)
+                FROM Racks r
+                JOIN Stores s ON r.store_id = s.store_id
+                LEFT JOIN Circuits c ON r.rack_id = c.rack_id
+            `;
+            if (searchTerm) {
+                query += ` WHERE s.store_id LIKE '%${searchTerm}%'`;
             }
+            query += " GROUP BY r.rack_id LIMIT 250";
 
-            html += `<tr>
-                        <td>${storeId}</td>
-                        <td>${rackName}</td>
-                        <td>${cHtml}</td>
-                        <td>${rackInfo.system}</td>
-                        <td>
-                            <button class="primary-button btn-small" onclick="editMapping('${storeId}', '${rackName}')">Edit</button>
-                            <button class="secondary-button btn-small" onclick="deleteMapping('${storeId}', '${rackName}')" style="margin-top: 4px;">Delete</button>
-                        </td>
-                    </tr>`;
-          }
+            try {
+                const results = window.mainDB.exec(query);
+                if (results.length > 0) {
+                    results[0].values.forEach(row => {
+                        const storeId = row[0];
+                        const rackName = row[1];
+                        const system = row[2];
+                        const needsReview = row[3];
+                        const circuits = row[4] ? row[4].split(',').slice(0, 5).join(', ') + '...' : '-';
+                        
+                        html += `
+                            <tr ${needsReview ? 'style="background-color: rgba(255, 152, 0, 0.1);" title="Needs review"' : ''}>
+                                <td>${storeId}</td>
+                                <td>${rackName}</td>
+                                <td>${system}</td>
+                                <td>${circuits}</td>
+                                <td>
+                                    <!-- actions omitted for db view -->
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                     html = "<tr><td colspan='5' style='text-align:center;'>No matching racks found in database.</td></tr>";
+                }
+            } catch(e) {
+                console.error("Failed to query DB for table render", e);
+            }
+        } else {
+            // Legacy JSON Logic for when DB is not loaded
+            for (const storeId in frostbyteEmsMapping) {
+              if (searchTerm && !storeId.includes(searchTerm)) continue;
+
+              const storeData = frostbyteEmsMapping[storeId];
+              if (!storeData.racks) continue;
+
+              for (const rackName in storeData.racks) {
+                const rackInfo = storeData.racks[rackName];
+                let cHtml = "-";
+                if (rackInfo.circuits && Object.keys(rackInfo.circuits).length > 0) {
+                    cHtml = Object.keys(rackInfo.circuits).join(", ");
+                }
+                html += `
+                  <tr>
+                    <td>${storeId}</td>
+                    <td>${rackName}</td>
+                    <td>${rackInfo.system}</td>
+                    <td>${cHtml}</td>
+                    <td>
+                      <!-- Legacy actions omitted -->
+                    </td>
+                  </tr>
+                `;
+              }
+            }
         }
-
-        if (html === "") {
-          html = `<tr><td colspan="5" style="text-align: center;">No local mapping data found.</td></tr>`;
-        }
-
+        
         tbody.innerHTML = html;
       }
 
