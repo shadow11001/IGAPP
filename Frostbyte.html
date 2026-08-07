@@ -13481,15 +13481,22 @@ verified in {SYSTEM}
         const insightContent = document.getElementById("ems-insights-content");
 
         if (storeInput) {
-          insightPanel.style.display = "block";
-          insightContent.innerHTML = getEmsInsightForStore(
-            storeInput,
-            rackInput,
-            circuitInput,
-          );
-        } else {
-          insightPanel.style.display = "none";
-        }
+            insightPanel.style.display = "block";
+            const insights = getEmsInsightForStore(storeInput, rackInput, circuitInput);
+            
+            if (insights.length > 0) {
+                let htmlOut = "<ul style='margin: 0; padding-left: 20px;'>";
+                insights.forEach(item => {
+                    htmlOut += `<li><strong>${item.rack}</strong>: ${item.system}</li>`;
+                });
+                htmlOut += "</ul>";
+                insightContent.innerHTML = htmlOut;
+            } else {
+                insightContent.innerHTML = "<em>No known EMS data for this request.</em>";
+            }
+          } else {
+            insightPanel.style.display = "none";
+          }
       }
 
       function openEmsMappingBuilder() {
