@@ -13612,9 +13612,30 @@ verified in {SYSTEM}
               updateEmsInsightsPanel();
             }
             
+            console.log("Checking addQuickNote typeof:", typeof addQuickNote);
+            
             // Add a "Logged into" note dynamically
-            if (typeof addQuickNote === 'function') {
-                addQuickNote(`Logged into ${rackName}.`);
+            try {
+                if (typeof addQuickNote === 'function') {
+                    addQuickNote(`Logged into ${rackName}.`);
+                } else if (window.addQuickNote) {
+                    window.addQuickNote(`Logged into ${rackName}.`);
+                } else {
+                    // Fallback to inserting manually if scoping is broken
+                    const notesTextarea = document.getElementById("notes");
+                    if (notesTextarea) {
+                        const currentNotes = notesTextarea.value.trim();
+                        if (currentNotes) {
+                           notesTextarea.value = currentNotes + " Logged into " + rackName + ".";
+                        } else {
+                           notesTextarea.value = "Logged into " + rackName + ".";
+                        }
+                        if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
+                        if (typeof analyzeNotesForTags === 'function') analyzeNotesForTags();
+                    }
+                }
+            } catch(e) {
+                console.error("Failed to add note", e);
             }
 
           setTimeout(async () => {
