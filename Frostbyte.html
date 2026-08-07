@@ -13527,7 +13527,7 @@ verified in {SYSTEM}
                if (res.length > 0) {
                    html += `<div style="display:flex; flex-wrap:wrap; gap:8px;">`;
                    res[0].values.forEach(row => {
-                       const rackName = row[0];
+                       const rackName = row[0] ? row[0].toString().trim() : '';
                        const system = row[1];
                        const circuitsStr = row[2] || "";
                        const circuits = circuitsStr ? circuitsStr.split(',') : [];
@@ -13541,16 +13541,19 @@ verified in {SYSTEM}
                            }
                        }
                        
-                       const isSelected = AppState.currentRack && (AppState.currentRack.name === rackName || AppState.currentRack === rackName);
+                       const isSelected = AppState.currentRack && ((typeof AppState.currentRack === 'object' ? AppState.currentRack.name : AppState.currentRack.toString()).trim() === rackName);
                        let highlightStyle = "";
                        if (isSelected || circuitMatch) {
-                           highlightStyle = "background-color: var(--primary-color); color: white;";
+                           highlightStyle = "background-color: #007acc; color: white;";
                        }
                        
                        // For selection, if system is OPUS, we might have special behavior,
                        // but selectRackAndEms will handle the UI part.
                        html += `<div style="padding: 5px 10px; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); font-size: 11px; cursor: pointer; ${highlightStyle}" onclick="selectRackAndEms('${rackName}', '${system}')">`;
                        html += `<strong>${rackName}</strong>: ${system}`;
+                         if (circuits.length > 0) {
+                              html += ` <span style="display:inline-block; background:rgba(255,255,255,0.2); color:inherit; padding:2px 6px; border-radius:10px; font-size:9px; margin-left:4px;">${circuits.length}</span>`;
+                         }
                        if (circuitMatch) {
                          html += ` <span style="color: #4caf50; margin-left: 5px;"><i class="fas fa-check-circle"></i></span>`;
                        }
@@ -13568,7 +13571,7 @@ verified in {SYSTEM}
                 const info = storeData.racks[rackName];
                 
                 
-                const isSelected = AppState.currentRack && (AppState.currentRack.name === rackName || AppState.currentRack === rackName);
+                const isSelected = AppState.currentRack && ((typeof AppState.currentRack === 'object' ? AppState.currentRack.name : AppState.currentRack.toString()).trim() === rackName);
                 let circuitMatch = false;
                 if (circuitFilter && info.circuits) {
                   circuitMatch = Object.keys(info.circuits).some((c) =>
@@ -13577,10 +13580,14 @@ verified in {SYSTEM}
                 }
                 let highlightStyle = "";
                 if (isSelected || circuitMatch) {
-                  highlightStyle = "background-color: var(--primary-color); color: white;";
+                  highlightStyle = "background-color: #007acc; color: white;";
                 }
                 html += `<div style="padding: 5px 10px; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); font-size: 11px; cursor: pointer; ${highlightStyle}" onclick="selectRackAndEms('${rackName}', '${info.system}')">`;
                 html += `<strong>${rackName}</strong>: ${info.system}`;
+                  const cCount = info.circuits ? Object.keys(info.circuits).length : 0;
+                  if (cCount > 0) {
+                       html += ` <span style="display:inline-block; background:rgba(255,255,255,0.2); color:inherit; padding:2px 6px; border-radius:10px; font-size:9px; margin-left:4px;">${cCount}</span>`;
+                  }
                 if (circuitMatch) {
                   html += ` <span style="color: #4caf50; margin-left: 5px;"><i class="fas fa-check-circle"></i></span>`;
                 }
