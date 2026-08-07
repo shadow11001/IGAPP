@@ -12614,10 +12614,13 @@ verified in {SYSTEM}
       
       function selectSystem(system) {
         /* [INJECTED OPUS EVENT] */
-        if (system === 'Opus Architect' || system === 'Opus Magnum') {
+        console.log("selectSystem called with", system);
+        if (system === 'Opus Arch' || system === 'Opus Architect' || system === 'Opus Mag' || system === 'Opus Magnum') {
             const storeNum = document.getElementById("store-number").value.trim();
             const rackName = AppState.currentRack ? (typeof AppState.currentRack === "object" ? AppState.currentRack.name : AppState.currentRack) : "Unknown";
+            console.log("Opus detected! storeNum:", storeNum, "rackName:", rackName);
             if (storeNum) {
+                console.log("Dispatching opusClassified event");
                 window.dispatchEvent(new CustomEvent('opusClassified', { 
                     detail: { storeId: parseInt(storeNum), rackName: rackName, emsType: system } 
                 }));
@@ -13324,14 +13327,26 @@ verified in {SYSTEM}
          });
 
          window.addEventListener('opusClassified', async (e) => {
-             if(!window.mainDB) return;
+             console.log('opusClassified event received', e.detail);
+             if(!window.mainDB) {
+                 console.log('mainDB is null, aborting');
+                 return;
+             }
              const { storeId, rackName, emsType } = e.detail;
              try {
-                 window.mainDB.run("UPDATE Racks SET ems_type = ?, needs_review = 0 WHERE store_id = ? AND rack_name = ?", [emsType, storeId, rackName]);
+                 window.mainDB.run("UPDATE Racks SET ems_type = ?, needs_review = 0 WHERE store_id = ? AND UPPER(rack_name) = UPPER(?)", [emsType, storeId, rackName]);
+                   console.log("Executed SQL update for", rackName);
                  showNotification(`Updated ${rackName} to ${emsType} in Database!`, "success");
                  // Re-cache mutated DB
                  const exported = window.mainDB.export();
                  await saveToIndexedDB(exported);
+
+                   if (window.frostbyteEmsMapping && frostbyteEmsMapping[storeId] && frostbyteEmsMapping[storeId].racks && frostbyteEmsMapping[storeId].racks[rackName]) {
+                       frostbyteEmsMapping[storeId].racks[rackName].system = emsType;
+                       saveEmsData();
+                   }
+                   console.log("Cached successfully");
+
                  
                  // Explicitly set the DOM label so the UI looks active
                  const labelBox = document.getElementById("selected-system-label");
@@ -13578,31 +13593,28 @@ verified in {SYSTEM}
       }
 
       function selectRackAndEms(rackName, system) {
-        // Explicitly set AppState.currentRack so highlight immediately works
-        AppState.currentRack = { name: rackName, circuits: [] };
-        
-        // Let it visually update the field too
-        const rackField = document.getElementById("quick-notes-rack");
-        if (rackField) {
-          rackField.value = rackName;
-        }
-        
-        // Store it so that the state isn't reset by the checkAndAutoMapEms logic right after
-        // Re-render panels explicitly to reflect the CSS class change
-        if (typeof updateEmsInsightsPanel === 'function') updateEmsInsightsPanel();
+          // Explicitly set AppState.currentRack to just a STRING natively
+          AppState.currentRack = rackName;
 
-        // Let setCurrentRack establish the context properly
-        setTimeout(async () => {
-             const sysUpper = system ? system.toUpperCase() : "";
-             if (sysUpper && sysUpper !== "UNKNOWN" && sysUpper !== "OPUS") {
-                  selectSystem(system);
-                  showNotification(`Selected ${rackName} and set system to ${system}`, "success");
-             } else {
-                  // For OPUS/Unknown we need to set the label visual manually and wait for their input
-                  showNotification(`Selected ${rackName}. Please select specific EMS type.`, "info");
-             }
-         }, 100);
-      }
+          const rackField = document.getElementById("quick-notes-rack");
+          if (rackField) {
+            rackField.value = rackName;
+          }
+
+          if (typeof updateEmsInsightsPanel === 'function') {
+            updateEmsInsightsPanel();
+          }
+
+          setTimeout(async () => {
+               const sysUpper = system ? system.toUpperCase() : "";
+               if (sysUpper && sysUpper !== "UNKNOWN" && sysUpper !== "OPUS") {
+                    selectSystem(system);
+                    showNotification(`Selected ${rackName} and set system to ${system}`, "success");
+               } else {
+                    showNotification(`Selected ${rackName}. Please select specific EMS type.`, "info");
+               }
+           }, 100);
+        }
 
       function updateEmsInsightsPanel() {
         // Re-sync if AppState.currentRack exists but quick-notes-rack is empty
