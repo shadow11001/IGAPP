@@ -5626,7 +5626,10 @@
         <div id="servicechannel-details" class="sc-details-panel" style="margin-top: 15px; padding: 10px; background: rgba(56, 189, 248, 0.05); border-left: 3px solid #38bdf8; border-radius: 4px; display: none;">
             <h4 style="margin-top: 0; margin-bottom: 8px; font-size: 14px; color: #38bdf8;">Work Order Details</h4>
             <div style="font-size: 13px; margin-bottom: 5px;"><strong>Status: </strong> <span id="sc-status">Loading...</span></div>
-            <div style="font-size: 13px;"><strong>Problem Description: </strong> <span id="sc-description">Loading...</span></div>
+            <div style="font-size: 13px; margin-bottom: 5px;"><strong>Priority: </strong> <span id="sc-priority">Loading...</span></div>
+            <div style="font-size: 13px; margin-bottom: 5px;" id="sc-host-container" style="display: none;"><strong>Host Address: </strong> <span id="sc-host">Loading...</span></div>
+            <div style="font-size: 13px; margin-bottom: 5px;"><strong>Problem Description: </strong> <span id="sc-description">Loading...</span></div>
+            <div style="font-size: 13px;" id="sc-modules-container" style="display: none;"></div>
         </div>
 
         <div
@@ -13046,10 +13049,14 @@ verified in {SYSTEM}
             const woData = e.detail.woData;
             const data = e.detail.data;
             if(woData.store && storeInput && !storeInput.value) {
-                storeInput.value = woData.store;
-                // Trigger store blur to fetch IoT/SAOne immediately
-                storeInput.dispatchEvent(new Event('blur'));
-            }
+                  storeInput.value = woData.store;
+                  // Trigger store events to fetch IoT/SAOne AND populate the EMS array natively
+                  storeInput.dispatchEvent(new Event('blur'));
+                  storeInput.dispatchEvent(new Event('input')); // This triggers updateEmsInsightsPanel natively
+                  if (typeof updateEmsInsightsPanel === 'function') {
+                      updateEmsInsightsPanel(); // Double guarantee for layout consistency
+                  }
+              }
             if(woData.trade) {
               // Setup Tech Name 
                 const techInput = document.getElementById("tech-name");
@@ -13057,15 +13064,69 @@ verified in {SYSTEM}
                     techInput.value = woData.techName;
                 }
 
-                  // Setup Rack and Circuit
+                  // Setup Rack and Circuit with Database Verification
                   const rackInput = document.getElementById("quick-notes-rack");
-                  if (rackInput && woData.rack && !rackInput.value) {
-                      rackInput.value = woData.rack;
+                  const circuitInput = document.getElementById("quick-notes-circuit");
+                  
+                  let verifiedRackName = "";
+                  let verifiedEmsType = "";
+                  let verifiedHostAddr = "";
+                  let verifiedCircuits = [];
+                  
+                  if (window.mainDB && woData.store) {
+                      try {
+                          // Search for the Rack based on partial MTF match
+                          if (woData.rack) {
+                              // We use the JSON extraction MTF, and search SQL for "Rack MTF" or just "%MTF%"
+                              const cleanRackSearch = woData.rack.replace(/RACK\s+/g, "").trim(); 
+                              const rQuery = `SELECT rack_id, rack_name, ems_type, host_address FROM racks WHERE store_id=${parseInt(woData.store)} AND (rack_name LIKE '%${cleanRackSearch}%' OR rack_name LIKE '%${woData.rack}%') LIMIT 1`;
+                              const rRes = window.mainDB.exec(rQuery);
+                              
+                              if (rRes && rRes.length > 0 && rRes[0].values.length > 0) {
+                                  const row = rRes[0].values[0];
+                                  const rackId = row[0];
+                                  verifiedRackName = row[1];
+                                  verifiedEmsType = row[2];
+                                  verifiedHostAddr = row[3];
+                                  
+                                  // Verify Circuits precisely against this specific rack ID
+                                  if (woData.circuits) {
+                                      const splits = woData.circuits.split(",").map(s => s.trim());
+                                      for (let crc of splits) {
+                                          // ServiceChannel might have "F2 IC DRS", but DB shows "F2"
+                                          // Or ServiceChannel has "F02", DB has "F2" or "F02"
+                                          // Let's do a LIKE query against circuit_name for this rack_id
+                                          const cQuery = `SELECT circuit_name FROM circuits WHERE rack_id=${rackId} AND (circuit_name LIKE '%${crc}%' OR '${crc}' LIKE '%' || circuit_name || '%') LIMIT 1`;
+                                          const cRes = window.mainDB.exec(cQuery);
+                                          if (cRes && cRes.length > 0 && cRes[0].values.length > 0) {
+                                              verifiedCircuits.push(cRes[0].values[0][0]);
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                      } catch(e) {
+                          console.error("SQLite Verification Failed", e);
+                      }
+                  } else {
+                      // Fallback if DB is not loaded natively
+                      verifiedRackName = woData.rack;
+                      verifiedCircuits = woData.circuits ? woData.circuits.split(',').map(s=>s.trim()) : [];
                   }
                   
-                  const circuitInput = document.getElementById("quick-notes-circuit");
-                  if (circuitInput && woData.circuits && !circuitInput.value) {
-                      circuitInput.value = woData.circuits;
+                  if (rackInput && verifiedRackName && !rackInput.value) {
+                      rackInput.value = verifiedRackName;
+                      
+                      // Trigger AppState change natively for EMS table and tag highlighting
+                      if (typeof selectRackAndEms === "function") {
+                          selectRackAndEms(verifiedRackName, verifiedEmsType || "");
+                      } else {
+                          AppState.currentRack = verifiedRackName;
+                      }
+                  }
+                  
+                  if (circuitInput && verifiedCircuits.length > 0 && !circuitInput.value) {
+                      circuitInput.value = verifiedCircuits.join(", ");
                   }
 
                   showNotification(`ServiceChannel Data Pulled successfully for ${e.detail.woId}`);
@@ -13074,6 +13135,7 @@ verified in {SYSTEM}
                   if (woData.status || woData.description) {
                       const scPanel = document.getElementById("servicechannel-details");
                       const scStatus = document.getElementById("sc-status");
+                      const scPriority = document.getElementById("sc-priority");
                       const scDesc = document.getElementById("sc-description");
                       
                       if (scPanel) scPanel.style.display = "block";
@@ -13086,8 +13148,35 @@ verified in {SYSTEM}
                           }
                       }
                       
+                      if (scPriority && woData.priority) {
+                          scPriority.textContent = woData.priority;
+                      } else if (scPriority) {
+                          scPriority.textContent = "N/A";
+                      }
+                      
+                      const scHostContainer = document.getElementById("sc-host-container");
+                      const scHost = document.getElementById("sc-host");
+                      if (scHostContainer && scHost && verifiedHostAddr) {
+                          scHostContainer.style.display = "block";
+                          scHost.textContent = verifiedHostAddr;
+                      }
+                      
                       if (scDesc) {
                           scDesc.textContent = woData.description || "No description provided";
+                      }
+                      
+                      if (woData.modules && woData.modules.length > 0) {
+                          const scModulesContainer = document.getElementById("sc-modules-container");
+                          if (scModulesContainer) {
+                              scModulesContainer.style.display = "block";
+                              scModulesContainer.innerHTML = '<strong>Associated Modules:</strong><br>';
+                              woData.modules.forEach(mod => {
+                                  // Append placeholders that iotDataReady can populate later if matched
+                                  scModulesContainer.innerHTML += `<div id="sc-mod-${mod.replace(/\s+/g, '-')}">- ${mod}: <span class="mod-status" style="color:#aaa;">Pending IoT sync...</span></div>`;
+                              });
+                          }
+                          // Manually kick off an IoT string check just in case we already have IoT payload cached
+                          window.dispatchEvent(new CustomEvent('syncModulesWithIoT', { detail: { modules: woData.modules, store: woData.store } }));
                       }
                   }
               }
@@ -13098,39 +13187,108 @@ verified in {SYSTEM}
            if(e.detail.data) {
                 const storeId = e.detail.storeNumber;
                 console.log("IoT Data received for", storeId);
-                // Parse IoT and pass to EMS SQLite processor
+                
+                // Keep the global payload accessible for the module sync
+                window._lastIotPayload = e.detail.data;
+                
+                // Immediately check if we have any pending UI placeholders waiting for sync
+                const modContainer = document.getElementById("sc-modules-container");
+                if (modContainer && modContainer.style.display !== "none") {
+                    const pendingMods = Array.from(modContainer.querySelectorAll("div[id^='sc-mod-']"));
+                    if (pendingMods.length > 0) {
+                        const extractedMods = pendingMods.map(p => p.id.replace('sc-mod-', '').replace(/-/g, ' '));
+                        window.dispatchEvent(new CustomEvent('syncModulesWithIoT', { detail: { modules: extractedMods, store: storeId } }));
+                    }
+                }
            } 
+        });
+
+        // Dedicated listener to recursively traverse IoT JSON arrays natively and mutate the DOM directly!
+        window.addEventListener('syncModulesWithIoT', (e) => {
+             const mods = e.detail.modules;
+             const iotData = window._lastIotPayload;
+             if (!mods || mods.length === 0 || !iotData) return;
+
+             // Recursive tree walk to locate the exact label and read its variables
+             const traverseIotTree = (node, searchStr) => {
+                 if (node.label && node.label.toUpperCase().includes(searchStr.toUpperCase())) {
+                     return node;
+                 }
+                 if (node.children && node.children.length > 0) {
+                     for (let child of node.children) {
+                         const found = traverseIotTree(child, searchStr);
+                         if (found) return found;
+                     }
+                 }
+                 return null;
+             };
+
+             mods.forEach(mod => {
+                 const iotMatch = traverseIotTree(iotData, mod);
+                 const uiEl = document.getElementById(`sc-mod-${mod.replace(/\s+/g, '-')}`);
+                 
+                 if (uiEl) {
+                     const statusSpan = uiEl.querySelector('.mod-status');
+                     if (iotMatch && statusSpan) {
+                         if (iotMatch.rackCommLoss) {
+                             statusSpan.textContent = `Offline (Comm Loss)`;
+                             statusSpan.style.color = '#ef4444';
+                         } else {
+                             // Assuming if we found the node, we can pull expanded states or direct flag variables.
+                             statusSpan.textContent = `Online (Tracked)`;
+                             statusSpan.style.color = '#10b981';
+                         }
+                     } else if (statusSpan) {
+                         statusSpan.textContent = `Not found in IoT telemetry`;
+                         statusSpan.style.color = '#f59e0b';
+                     }
+                 }
+             });
         });
       });
       
       // Inject links next to inputs
       document.addEventListener("DOMContentLoaded", () => {
-         const storeGroup = document.getElementById("store-number").closest(".form-group");
-         if(storeGroup) {
+         const storeInput = document.getElementById("store-number");
+         if(storeInput) {
              const link = document.createElement("a");
              link.id = "iot-link";
              link.text = "🌍 Open in IoT";
              link.style = "font-size:12px; margin-left:10px; display:inline-block;";
              link.target = "_blank";
-             storeGroup.appendChild(link);
+             link.href = "#";
+             // Insert after the input
+             storeInput.parentNode.insertBefore(link, storeInput.nextSibling);
              
-             document.getElementById("store-number").addEventListener("input", (e) => {
-                link.href = `https://em.walmart.com/us/sensors?query=US%7C${e.target.value}#`;
+             storeInput.addEventListener("input", (e) => {
+                const val = e.target.value;
+                link.href = val ? `https://em.walmart.com/us/sensors?query=US%7C${val}#` : "#";
              });
+             
+             // Fire event manually on load if there's already a value
+             if (storeInput.value) {
+                 link.href = `https://em.walmart.com/us/sensors?query=US%7C${storeInput.value}#`;
+             }
          }
          
-         const woGroup = document.getElementById("work-order").closest(".form-group");
-         if(woGroup) {
+         const woInput = document.getElementById("work-order");
+         if(woInput) {
              const link = document.createElement("a");
              link.id = "sc-link";
              link.text = "🎫 Open in ServiceChannel";
              link.style = "font-size:12px; margin-left:10px; display:inline-block;";
              link.target = "_blank";
-             woGroup.appendChild(link);
+             link.href = "#";
+             woInput.parentNode.insertBefore(link, woInput.nextSibling);
              
-             document.getElementById("work-order").addEventListener("input", (e) => {
-                link.href = `https://www.servicechannel.com/sc/wo/workorders/list?id=${e.target.value}`;
+             woInput.addEventListener("input", (e) => {
+                const val = e.target.value;
+                link.href = val ? `https://www.servicechannel.com/sc/wo/workorders/list?id=${val}` : "#";
              });
+             
+             if (woInput.value) {
+                 link.href = `https://www.servicechannel.com/sc/wo/workorders/list?id=${woInput.value}`;
+             }
          }
       });
       

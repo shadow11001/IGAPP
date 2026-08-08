@@ -143,7 +143,7 @@
                                         // Or parse trailing strings in systems like "F02 FF DRS"
                                         // The pattern (?:[A-Z]\d{1,2}(?:\.\d)?) gets basic circuits like A1, F02, D10.1
                                         if (p.includes('Systems Affected:') || !p.includes(':')) {
-                                            const circMatches = p.match(/([A-Z]\d{1,2}(?:\.\d)?)/gi);
+                                            const circMatches = p.match(/\b([A-Z]\d{1,2}(?:\.\d)?)\b/gi);
                                             if (circMatches) {
                                                 for (const match of circMatches) {
                                                     // Add if it's not a generic word and not already captured
@@ -151,6 +151,21 @@
                                                         circuitsList.push(match.toUpperCase());
                                                     }
                                                 }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Extract module associations from systems parsing (e.g. VFD[...], or VFD-SPEED)
+                                let modulesExtracted = [];
+                                if (desc && typeof desc === 'string') {
+                                    // Locate text that resembles MODULE[PARAMS], e.g. VFD[VFD ( Reading: )] or VFD- SPEED[COND SPLIT MODE...]
+                                    const moduleMatches = desc.match(/([A-Z0-9\-\s]+)\[/gi);
+                                    if (moduleMatches) {
+                                        for (const m of moduleMatches) {
+                                            let cleanMod = m.replace('[', '').trim();
+                                            if (cleanMod && !modulesExtracted.includes(cleanMod) && cleanMod !== "Systems" && cleanMod !== "Units Affected" && cleanMod.length > 2) {
+                                                modulesExtracted.push(cleanMod);
                                             }
                                         }
                                     }
@@ -182,16 +197,7 @@
                                       techName: techName,
                                       status: finalStatus,
                                       description: desc || "",
-                                      rawWoData: mergedWoData
-                                  };
-                                  
-                                  const notesUrl = `https://www.servicechannel.com/sc/Location/GetLocationNotes?locationId=${locationId}&includeEmptyValue=false`;
-                                  
-                                  // Call location notes next...
-                                  GM_xmlhttpRequest({
-                                      method: 'GET',
-                                      url: notesUrl,
-                                      headers: {
+                                      modules: modulesExtracted.length > 0 ? modulesExtracted : [],
                                           "Accept": "application/json"
                                       },
                                       onload: function(notesRes) {

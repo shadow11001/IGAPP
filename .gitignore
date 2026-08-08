@@ -28,3 +28,4 @@ debug_select.py
 development/cors_proxy_ems_mapper.user.js
 .gitignore
 update_proxy_logic.py
+update_db_check.py
