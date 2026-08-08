@@ -46,3 +46,6 @@ fix_html_replace.py
 fix_html.py
 fix_parsing.py
 fix_woData.py
+fix_parsing3.py
+fix_sensor_unique.py
+fix_sensor2.py

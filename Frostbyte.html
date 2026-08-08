@@ -13296,7 +13296,13 @@ verified in {SYSTEM}
              };
              
              const traverseIotTreeForSensor = (node, searchStr) => {
-                 // Check node variables array
+                 // The payload may have the sensor loosely floating as a full child node rather than an array of `variables` appended to a module
+                 // E.g. { "label": "COMP 5 OIL L/O(RIM24)" }
+                 if (node.label && node.label.toUpperCase().includes(searchStr.toUpperCase())) {
+                     return { node: node, variable: { value: node.value, units: node.unit || '' } };
+                 }
+                 
+                 // Check node variables array if nested cleanly
                  if (node.variables && node.variables.length > 0) {
                      for (let v of node.variables) {
                          if (v.name && v.name.toUpperCase().includes(searchStr.toUpperCase())) {
@@ -13343,7 +13349,7 @@ verified in {SYSTEM}
                      const statusSpan = uiEl.querySelector('.sen-status');
                      if (iotMatch && statusSpan) {
                          // Initiate fetch from sensor history
-                         const uniqueId = iotMatch.node.id;
+                         const uniqueId = iotMatch.node.id || iotMatch.node.key;
                          statusSpan.innerHTML = `Fetching history...`;
                          statusSpan.style.color = '#f59e0b';
                          

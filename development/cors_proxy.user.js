@@ -137,6 +137,12 @@
                                             const rackMatch = systems.match(/RACK\s+([A-Z0-9]+)/i);
                                             if (rackMatch && rackMatch[1]) {
                                                 rack = rackMatch[1];
+                                            } else {
+                                                // Grabs the first word (like LTA) if it's there
+                                                const firstWord = systems.split(' ')[0].trim();
+                                                if (firstWord.length <= 4 && firstWord.match(/^[A-Z0-9]+$/i)) {
+                                                    rack = firstWord;
+                                                }
                                             }
                                         }
                                         
