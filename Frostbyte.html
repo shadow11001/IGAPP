@@ -13376,7 +13376,11 @@ verified in {SYSTEM}
                                          latestReading = sortedResults[0];
                                      }
                                      if (latestReading && latestReading.sensorDetails && latestReading.sensorDetails.sensorStatus) {
-                                         const val = latestReading.sensorDetails.sensorStatus.reading !== undefined && latestReading.sensorDetails.sensorStatus.reading !== null ? latestReading.sensorDetails.sensorStatus.reading : (iotMatch.variable ? (iotMatch.variable.value !== undefined ? iotMatch.variable.value : 'Unknown') : 'Unknown');
+                                         // Provide the actual string "OPEN" or "CLOSED" instead of numeric mapping if we want
+                                         let val = latestReading.sensorDetails.sensorStatus.reading !== undefined && latestReading.sensorDetails.sensorStatus.reading !== null ? latestReading.sensorDetails.sensorStatus.reading : latestReading.sensorDetails.sensorStatus.mappedReading;
+                                         if (val === undefined || val === null) {
+                                             val = (iotMatch.variable ? (iotMatch.variable.value !== undefined ? iotMatch.variable.value : 'Unknown') : 'Unknown');
+                                         }
                                          let unit = latestReading.sensorDetails.sensorStatus.units || (iotMatch.variable && iotMatch.variable.units ? iotMatch.variable.units : '');
                                          
                                          // Make units prettier

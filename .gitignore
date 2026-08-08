@@ -61,3 +61,6 @@ revert_clta.py
 fix_parsing4.py
 fix_html_rack.py
 fix_sensor5.py
+test_iot.py
+fix_sensor7.py
+fix_sensor6.py
