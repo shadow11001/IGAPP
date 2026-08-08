@@ -198,6 +198,16 @@
                                       status: finalStatus,
                                       description: desc || "",
                                       modules: modulesExtracted.length > 0 ? modulesExtracted : [],
+                                      rawWoData: mergedWoData
+                                };
+                                
+                                // Fetch Work Order Notes as an additional payload
+                                const notesUrl = `https://www.servicechannel.com/sc/wo/WorkOrders/GetLocationNotes?workOrderId=${woId}`;
+                                
+                                GM_xmlhttpRequest({
+                                      method: 'GET',
+                                      url: notesUrl,
+                                      headers: {
                                           "Accept": "application/json"
                                       },
                                       onload: function(notesRes) {
