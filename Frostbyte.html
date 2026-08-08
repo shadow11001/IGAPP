@@ -13250,44 +13250,68 @@ verified in {SYSTEM}
       // Inject links next to inputs
       document.addEventListener("DOMContentLoaded", () => {
          const storeInput = document.getElementById("store-number");
-         if(storeInput) {
+         if (storeInput) {
+             const label = document.querySelector('label[for="store-number"]');
              const link = document.createElement("a");
              link.id = "iot-link";
              link.text = "🌍 Open in IoT";
-             link.style = "font-size:12px; margin-left:10px; display:inline-block;";
+             // Align it on the same line as the label, pushed right
+             link.style = "font-size:12px; float:right; display:none;";
              link.target = "_blank";
              link.href = "#";
-             // Insert after the input
-             storeInput.parentNode.insertBefore(link, storeInput.nextSibling);
+             
+             if (label) {
+                 label.appendChild(link);
+             } else {
+                 storeInput.parentNode.insertBefore(link, storeInput);
+             }
              
              storeInput.addEventListener("input", (e) => {
-                const val = e.target.value;
-                link.href = val ? `https://em.walmart.com/us/sensors?query=US%7C${val}#` : "#";
+                const val = e.target.value.trim();
+                if (val) {
+                    link.style.display = "inline-block";
+                    link.href = `https://em.walmart.com/us/sensors?query=US%7C${val}#`;
+                } else {
+                    link.style.display = "none";
+                }
              });
              
              // Fire event manually on load if there's already a value
-             if (storeInput.value) {
-                 link.href = `https://em.walmart.com/us/sensors?query=US%7C${storeInput.value}#`;
+             if (storeInput.value.trim()) {
+                 link.style.display = "inline-block";
+                 link.href = `https://em.walmart.com/us/sensors?query=US%7C${storeInput.value.trim()}#`;
              }
          }
          
          const woInput = document.getElementById("work-order");
-         if(woInput) {
+         if (woInput) {
+             const label = document.querySelector('label[for="work-order"]');
              const link = document.createElement("a");
              link.id = "sc-link";
              link.text = "🎫 Open in ServiceChannel";
-             link.style = "font-size:12px; margin-left:10px; display:inline-block;";
+             link.style = "font-size:12px; float:right; display:none;";
              link.target = "_blank";
              link.href = "#";
-             woInput.parentNode.insertBefore(link, woInput.nextSibling);
+             
+             if (label) {
+                 label.appendChild(link);
+             } else {
+                 woInput.parentNode.insertBefore(link, woInput);
+             }
              
              woInput.addEventListener("input", (e) => {
-                const val = e.target.value;
-                link.href = val ? `https://www.servicechannel.com/sc/wo/workorders/list?id=${val}` : "#";
+                const val = e.target.value.trim();
+                if (val) {
+                    link.style.display = "inline-block";
+                    link.href = `https://www.servicechannel.com/sc/wo/workorders/list?id=${val}`;
+                } else {
+                    link.style.display = "none";
+                }
              });
              
-             if (woInput.value) {
-                 link.href = `https://www.servicechannel.com/sc/wo/workorders/list?id=${woInput.value}`;
+             if (woInput.value.trim()) {
+                 link.style.display = "inline-block";
+                 link.href = `https://www.servicechannel.com/sc/wo/workorders/list?id=${woInput.value.trim()}`;
              }
          }
       });
