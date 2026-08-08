@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Dispatch Assistant CORS Proxy
+// @name         Frostbyte CORS Proxy
 // @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  Bypasses CORS for Dispatch Assistant standalone file to pull ServiceChannel data
+// @description  Bypasses CORS for Frostbyte standalone file to pull ServiceChannel data
 // @author       You
 // @match        file:///*
 // @match        https://em.walmart.com/*
@@ -27,7 +27,7 @@
         XMLHttpRequest.prototype.setRequestHeader = function(header, value) {
             if (header.toLowerCase() === 'authorization' && this._url && this._url.includes('weiot-em-telemetryapi.prod.walmart.com')) {
                 // Intercept and store the JWT
-                console.log("[Dispatch Assistant] Sniffed IoT Telemetry API Token!");
+                console.log("[Frostbyte] Sniffed IoT Telemetry API Token!");
                 GM_setValue('iot_jwt_token', value);
             }
             origSetRequestHeader.apply(this, arguments);
@@ -202,7 +202,7 @@
                                 };
                                 
                                 // Fetch Work Order Notes as an additional payload
-                                const notesUrl = `https://www.servicechannel.com/sc/wo/WorkOrders/GetLocationNotes?workOrderId=${woId}`;
+                                const notesUrl = `https://www.servicechannel.com/sc/Location/GetLocationNotes?locationId=${locationId}&includeEmptyValue=false`;
                                 
                                 GM_xmlhttpRequest({
                                       method: 'GET',
@@ -212,10 +212,11 @@
                                       },
                                       onload: function(notesRes) {
                                           try {
-                                              if (notesRes.status !== 200) {
-                                                  return window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, error: `Invalid status ${notesRes.status}` } }));
+                                              let notesData = null;
+                                              // Handle if the notes endpoint redirects unexpectedly or throws HTML error instead of JSON gracefully
+                                              if (notesRes.status === 200 && notesRes.responseText.startsWith('{')) {
+                                                  notesData = JSON.parse(notesRes.responseText);
                                               }
-                                              const notesData = JSON.parse(notesRes.responseText);
                                               window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, data: notesData, woData: woData } }));
                                           } catch (err) {
                                               window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, error: 'Failed to parse notesData: ' + err.message } }));
