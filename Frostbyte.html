@@ -13056,9 +13056,19 @@ verified in {SYSTEM}
                 if (techInput && woData.techName && !techInput.value) {
                     techInput.value = woData.techName;
                 }
-                
-                
-                showNotification(`ServiceChannel Data Pulled successfully for ${e.detail.woId}`);
+
+                  // Setup Rack and Circuit
+                  const rackInput = document.getElementById("quick-notes-rack");
+                  if (rackInput && woData.rack && !rackInput.value) {
+                      rackInput.value = woData.rack;
+                  }
+                  
+                  const circuitInput = document.getElementById("quick-notes-circuit");
+                  if (circuitInput && woData.circuits && !circuitInput.value) {
+                      circuitInput.value = woData.circuits;
+                  }
+
+                  showNotification(`ServiceChannel Data Pulled successfully for ${e.detail.woId}`);
                   
                   // Setup Status and Description
                   if (woData.status || woData.description) {

@@ -124,7 +124,7 @@
             
                                 // Check for ProblemDescription first per API request
                                 const desc = findKey(mergedWoData, 'ProblemDescription') || findKey(mergedWoData, 'Description');
-                                let rack = ''; let systems = '';
+                                let rack = ''; let systems = ''; let circuitsList = [];
                                 if (desc && typeof desc === 'string') {
                                     const parts = desc.split('|');
                                     for (let p of parts) {
@@ -132,9 +132,31 @@
                                             rack = p.split('Rack Associated:')[1].trim();
                                         } else if (p.includes('Systems Affected:')) {
                                             systems = p.split('Systems Affected:')[1].trim();
+                                            // Handle "RACK MTF (+16)" cleanly
+                                            const rackMatch = systems.match(/RACK\s+([A-Z0-9]+)/i);
+                                            if (rackMatch && rackMatch[1]) {
+                                                rack = rackMatch[1];
+                                            }
+                                        }
+                                        
+                                        // Attempt to globally search for common circuit signatures like "F02", "D1", "A13" in this block
+                                        // Or parse trailing strings in systems like "F02 FF DRS"
+                                        // The pattern (?:[A-Z]\d{1,2}(?:\.\d)?) gets basic circuits like A1, F02, D10.1
+                                        if (p.includes('Systems Affected:') || !p.includes(':')) {
+                                            const circMatches = p.match(/([A-Z]\d{1,2}(?:\.\d)?)/gi);
+                                            if (circMatches) {
+                                                for (const match of circMatches) {
+                                                    // Add if it's not a generic word and not already captured
+                                                    if (!circuitsList.includes(match.toUpperCase()) && !match.match(/^(VFD)$/i)) {
+                                                        circuitsList.push(match.toUpperCase());
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
+                                
+                                const detectedCircuits = circuitsList.join(", ");
 
                                 // Strict matching for Tech Name from ApplyFilters schema
                                 let techName = findKey(mergedWoData, 'AcceptedTechInfo') || findKey(mergedWoData, 'AssignedTechInfo') || "";
@@ -156,6 +178,7 @@
                                       priority: priority || "",
                                       rack: rack,
                                       systems: systems,
+                                      circuits: detectedCircuits,
                                       techName: techName,
                                       status: finalStatus,
                                       description: desc || "",
