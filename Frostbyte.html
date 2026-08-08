@@ -13362,19 +13362,37 @@ verified in {SYSTEM}
                                      statusSpan.textContent = `Error: ${ev.detail.error}`;
                                      statusSpan.style.color = '#ef4444';
                                  } else {
-                                     const latestReading = ev.detail.data.results && ev.detail.data.results.length > 0 ? ev.detail.data.results[ev.detail.data.results.length - 1] : null;
-                                     if (latestReading && latestReading.sensorStatus) {
-                                         const val = latestReading.sensorStatus.reading !== undefined && latestReading.sensorStatus.reading !== null ? latestReading.sensorStatus.reading : (iotMatch.variable.value !== undefined ? iotMatch.variable.value : 'Unknown');
-                                         const unit = latestReading.sensorStatus.units || (iotMatch.variable.units || '');
-                                         statusSpan.textContent = `${val} ${unit}`;
+                                     let latestReading = null;
+                                     if (ev.detail.data.results && ev.detail.data.results.length > 0) {
+                                         // Make sure to find the reading with the latest resTS by sorting if needed. Or just check end of arr.
+                                         // Given API often returns array in ascending time, last is generally newest.
+                                         // Let's sort array descending by date just to guarantee
+                                         const sortedResults = ev.detail.data.results.sort((a,b) => {
+                                             if (a.sensorDetails && b.sensorDetails && a.sensorDetails.resTS && b.sensorDetails.resTS) {
+                                                 return new Date(b.sensorDetails.resTS) - new Date(a.sensorDetails.resTS);
+                                             }
+                                             return 0;
+                                         });
+                                         latestReading = sortedResults[0];
+                                     }
+                                     if (latestReading && latestReading.sensorDetails && latestReading.sensorDetails.sensorStatus) {
+                                         const val = latestReading.sensorDetails.sensorStatus.reading !== undefined && latestReading.sensorDetails.sensorStatus.reading !== null ? latestReading.sensorDetails.sensorStatus.reading : (iotMatch.variable ? (iotMatch.variable.value !== undefined ? iotMatch.variable.value : 'Unknown') : 'Unknown');
+                                         let unit = latestReading.sensorDetails.sensorStatus.units || (iotMatch.variable && iotMatch.variable.units ? iotMatch.variable.units : '');
+                                         
+                                         // Make units prettier
+                                         if (unit.toUpperCase() === "PSI") unit = "PSI";
+                                         else if (unit.toUpperCase() === "DEG F" || unit.toUpperCase() === "DEGF" || unit.includes("F")) unit = "°F";
+                                         else if (unit.toUpperCase() === "DEG C" || unit.toUpperCase() === "DEGC" || unit.includes("C")) unit = "°C";
+
+                                         statusSpan.textContent = val + (unit ? ` ${unit}` : '');
                                          statusSpan.style.color = '#10b981';
                                          statusSpan.style.fontWeight = 'bold';
                                          statusSpan.title = `Last Updated: ${new Date(latestReading.sensorDetails.resTS).toLocaleString()}`;
                                      } else {
                                          // Fall back to original sync data
-                                         const val = iotMatch.variable.value !== undefined && iotMatch.variable.value !== null ? iotMatch.variable.value : 'Unknown';
-                                         const unit = iotMatch.variable.units || '';
-                                         statusSpan.textContent = `${val} ${unit}`;
+                                         const val = iotMatch.variable ? (iotMatch.variable.value !== undefined && iotMatch.variable.value !== null ? iotMatch.variable.value : 'Unknown') : 'Unknown';
+                                         const unit = iotMatch.variable && iotMatch.variable.units ? iotMatch.variable.units : '';
+                                         statusSpan.textContent = val + (unit ? ` ${unit}` : '');
                                          statusSpan.style.color = '#10b981';
                                          statusSpan.style.fontWeight = 'bold';
                                      }
