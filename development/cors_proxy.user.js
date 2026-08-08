@@ -89,66 +89,109 @@
 
                                         let rack = '';
                     let systems = '';
-                    // Check for ProblemDescription first per API request
-                    const desc = findKey(createWoData, 'ProblemDescription') || findKey(createWoData, 'Description');
-                    if (desc && typeof desc === 'string') {
-                        const parts = desc.split('|');
-                        for (let p of parts) {
-                            if (p.includes('Rack Associated:')) {
-                                rack = p.split('Rack Associated:')[1].trim();
-                            } else if (p.includes('Systems Affected:')) {
-                                systems = p.split('Systems Affected:')[1].trim();
-                            }
-                        }
-                    }
-
-                    // Strict matching for Tech Name from ApplyFilters schema
-                    let techName = findKey(createWoData, 'AcceptedTechInfo') || findKey(createWoData, 'AssignedTechInfo') || "";
-
-                    // Construct granular Status
-                    let primaryStatus = findKey(createWoData, 'Status') || findKey(createWoData, 'StatusName') || "";
-                    let extendedStatus = findKey(createWoData, 'ExtendedStatus') || "";
-                    let finalStatus = primaryStatus;
-                    
-                    if (primaryStatus && extendedStatus) {
-                        finalStatus = `${primaryStatus}/${extendedStatus}`;
-                    } else if (extendedStatus) {
-                        finalStatus = extendedStatus;
-                    }
-
-                    const woData = {
-                          store: storeId || "",
-                          trade: trade || "",
-                          priority: priority || "",
-                          rack: rack,
-                          systems: systems,
-                          techName: techName,
-                          status: finalStatus,
-                          description: desc || "",
-                          rawWoData: createWoData
-                      };
-                    
-                    const notesUrl = `https://www.servicechannel.com/sc/Location/GetLocationNotes?locationId=${locationId}&includeEmptyValue=false`;
+                    // Chain ApplyFilters POST to get the new accurate data
+                    const applyFiltersUrl = "https://www.servicechannel.com/sc/wo/WorkOrders/ApplyFilters";
+                    const applyFiltersBody = JSON.stringify({
+                        "filterModel": {
+                            "Ids": [parseInt(woId)],
+                            "Page": 1,
+                            "PageSize": 50,
+                            "TimeZoneOffset": -300
+                        },
+                        "source": "lvm.load.filterOff-> lvm.applyFilter -> applyFilters"
+                    });
                     
                     GM_xmlhttpRequest({
-                        method: 'GET',
-                        url: notesUrl,
+                        method: 'POST',
+                        url: applyFiltersUrl,
                         headers: {
-                            "Accept": "application/json"
+                            "Accept": "application/json",
+                            "Content-Type": "application/json; charset=UTF-8"
                         },
-                        onload: function(notesRes) {
+                        data: applyFiltersBody,
+                        onload: function(filtersRes) {
                             try {
-                                if (notesRes.status !== 200) {
-                                    return window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, error: `Invalid status ${notesRes.status}` } }));
+                                let applyData = null;
+                                if (filtersRes.status === 200) {
+                                    const filtersData = JSON.parse(filtersRes.responseText);
+                                    if (filtersData && filtersData.response && filtersData.response.Result && filtersData.response.Result.list && filtersData.response.Result.list.length > 0) {
+                                        applyData = filtersData.response.Result.list[0];
+                                    }
                                 }
-                                const notesData = JSON.parse(notesRes.responseText);
-                                window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, data: notesData, woData: woData } }));
-                            } catch (err) {
-                                window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, error: 'Failed to parse notesData: ' + err.message } }));
+                                
+                                // Merge data objects for fallback searching
+                                const mergedWoData = applyData ? Object.assign({}, createWoData, applyData) : createWoData;
+            
+                                // Check for ProblemDescription first per API request
+                                const desc = findKey(mergedWoData, 'ProblemDescription') || findKey(mergedWoData, 'Description');
+                                let rack = ''; let systems = '';
+                                if (desc && typeof desc === 'string') {
+                                    const parts = desc.split('|');
+                                    for (let p of parts) {
+                                        if (p.includes('Rack Associated:')) {
+                                            rack = p.split('Rack Associated:')[1].trim();
+                                        } else if (p.includes('Systems Affected:')) {
+                                            systems = p.split('Systems Affected:')[1].trim();
+                                        }
+                                    }
+                                }
+
+                                // Strict matching for Tech Name from ApplyFilters schema
+                                let techName = findKey(mergedWoData, 'AcceptedTechInfo') || findKey(mergedWoData, 'AssignedTechInfo') || "";
+
+                                // Construct granular Status
+                                let primaryStatus = findKey(mergedWoData, 'Status') || findKey(mergedWoData, 'StatusName') || "";
+                                let extendedStatus = findKey(mergedWoData, 'ExtendedStatus') || "";
+                                let finalStatus = primaryStatus;
+                                
+                                if (primaryStatus && extendedStatus) {
+                                    finalStatus = `${primaryStatus}/${extendedStatus}`;
+                                } else if (extendedStatus) {
+                                    finalStatus = extendedStatus;
+                                }
+
+                                const woData = {
+                                      store: storeId || "",
+                                      trade: trade || "",
+                                      priority: priority || "",
+                                      rack: rack,
+                                      systems: systems,
+                                      techName: techName,
+                                      status: finalStatus,
+                                      description: desc || "",
+                                      rawWoData: mergedWoData
+                                  };
+                                  
+                                  const notesUrl = `https://www.servicechannel.com/sc/Location/GetLocationNotes?locationId=${locationId}&includeEmptyValue=false`;
+                                  
+                                  // Call location notes next...
+                                  GM_xmlhttpRequest({
+                                      method: 'GET',
+                                      url: notesUrl,
+                                      headers: {
+                                          "Accept": "application/json"
+                                      },
+                                      onload: function(notesRes) {
+                                          try {
+                                              if (notesRes.status !== 200) {
+                                                  return window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, error: `Invalid status ${notesRes.status}` } }));
+                                              }
+                                              const notesData = JSON.parse(notesRes.responseText);
+                                              window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, data: notesData, woData: woData } }));
+                                          } catch (err) {
+                                              window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, error: 'Failed to parse notesData: ' + err.message } }));
+                                          }
+                                      },
+                                      onerror: function(err) {
+                                          window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, error: err } }));
+                                      }
+                                  });
+                            } catch (e) {
+                                window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, error: e.message } }));
                             }
                         },
                         onerror: function(err) {
-                            window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, error: err } }));
+                                window.dispatchEvent(new CustomEvent('serviceChannelDataReady', { detail: { woId: woId, error: 'Network error fetching ApplyFilters' } }));
                         }
                     });
                     

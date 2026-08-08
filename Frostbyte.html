@@ -13055,13 +13055,6 @@ verified in {SYSTEM}
                 const techInput = document.getElementById("tech-name");
                 if (techInput && woData.techName && !techInput.value) {
                     techInput.value = woData.techName;
-                } else if (techInput && woData.rawWoData && !techInput.value) {
-                    // Fallback search the raw json string for name-like keys
-                    const rawStr = JSON.stringify(woData.rawWoData);
-                    const techMatch = rawStr.match(/"(TechnicianName|CallerName|TechName|PrimaryContact|FullName)":\s*"([^"]+)"/i);
-                    if (techMatch && techMatch[2]) {
-                        techInput.value = techMatch[2];
-                    }
                 }
                 
                 
