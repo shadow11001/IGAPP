@@ -57,3 +57,6 @@ fix_cors10.py
 fix_cors91.py
 test_parse_2.js
 test_parse.js
+revert_clta.py
+fix_parsing4.py
+fix_html_rack.py

@@ -13104,7 +13104,8 @@ verified in {SYSTEM}
                               // We use the JSON extraction MTF, and search SQL for "Rack MTF" or just "%MTF%"
                               const cleanRackSearch = woData.rack.replace(/RACK\s+/g, "").trim(); 
                               const activeStoreNum = document.getElementById("store-number") ? (document.getElementById("store-number").value.trim() || woData.store) : woData.store;
-                              const rQuery = `SELECT rack_id, rack_name, ems_type, host_address FROM racks WHERE store_id=${parseInt(activeStoreNum)} AND (rack_name LIKE '%${cleanRackSearch}%' OR rack_name LIKE '%${woData.rack}%') LIMIT 1`;
+                                  // Look for an exact match first, or a word match, so 'LTA' doesn't match 'CLTA'
+                                  const rQuery = `SELECT rack_id, rack_name, ems_type, host_address FROM racks WHERE store_id=${parseInt(activeStoreNum)} AND (rack_name = '${cleanRackSearch}' OR rack_name LIKE '${cleanRackSearch} %' OR rack_name LIKE '% ${cleanRackSearch}' OR rack_name LIKE '% ${cleanRackSearch} %' OR rack_name = '${woData.rack}') LIMIT 1`;
                               const rRes = window.mainDB.exec(rQuery);
                               
                               if (rRes && rRes.length > 0 && rRes[0].values.length > 0) {
