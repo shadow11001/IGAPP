@@ -13045,7 +13045,12 @@ verified in {SYSTEM}
         }
 
         window.addEventListener('serviceChannelDataReady', (e) => {
-          if(e.detail && e.detail.woData) {
+          if (e.detail && e.detail.error) {
+              console.error("ServiceChannel Proxy Error:", e.detail.error);
+              showNotification(`ServiceChannel Error: ${e.detail.error}`, 'error');
+              return;
+          }
+          if (e.detail && e.detail.woData) {
             const woData = e.detail.woData;
             const data = e.detail.data;
             if(woData.store && storeInput && !storeInput.value) {

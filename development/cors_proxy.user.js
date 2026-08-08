@@ -133,7 +133,7 @@
                                         } else if (p.includes('Systems Affected:')) {
                                             systems = p.split('Systems Affected:')[1].trim();
                                             // Handle "RACK MTF (+16)" cleanly
-                                            const rackMatch = systems.match(/RACK\s+([A-Z0-9]+)/i);
+                                            const rackMatch = systems.match(/RACK\s+([A-Z0-9]+)/i);
                                             if (rackMatch && rackMatch[1]) {
                                                 rack = rackMatch[1];
                                             }
