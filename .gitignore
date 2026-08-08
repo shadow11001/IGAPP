@@ -40,3 +40,5 @@ fix_cors.py
 parse_sensors.py
 update_proxy.py
 fix_cors2.py
+fix_iot2.py
+fix_frost.py

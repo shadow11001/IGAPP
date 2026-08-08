@@ -13319,12 +13319,46 @@ verified in {SYSTEM}
                  if (uiEl) {
                      const statusSpan = uiEl.querySelector('.sen-status');
                      if (iotMatch && statusSpan) {
-                         // We found the variable, provide reading
-                         const val = iotMatch.variable.value !== undefined && iotMatch.variable.value !== null ? iotMatch.variable.value : 'Unknown';
-                         const unit = iotMatch.variable.units || '';
-                         statusSpan.textContent = `${val} ${unit}`;
-                         statusSpan.style.color = '#10b981';
-                         statusSpan.style.fontWeight = 'bold';
+                         // Initiate fetch from sensor history
+                         const uniqueId = iotMatch.node.id;
+                         statusSpan.innerHTML = `Fetching history...`;
+                         statusSpan.style.color = '#f59e0b';
+                         
+                         // Create unique event listener for response
+                         const handler = (ev) => {
+                             if (ev.detail.uniqueId === uniqueId) {
+                                 window.removeEventListener('iotSensorReadingReady', handler);
+                                 if (ev.detail.error) {
+                                     statusSpan.textContent = `Error: ${ev.detail.error}`;
+                                     statusSpan.style.color = '#ef4444';
+                                 } else {
+                                     const latestReading = ev.detail.data.results && ev.detail.data.results.length > 0 ? ev.detail.data.results[ev.detail.data.results.length - 1] : null;
+                                     if (latestReading && latestReading.sensorStatus) {
+                                         const val = latestReading.sensorStatus.reading !== undefined && latestReading.sensorStatus.reading !== null ? latestReading.sensorStatus.reading : (iotMatch.variable.value !== undefined ? iotMatch.variable.value : 'Unknown');
+                                         const unit = latestReading.sensorStatus.units || (iotMatch.variable.units || '');
+                                         statusSpan.textContent = `${val} ${unit}`;
+                                         statusSpan.style.color = '#10b981';
+                                         statusSpan.style.fontWeight = 'bold';
+                                         statusSpan.title = `Last Updated: ${new Date(latestReading.sensorDetails.resTS).toLocaleString()}`;
+                                     } else {
+                                         // Fall back to original sync data
+                                         const val = iotMatch.variable.value !== undefined && iotMatch.variable.value !== null ? iotMatch.variable.value : 'Unknown';
+                                         const unit = iotMatch.variable.units || '';
+                                         statusSpan.textContent = `${val} ${unit}`;
+                                         statusSpan.style.color = '#10b981';
+                                         statusSpan.style.fontWeight = 'bold';
+                                     }
+                                 }
+                             }
+                         };
+                         window.addEventListener('iotSensorReadingReady', handler);
+                         
+                         window.dispatchEvent(new CustomEvent('fetchSensorReadingIOT', { 
+                             detail: { 
+                                 storeNumber: e.detail.store, 
+                                 uniqueId: uniqueId 
+                             } 
+                         }));
                      } else if (statusSpan) {
                          statusSpan.textContent = `No reading found`;
                          statusSpan.style.color = '#f59e0b';

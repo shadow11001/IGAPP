@@ -351,4 +351,53 @@
             }
         });
     });
+    window.addEventListener('fetchSensorReadingIOT', function(e) {
+        if (!e.detail || !e.detail.storeNumber || !e.detail.uniqueId) return;
+        
+        const storeNum = e.detail.storeNumber;
+        const uniqueId = e.detail.uniqueId;
+        const fromDate = e.detail.fromDate || -1440;
+        const toDate = e.detail.toDate || 0;
+        
+        const iotUrl = `https://weiot-em-telemetryapi.prod.walmart.com/api/sensors/getsensorreading`;
+        const payload = JSON.stringify({
+             "uniqueId": uniqueId,
+             "fromDate": fromDate,
+             "toDate": toDate,
+             "timeZone": "UTC"
+        });
+
+        // Retrieve the sniffed token from GM storage
+        const currentToken = GM_getValue('iot_jwt_token');
+
+        if (!currentToken) {
+             window.dispatchEvent(new CustomEvent('iotSensorReadingReady', { detail: { storeNumber: storeNum, uniqueId: uniqueId, error: 'No IoT Auth Token sniffed yet. Please open a tab to https://em.walmart.com/ and let it load.' } }));
+             return;
+        }
+        
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url: iotUrl,
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "authorization": currentToken
+            },
+            data: payload,
+            onload: function(res) {
+                try {
+                    if (res.status !== 200 && res.status !== 201) {
+                        return window.dispatchEvent(new CustomEvent('iotSensorReadingReady', { detail: { storeNumber: storeNum, uniqueId: uniqueId, error: `Invalid status ${res.status}` } }));
+                    }
+                    const data = JSON.parse(res.responseText);
+                    window.dispatchEvent(new CustomEvent('iotSensorReadingReady', { detail: { storeNumber: storeNum, uniqueId: uniqueId, data: data } }));
+                } catch (err) {
+                    window.dispatchEvent(new CustomEvent('iotSensorReadingReady', { detail: { storeNumber: storeNum, uniqueId: uniqueId, error: 'Failed to parse IOT response: ' + err.message } }));
+                }
+            },
+            onerror: function(err) {
+                window.dispatchEvent(new CustomEvent('iotSensorReadingReady', { detail: { storeNumber: storeNum, uniqueId: uniqueId, error: err } }));
+            }
+        });
+    });
 })();
