@@ -13045,14 +13045,22 @@ verified in {SYSTEM}
                 storeInput.dispatchEvent(new Event('blur'));
             }
             if(woData.trade) {
-                // Populate trade/name if found in notes using some heuristics in Frostbyte logic maybe?
-            }
-            
-            // Setup Tech Name 
-            if(data) {
-                 // Try looking for Name/Tech Name in notes JSON, logic belongs here depending on payload shape
-            }
-            showNotification(`ServiceChannel Data Pulled successfully for ${e.detail.woId}`);
+              }
+              // Setup Tech Name 
+                const techInput = document.getElementById("tech-name");
+                if (techInput && woData.techName && !techInput.value) {
+                    techInput.value = woData.techName;
+                } else if (techInput && woData.rawWoData && !techInput.value) {
+                    // Fallback search the raw json string for name-like keys
+                    const rawStr = JSON.stringify(woData.rawWoData);
+                    const techMatch = rawStr.match(/"(TechnicianName|CallerName|TechName|PrimaryContact|FullName)":\s*"([^"]+)"/i);
+                    if (techMatch && techMatch[2]) {
+                        techInput.value = techMatch[2];
+                    }
+                }
+                
+                
+                showNotification(`ServiceChannel Data Pulled successfully for ${e.detail.woId}`);
           }
         });
         
