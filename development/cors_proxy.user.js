@@ -132,16 +132,18 @@
                                         if (p.includes('Rack Associated:')) {
                                             rack = p.split('Rack Associated:')[1].trim();
                                         } else if (p.includes('Systems Affected:')) {
-                                            systems = p.split('Systems Affected:')[1].trim();
+                                            const dirtySystems = p.split('Systems Affected:')[1].trim();
                                             // Handle "RACK MTF (+16)" cleanly
-                                            const rackMatch = systems.match(/RACK\s+([A-Z0-9]+)/i);
+                                            const rackMatch = dirtySystems.match(/RACK\s+([A-Z0-9]+)/i);
                                             if (rackMatch && rackMatch[1]) {
                                                 rack = rackMatch[1];
                                             } else {
-                                                // Grabs the first word (like LTA) if it's there
-                                                const firstWord = systems.split(' ')[0].trim();
-                                                if (firstWord.length <= 4 && firstWord.match(/^[A-Z0-9]+$/i)) {
-                                                    rack = firstWord;
+                                                // Some desc bodies include extraneous data appended after space "LTA | RIM24[...]"
+                                                const partsNested = dirtySystems.split(' ');
+                                                if (partsNested.length > 0 && partsNested[0].length <= 4 && partsNested[0].match(/^[A-Z0-9]+$/i)) {
+                                                    rack = partsNested[0];
+                                                } else {
+                                                    systems = dirtySystems;
                                                 }
                                             }
                                         }
@@ -188,9 +190,11 @@
                                                 cleanMod = cleanMod.split('Systems Affected:')[1].trim();
                                             }
                                             
-                                            // Handle "Systems Affected: LTA " logic to extract the rack if it isn't parsed earlier
-                                            if (rack === '' && cleanMod.match(/^[A-Z0-9]+$/i) && cleanMod.length <= 4) {
+                                            let isFallbackRack = false;
+                                            if (cleanMod.match(/^[A-Z0-9]+$/i) && cleanMod.length <= 4) {
                                                 // It's likely LTA / MTC etc and not a module, handle edge case if needed, but for now just trim
+                                                isFallbackRack = true;
+                                                if (rack === '') rack = cleanMod;
                                             }
 
                                             // Extract the inner sensor name and split by comma
@@ -213,7 +217,7 @@
                                                 }
                                             });
                                             
-                                            if (cleanMod && !modulesExtracted.includes(cleanMod) && cleanMod !== "Systems" && cleanMod !== "Units Affected" && cleanMod.toUpperCase() !== "UNDEFINED" && cleanMod.length > 2) {
+                                            if (!isFallbackRack && cleanMod && !modulesExtracted.includes(cleanMod) && cleanMod !== "Systems" && cleanMod !== "Units Affected" && cleanMod.toUpperCase() !== "UNDEFINED" && cleanMod.length > 2) {
                                                 modulesExtracted.push(cleanMod);
                                                 modulesWithSensors.push({
                                                     module: cleanMod,
@@ -226,7 +230,14 @@
                                             if (cleanMod.includes('Systems Affected:')) {
                                                 cleanMod = cleanMod.split('Systems Affected:')[1].trim();
                                             }
-                                            if (cleanMod && !modulesExtracted.includes(cleanMod) && cleanMod !== "Systems" && cleanMod !== "Units Affected" && cleanMod.toUpperCase() !== "UNDEFINED" && cleanMod.length > 2) {
+                                            
+                                            let isFallbackRack = false;
+                                            if (cleanMod.match(/^[A-Z0-9]+$/i) && cleanMod.length <= 4) {
+                                                isFallbackRack = true;
+                                                if (rack === '') rack = cleanMod;
+                                            }
+                                            
+                                            if (!isFallbackRack && cleanMod && !modulesExtracted.includes(cleanMod) && cleanMod !== "Systems" && cleanMod !== "Units Affected" && cleanMod.toUpperCase() !== "UNDEFINED" && cleanMod.length > 2) {
                                                 modulesExtracted.push(cleanMod);
                                                 modulesWithSensors.push({
                                                     module: cleanMod,
@@ -417,8 +428,9 @@
             url: iotUrl,
             headers: {
                 "Accept": "application/json",
-                "Content-Type": "application/json",
-                "authorization": currentToken
+                "Content-Type": "application/json; charset=utf-8",
+                "authorization": currentToken,
+                "x-tenant": "US"
             },
             data: payload,
             onload: function(res) {
