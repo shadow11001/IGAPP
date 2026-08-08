@@ -13194,7 +13194,30 @@ verified in {SYSTEM}
                           scDesc.textContent = woData.description || "No description provided";
                       }
                       
-                      if (woData.modules && woData.modules.length > 0) {
+                      if (woData.modulesWithSensors && woData.modulesWithSensors.length > 0) {
+                          const scModulesContainer = document.getElementById("sc-modules-container");
+                          if (scModulesContainer) {
+                              scModulesContainer.style.display = "block";
+                              scModulesContainer.innerHTML = '<strong>Associated Modules:</strong><br>';
+                              woData.modulesWithSensors.forEach(modData => {
+                                  // Append placeholders that iotDataReady can populate later if matched
+                                  const safeMod = modData.module.replace(/\s+/g, '-');
+                                  let htmlBlock = `<div id="sc-mod-${safeMod}" style="margin-top: 5px;">- ${modData.module}: <span class="mod-status" style="color:#aaa;">Pending IoT sync...</span></div>`;
+                                  
+                                  if (modData.sensors && modData.sensors.length > 0) {
+                                      modData.sensors.forEach(sen => {
+                                          const safeSen = sen.replace(/[^a-zA-Z0-9_-]/g, '-');
+                                          htmlBlock += `<div id="sc-sen-${safeSen}" style="margin-left: 15px; margin-top: 2px;">- ${sen}: <span class="sen-status" style="color:#aaa;">Pending IoT sync...</span></div>`;
+                                      });
+                                  }
+                                  
+                                  scModulesContainer.innerHTML += htmlBlock;
+                              });
+                          }
+                          // Manually kick off an IoT string check just in case we already have IoT payload cached
+                          window.dispatchEvent(new CustomEvent('syncModulesWithIoT', { detail: { modules: woData.modules, sensors: woData.sensors, store: woData.store } }));
+
+                      } else if (woData.modules && woData.modules.length > 0) {
                           const scModulesContainer = document.getElementById("sc-modules-container");
                           if (scModulesContainer) {
                               scModulesContainer.style.display = "block";

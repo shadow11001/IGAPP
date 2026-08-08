@@ -160,6 +160,8 @@
                                 // Extract module associations and sensors from systems parsing (e.g. VFD[...], or VFD-SPEED)
                                 let modulesExtracted = [];
                                 let sensorsExtracted = [];
+                                let modulesWithSensors = []; // Array of objects { module: "RIM24", sensors: ["COMP 5 OIL L/O", "COMP 2 OIL L/O"] }
+                                
                                 if (desc && typeof desc === 'string') {
                                     // Locate text that resembles MODULE[PARAMS], e.g. VFD[VFD ( Reading: )] or VFD- SPEED[COND SPLIT MODE...]
                                     
@@ -175,27 +177,55 @@
                                             // Extract the module name (the part before the bracket)
                                             let cleanMod = sectionTrim.substring(0, bracketIndexStart).trim();
                                             
-                                            // Extract the inner sensor name
-                                            let innerText = sectionTrim.substring(bracketIndexStart + 1, bracketIndexEnd).trim();
-                                            
-                                            // Drop the " ( Reading: )" if present
-                                            const readingIndex = innerText.indexOf(' (');
-                                            if (readingIndex !== -1) {
-                                                innerText = innerText.substring(0, readingIndex).trim();
+                                            // Clean 'Systems Affected:' if present before the module name
+                                            if (cleanMod.includes('Systems Affected:')) {
+                                                cleanMod = cleanMod.split('Systems Affected:')[1].trim();
                                             }
+                                            
+                                            // Handle "Systems Affected: LTA " logic to extract the rack if it isn't parsed earlier
+                                            if (rack === '' && cleanMod.match(/^[A-Z0-9]+$/i) && cleanMod.length <= 4) {
+                                                // It's likely LTA / MTC etc and not a module, handle edge case if needed, but for now just trim
+                                            }
+
+                                            // Extract the inner sensor name and split by comma
+                                            let innerText = sectionTrim.substring(bracketIndexStart + 1, bracketIndexEnd).trim();
+                                            let currentSensors = [];
+                                            
+                                            const sensorSplits = innerText.split(',');
+                                            sensorSplits.forEach(sen => {
+                                                let sName = sen.trim();
+                                                // Drop the " ( Reading: )" if present
+                                                const readingIndex = sName.indexOf(' (');
+                                                if (readingIndex !== -1) {
+                                                    sName = sName.substring(0, readingIndex).trim();
+                                                }
+                                                if (sName) {
+                                                    currentSensors.push(sName);
+                                                    if (!sensorsExtracted.includes(sName)) {
+                                                        sensorsExtracted.push(sName);
+                                                    }
+                                                }
+                                            });
                                             
                                             if (cleanMod && !modulesExtracted.includes(cleanMod) && cleanMod !== "Systems" && cleanMod !== "Units Affected" && cleanMod.toUpperCase() !== "UNDEFINED" && cleanMod.length > 2) {
                                                 modulesExtracted.push(cleanMod);
-                                            }
-                                            
-                                            if (innerText && !sensorsExtracted.includes(innerText)) {
-                                                sensorsExtracted.push(innerText);
+                                                modulesWithSensors.push({
+                                                    module: cleanMod,
+                                                    sensors: currentSensors
+                                                });
                                             }
                                         } else if (bracketIndexStart !== -1) {
                                             // Fallback for just modules mapping if brackets are malformed
                                             let cleanMod = sectionTrim.substring(0, bracketIndexStart).trim();
+                                            if (cleanMod.includes('Systems Affected:')) {
+                                                cleanMod = cleanMod.split('Systems Affected:')[1].trim();
+                                            }
                                             if (cleanMod && !modulesExtracted.includes(cleanMod) && cleanMod !== "Systems" && cleanMod !== "Units Affected" && cleanMod.toUpperCase() !== "UNDEFINED" && cleanMod.length > 2) {
                                                 modulesExtracted.push(cleanMod);
+                                                modulesWithSensors.push({
+                                                    module: cleanMod,
+                                                    sensors: []
+                                                });
                                             }
                                         }
                                     });
@@ -229,6 +259,7 @@
                                       description: desc || "",
                                       modules: modulesExtracted.length > 0 ? modulesExtracted : [],
                                       sensors: sensorsExtracted.length > 0 ? sensorsExtracted : [],
+                                      modulesWithSensors: modulesWithSensors.length > 0 ? modulesWithSensors : [],
                                       rawWoData: mergedWoData
                                 };
                                 

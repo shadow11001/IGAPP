@@ -42,3 +42,7 @@ update_proxy.py
 fix_cors2.py
 fix_iot2.py
 fix_frost.py
+fix_html_replace.py
+fix_html.py
+fix_parsing.py
+fix_woData.py
