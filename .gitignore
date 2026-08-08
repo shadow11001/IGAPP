@@ -32,3 +32,11 @@ update_db_check.py
 fix_db_query.py
 fix_hide_empty_host.py
 fix_proxy_store.py
+fix_app.py
+fix_app2.py
+fix_app3.py
+fix_clear_form.py
+fix_cors.py
+parse_sensors.py
+update_proxy.py
+fix_cors2.py

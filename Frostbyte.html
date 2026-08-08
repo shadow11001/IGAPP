@@ -12765,6 +12765,9 @@ verified in {SYSTEM}
 
           // Clear infraction display
           clearInfractionDisplay();
+          
+          // Clear service channel overlay logic
+          clearServiceChannelDetails();
 
           // Clear current rack
           AppState.currentRack = null;
@@ -12804,6 +12807,9 @@ verified in {SYSTEM}
 
           // Clear infraction display
           clearInfractionDisplay();
+          
+          // Clear service channel overlay logic
+          clearServiceChannelDetails();
 
           // Clear current rack
           AppState.currentRack = null;
@@ -12897,6 +12903,17 @@ verified in {SYSTEM}
       }
 
       // Function to clear infraction display
+      function clearServiceChannelDetails() {
+          const scPanel = document.getElementById("servicechannel-details");
+          if (scPanel) scPanel.style.display = "none";
+          
+          const scHostContainer = document.getElementById("sc-host-container");
+          if (scHostContainer) scHostContainer.style.display = "none";
+          
+          const scModulesContainer = document.getElementById("sc-modules-container");
+          if (scModulesContainer) scModulesContainer.style.display = "none";
+      }
+
       function clearInfractionDisplay() {
         const infractionContainer = document.getElementById(
           "current-note-infractions",
@@ -13181,14 +13198,19 @@ verified in {SYSTEM}
                           const scModulesContainer = document.getElementById("sc-modules-container");
                           if (scModulesContainer) {
                               scModulesContainer.style.display = "block";
-                              scModulesContainer.innerHTML = '<strong>Associated Modules:</strong><br>';
+                              scModulesContainer.innerHTML = '<strong>Associated Points of Interest:</strong><br>';
                               woData.modules.forEach(mod => {
                                   // Append placeholders that iotDataReady can populate later if matched
                                   scModulesContainer.innerHTML += `<div id="sc-mod-${mod.replace(/\s+/g, '-')}">- ${mod}: <span class="mod-status" style="color:#aaa;">Pending IoT sync...</span></div>`;
                               });
+                              if (woData.sensors && woData.sensors.length > 0) {
+                                  woData.sensors.forEach(sen => {
+                                      scModulesContainer.innerHTML += `<div id="sc-sen-${sen.replace(/[^a-zA-Z0-9_-]/g, '-')}">- Sensor [${sen}]: <span class="sen-status" style="color:#aaa;">Pending IoT sync...</span></div>`;
+                                  });
+                              }
                           }
                           // Manually kick off an IoT string check just in case we already have IoT payload cached
-                          window.dispatchEvent(new CustomEvent('syncModulesWithIoT', { detail: { modules: woData.modules, store: woData.store } }));
+                          window.dispatchEvent(new CustomEvent('syncModulesWithIoT', { detail: { modules: woData.modules, sensors: woData.sensors, store: woData.store } }));
                       }
                   }
               }
@@ -13207,9 +13229,23 @@ verified in {SYSTEM}
                 const modContainer = document.getElementById("sc-modules-container");
                 if (modContainer && modContainer.style.display !== "none") {
                     const pendingMods = Array.from(modContainer.querySelectorAll("div[id^='sc-mod-']"));
+                    const pendingSensors = Array.from(modContainer.querySelectorAll("div[id^='sc-sen-']"));
+                    let extractedMods = [];
+                    let extractedSens = [];
                     if (pendingMods.length > 0) {
-                        const extractedMods = pendingMods.map(p => p.id.replace('sc-mod-', '').replace(/-/g, ' '));
-                        window.dispatchEvent(new CustomEvent('syncModulesWithIoT', { detail: { modules: extractedMods, store: storeId } }));
+                        extractedMods = pendingMods.map(p => p.id.replace('sc-mod-', '').replace(/-/g, ' '));
+                    }
+                    if (pendingSensors.length > 0) {
+                        extractedSens = pendingSensors.map(p => {
+                            // Recover sensor name loosely from id, or better yet re-pull it from the text since IDs strip spaces
+                            const textCont = p.textContent || p.innerText;
+                            const match = textCont.match(/\[(.*?)\]/);
+                            return match ? match[1] : p.id.replace('sc-sen-', '').replace(/-/g, ' ');
+                        });
+                    }
+                    
+                    if (extractedMods.length > 0 || extractedSens.length > 0) {
+                        window.dispatchEvent(new CustomEvent('syncModulesWithIoT', { detail: { modules: extractedMods, sensors: extractedSens, store: storeId } }));
                     }
                 }
            } 
@@ -13217,9 +13253,10 @@ verified in {SYSTEM}
 
         // Dedicated listener to recursively traverse IoT JSON arrays natively and mutate the DOM directly!
         window.addEventListener('syncModulesWithIoT', (e) => {
-             const mods = e.detail.modules;
+             const mods = e.detail.modules || [];
+             const sens = e.detail.sensors || [];
              const iotData = window._lastIotPayload;
-             if (!mods || mods.length === 0 || !iotData) return;
+             if ((mods.length === 0 && sens.length === 0) || !iotData) return;
 
              // Recursive tree walk to locate the exact label and read its variables
              const traverseIotTree = (node, searchStr) => {
@@ -13229,6 +13266,24 @@ verified in {SYSTEM}
                  if (node.children && node.children.length > 0) {
                      for (let child of node.children) {
                          const found = traverseIotTree(child, searchStr);
+                         if (found) return found;
+                     }
+                 }
+                 return null;
+             };
+             
+             const traverseIotTreeForSensor = (node, searchStr) => {
+                 // Check node variables array
+                 if (node.variables && node.variables.length > 0) {
+                     for (let v of node.variables) {
+                         if (v.name && v.name.toUpperCase().includes(searchStr.toUpperCase())) {
+                             return { node: node, variable: v };
+                         }
+                     }
+                 }
+                 if (node.children && node.children.length > 0) {
+                     for (let child of node.children) {
+                         const found = traverseIotTreeForSensor(child, searchStr);
                          if (found) return found;
                      }
                  }
@@ -13246,12 +13301,32 @@ verified in {SYSTEM}
                              statusSpan.textContent = `Offline (Comm Loss)`;
                              statusSpan.style.color = '#ef4444';
                          } else {
-                             // Assuming if we found the node, we can pull expanded states or direct flag variables.
                              statusSpan.textContent = `Online (Tracked)`;
                              statusSpan.style.color = '#10b981';
                          }
                      } else if (statusSpan) {
                          statusSpan.textContent = `Not found in IoT telemetry`;
+                         statusSpan.style.color = '#f59e0b';
+                     }
+                 }
+             });
+             
+             sens.forEach(sen => {
+                 const sensorSafeId = sen.replace(/[^a-zA-Z0-9_-]/g, '-');
+                 const iotMatch = traverseIotTreeForSensor(iotData, sen);
+                 const uiEl = document.getElementById(`sc-sen-${sensorSafeId}`);
+                 
+                 if (uiEl) {
+                     const statusSpan = uiEl.querySelector('.sen-status');
+                     if (iotMatch && statusSpan) {
+                         // We found the variable, provide reading
+                         const val = iotMatch.variable.value !== undefined && iotMatch.variable.value !== null ? iotMatch.variable.value : 'Unknown';
+                         const unit = iotMatch.variable.units || '';
+                         statusSpan.textContent = `${val} ${unit}`;
+                         statusSpan.style.color = '#10b981';
+                         statusSpan.style.fontWeight = 'bold';
+                     } else if (statusSpan) {
+                         statusSpan.textContent = `No reading found`;
                          statusSpan.style.color = '#f59e0b';
                      }
                  }

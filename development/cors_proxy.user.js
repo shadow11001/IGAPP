@@ -157,19 +157,48 @@
                                     }
                                 }
 
-                                // Extract module associations from systems parsing (e.g. VFD[...], or VFD-SPEED)
+                                // Extract module associations and sensors from systems parsing (e.g. VFD[...], or VFD-SPEED)
                                 let modulesExtracted = [];
+                                let sensorsExtracted = [];
                                 if (desc && typeof desc === 'string') {
                                     // Locate text that resembles MODULE[PARAMS], e.g. VFD[VFD ( Reading: )] or VFD- SPEED[COND SPLIT MODE...]
-                                    const moduleMatches = desc.match(/([A-Z0-9\-\s]+)\[/gi);
-                                    if (moduleMatches) {
-                                        for (const m of moduleMatches) {
-                                            let cleanMod = m.replace('[', '').trim();
-                                            if (cleanMod && !modulesExtracted.includes(cleanMod) && cleanMod !== "Systems" && cleanMod !== "Units Affected" && cleanMod.length > 2) {
+                                    
+                                    // Split description by pipe to analyze each section independently
+                                    const pipedSections = desc.split('|');
+                                    
+                                    pipedSections.forEach(sec => {
+                                        const sectionTrim = sec.trim();
+                                        const bracketIndexStart = sectionTrim.indexOf('[');
+                                        const bracketIndexEnd = sectionTrim.lastIndexOf(']');
+                                        
+                                        if (bracketIndexStart !== -1 && bracketIndexEnd !== -1 && bracketIndexEnd > bracketIndexStart) {
+                                            // Extract the module name (the part before the bracket)
+                                            let cleanMod = sectionTrim.substring(0, bracketIndexStart).trim();
+                                            
+                                            // Extract the inner sensor name
+                                            let innerText = sectionTrim.substring(bracketIndexStart + 1, bracketIndexEnd).trim();
+                                            
+                                            // Drop the " ( Reading: )" if present
+                                            const readingIndex = innerText.indexOf(' (');
+                                            if (readingIndex !== -1) {
+                                                innerText = innerText.substring(0, readingIndex).trim();
+                                            }
+                                            
+                                            if (cleanMod && !modulesExtracted.includes(cleanMod) && cleanMod !== "Systems" && cleanMod !== "Units Affected" && cleanMod.toUpperCase() !== "UNDEFINED" && cleanMod.length > 2) {
+                                                modulesExtracted.push(cleanMod);
+                                            }
+                                            
+                                            if (innerText && !sensorsExtracted.includes(innerText)) {
+                                                sensorsExtracted.push(innerText);
+                                            }
+                                        } else if (bracketIndexStart !== -1) {
+                                            // Fallback for just modules mapping if brackets are malformed
+                                            let cleanMod = sectionTrim.substring(0, bracketIndexStart).trim();
+                                            if (cleanMod && !modulesExtracted.includes(cleanMod) && cleanMod !== "Systems" && cleanMod !== "Units Affected" && cleanMod.toUpperCase() !== "UNDEFINED" && cleanMod.length > 2) {
                                                 modulesExtracted.push(cleanMod);
                                             }
                                         }
-                                    }
+                                    });
                                 }
                                 
                                 const detectedCircuits = circuitsList.join(", ");
@@ -199,6 +228,7 @@
                                       status: finalStatus,
                                       description: desc || "",
                                       modules: modulesExtracted.length > 0 ? modulesExtracted : [],
+                                      sensors: sensorsExtracted.length > 0 ? sensorsExtracted : [],
                                       rawWoData: mergedWoData
                                 };
                                 
