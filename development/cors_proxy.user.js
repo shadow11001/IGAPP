@@ -76,7 +76,8 @@
                     }
 
                     // Extract StoreId, Priority, and Trade
-                    const storeId = findKey(createWoData, 'StoreId');
+                    const matchedLocation = findKey(createWoData, 'Location');
+                    const storeId = matchedLocation && matchedLocation['StoreId'] ? matchedLocation['StoreId'] : findKey(createWoData, 'StoreId');
                     const priority = findKey(createWoData, 'Priority');
                     let trade = findKey(createWoData, 'Trade');
                     

@@ -29,3 +29,6 @@ development/cors_proxy_ems_mapper.user.js
 .gitignore
 update_proxy_logic.py
 update_db_check.py
+fix_db_query.py
+fix_hide_empty_host.py
+fix_proxy_store.py
