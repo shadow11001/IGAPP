@@ -5623,6 +5623,12 @@
           </div>
         </div>
 
+        <div id="servicechannel-details" class="sc-details-panel" style="margin-top: 15px; padding: 10px; background: rgba(56, 189, 248, 0.05); border-left: 3px solid #38bdf8; border-radius: 4px; display: none;">
+            <h4 style="margin-top: 0; margin-bottom: 8px; font-size: 14px; color: #38bdf8;">Work Order Details</h4>
+            <div style="font-size: 13px; margin-bottom: 5px;"><strong>Status: </strong> <span id="sc-status">Loading...</span></div>
+            <div style="font-size: 13px;"><strong>Problem Description: </strong> <span id="sc-description">Loading...</span></div>
+        </div>
+
         <div
           id="current-note-infractions"
           class="note-infractions"
@@ -13045,7 +13051,6 @@ verified in {SYSTEM}
                 storeInput.dispatchEvent(new Event('blur'));
             }
             if(woData.trade) {
-              }
               // Setup Tech Name 
                 const techInput = document.getElementById("tech-name");
                 if (techInput && woData.techName && !techInput.value) {
@@ -13061,8 +13066,30 @@ verified in {SYSTEM}
                 
                 
                 showNotification(`ServiceChannel Data Pulled successfully for ${e.detail.woId}`);
-          }
-        });
+                  
+                  // Setup Status and Description
+                  if (woData.status || woData.description) {
+                      const scPanel = document.getElementById("servicechannel-details");
+                      const scStatus = document.getElementById("sc-status");
+                      const scDesc = document.getElementById("sc-description");
+                      
+                      if (scPanel) scPanel.style.display = "block";
+                      
+                      if (scStatus) {
+                          if (woData.status && typeof woData.status === "object") {
+                              scStatus.textContent = woData.status.Status || woData.status.StatusName || JSON.stringify(woData.status);
+                          } else {
+                              scStatus.textContent = woData.status || "Unknown";
+                          }
+                      }
+                      
+                      if (scDesc) {
+                          scDesc.textContent = woData.description || "No description provided";
+                      }
+                  }
+              }
+            }
+          });
         
         window.addEventListener('iotDataReady', (e) => {
            if(e.detail.data) {

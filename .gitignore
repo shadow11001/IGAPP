@@ -1,8 +1,4 @@
-development/data/WAR ROOM Training 2.0.pptx
-development/data/War Room Template Examples
-development/data/image - 2025-10-04T175813.016.png
-development/data/Usage Report Analysis Prompt
-development/data/Email Issue Prompt
+development/data/
 Frostbyte.code-workspace
 WAR_ROOM_FIXES.md
 WAR_ROOM_PERSISTENT_DATA.md
@@ -23,7 +19,11 @@ patch_js_4.py
 patch_tags.py
 temp.js
 test.js
-development/programs/All in 1_v1.1.html
-development/
+development/programs/
+development/API/
+development/EMS_Mapper/
+development/scripts/
 node_modules/
 debug_select.py
+development/cors_proxy_ems_mapper.user.js
+.gitignore
