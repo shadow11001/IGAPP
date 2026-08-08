@@ -87,9 +87,10 @@
                         trade = trade.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
                     }
 
-                    let rack = '';
+                                        let rack = '';
                     let systems = '';
-                    const desc = findKey(createWoData, 'Description');
+                    // Check for ProblemDescription first per API request
+                    const desc = findKey(createWoData, 'ProblemDescription') || findKey(createWoData, 'Description');
                     if (desc && typeof desc === 'string') {
                         const parts = desc.split('|');
                         for (let p of parts) {
@@ -101,20 +102,18 @@
                         }
                     }
 
-                    let techName = findKey(createWoData, 'TechnicianName') || 
-                                   findKey(createWoData, 'TechName') || 
-                                   findKey(createWoData, 'CallerName') || 
-                                   findKey(createWoData, 'Caller');
-                                   
-                    if (!techName || typeof techName === 'object') {
-                        const prov = findKey(createWoData, 'Provider');
-                        if (prov && typeof prov === 'object') {
-                            techName = prov.PrimaryContact || prov.Name || "";
-                        } else if (typeof prov === 'string') {
-                            techName = prov;
-                        } else {
-                           techName = "";
-                        }
+                    // Strict matching for Tech Name from ApplyFilters schema
+                    let techName = findKey(createWoData, 'AcceptedTechInfo') || findKey(createWoData, 'AssignedTechInfo') || "";
+
+                    // Construct granular Status
+                    let primaryStatus = findKey(createWoData, 'Status') || findKey(createWoData, 'StatusName') || "";
+                    let extendedStatus = findKey(createWoData, 'ExtendedStatus') || "";
+                    let finalStatus = primaryStatus;
+                    
+                    if (primaryStatus && extendedStatus) {
+                        finalStatus = `${primaryStatus}/${extendedStatus}`;
+                    } else if (extendedStatus) {
+                        finalStatus = extendedStatus;
                     }
 
                     const woData = {
@@ -124,7 +123,7 @@
                           rack: rack,
                           systems: systems,
                           techName: techName,
-                          status: findKey(createWoData, 'Status') || findKey(createWoData, 'StatusName') || "",
+                          status: finalStatus,
                           description: desc || "",
                           rawWoData: createWoData
                       };
